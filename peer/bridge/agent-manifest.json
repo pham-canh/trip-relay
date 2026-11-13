@@ -1,0 +1,10 @@
+{
+  "networks": [
+    {
+      "name": "pharmacy"
+    }
+  ],
+  "actions": {
+    "version": 1
+  }
+}

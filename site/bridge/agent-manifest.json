@@ -1,0 +1,10 @@
+{
+  "networks": [
+    {
+      "name": "riverside_clinic"
+    }
+  ],
+  "actions": {
+    "version": 1
+  }
+}

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riverside Clinic — book a visit, with an agent you can audit</title>
+  <meta name="description" content="An open agentic web demo: a browser agent books a clinic visit and asks a pharmacy only after you approve the contact.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assistant.css">
+  <script type="module" src="site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">R</span>
+      <span>
+        <strong>Riverside Clinic</strong>
+        <small>Open agentic web demo</small>
+      </span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="#slots">Appointments</a>
+      <a href="#partner">Pharmacy</a>
+      <a href="#assistant">Assistant</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">Open Agentic Web Challenge · Mozilla Otari</p>
+      <h1>Book a visit.<br>Then ask the pharmacy — with consent.</h1>
+      <p class="lede">
+        This page runs its own agent in your browser. It can hold a slot, book it,
+        and ask a second site for pharmacy details. Before it contacts anyone else,
+        it shows you the origin, the purpose, and the exact request.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#slots">See open slots</a>
+        <a class="button ghost" href="#assistant">Ask the assistant</a>
+      </div>
+      <p class="fineprint">
+        Demo data only. No real appointments are made. Your model key stays in this
+        browser and goes to the router you choose.
+      </p>
+    </section>
+
+    <section class="how" aria-labelledby="how-heading">
+      <h2 id="how-heading">Three steps, one auditable trail</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-number">1</span>
+          <h3>Pick a real slot</h3>
+          <p>The page owns the schedule. The agent reads the same state you see.</p>
+        </li>
+        <li>
+          <span class="step-number">2</span>
+          <h3>Confirm the booking</h3>
+          <p>The browser asks before the write. The receipt is bound to the slot.</p>
+        </li>
+        <li>
+          <span class="step-number">3</span>
+          <h3>Approve the hand-off</h3>
+          <p>The pharmacy is a separate origin. Its agent loads only after you allow it.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="slots" class="slots-section" aria-labelledby="slots-heading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Schedule</p>
+          <h2 id="slots-heading">Open appointments</h2>
+        </div>
+        <p class="muted" id="schedule-note">Next five days · 30-minute visits</p>
+      </div>
+      <div id="slot-list" class="slot-list" aria-live="polite"></div>
+      <p id="slot-empty" class="empty" hidden>No slots left. Reset the demo below.</p>
+
+      <form id="booking-form" class="booking" autocomplete="off">
+        <fieldset>
+          <legend>Book the selected visit</legend>
+          <p class="selection" id="selection">No slot selected yet.</p>
+          <label for="patient-name">Patient name</label>
+          <input id="patient-name" name="patientName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
+          <button class="button primary" type="submit" id="book-button" disabled>Book this visit</button>
+          <p class="form-note">The site asks you to confirm. This demo stores nothing on a server.</p>
+        </fieldset>
+      </form>
+
+      <div id="bookings" class="bookings" aria-live="polite"></div>
+      <button class="link-button" type="button" id="reset-demo">Reset demo data</button>
+    </section>
+
+    <section id="partner" class="partner" aria-labelledby="partner-heading">
+      <div>
+        <p class="eyebrow">Second origin</p>
+        <h2 id="partner-heading">Linden Pharmacy</h2>
+        <p>
+          A separate agentic website. The clinic assistant can ask it what it offers,
+          how delivery works, and when it is open. It cannot see this chat, this
+          patient's name, or the booking code.
+        </p>
+        <p class="consent-copy">
+          The first contact opens a consent card with the pharmacy's origin and the
+          exact request. Decline it, and nothing is fetched.
+        </p>
+        <a class="button ghost" href="http://localhost:8081/" data-peer-link>Open the pharmacy site</a>
+      </div>
+      <dl class="facts">
+        <div><dt>Hand-off</dt><dd>user-approved, per origin</dd></div>
+        <div><dt>Private context</dt><dd>denied by default</dd></div>
+        <div><dt>Router</dt><dd>Otari, your key</dd></div>
+      </dl>
+    </section>
+
+    <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+      <h2 id="assistant-heading">Ask Riverside Clinic</h2>
+      <p>Book a visit, check what the pharmacy offers, or ask what this page cannot do.</p>
+      <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
+      <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+      <div id="agent-app">
+        <div data-ns-slot="header"></div>
+        <div class="assistant-panels">
+          <div data-ns-slot="chat"></div>
+          <div data-ns-slot="agents"></div>
+        </div>
+        <div data-ns-slot="settings"></div>
+      </div>
+    </section>
+
+    <section class="proof" aria-labelledby="proof-heading">
+      <h2 id="proof-heading">What to inspect</h2>
+      <ul>
+        <li><code>agent-manifest.json</code> names the network, the front agent, and the router.</li>
+        <li><code>riverside_clinic.network.json</code> is the resolved, data-only network.</li>
+        <li><code>links.json</code> points at the pharmacy's published network.</li>
+        <li>The network's <code>allowed_peers</code> lists exactly one origin.</li>
+      </ul>
+      <p class="fineprint">
+        Built for the Open Agentic Web Challenge. Spec:
+        <a href="https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md">MVP Profile 0.2</a>.
+        Router:
+        <a href="https://github.com/mozilla-ai/otari">Mozilla Otari</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Riverside Clinic is a demo for the Open Agentic Web Challenge. Not a real clinic.</p>
+    <p><a href="https://github.com/pham-canh/care-relay">Source</a> · MIT</p>
+  </footer>
+</body>
+</html>

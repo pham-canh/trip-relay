@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linden Pharmacy — a second agentic website</title>
+  <meta name="description" content="The peer site in the Care Relay demo. Published agent network, browser runtime, and a consent card before the clinic contacts it.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assistant.css">
+  <script type="module" src="site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>
+        <strong>Linden Pharmacy</strong>
+        <small>Peer agentic website</small>
+      </span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#refill">Refill</a>
+      <a href="#assistant">Assistant</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">Second origin · separate manifest</p>
+      <h1>Your pharmacy,<br>on its own origin.</h1>
+      <p class="lede">
+        This site publishes its own agent network and manifest. When the clinic's
+        assistant asks it something, the clinic first shows you this origin and the
+        request. Decline, and no file from this site is fetched.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#refill">Request a refill</a>
+        <a class="button ghost" href="http://127.0.0.1:8080/">Back to the clinic</a>
+      </div>
+      <p class="fineprint">Demo only. No prescription is dispensed, delivered, or stored.</p>
+    </section>
+
+    <section id="services" class="how" aria-labelledby="services-heading">
+      <h2 id="services-heading">What this pharmacy offers</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-number">1</span>
+          <h3>Refill intake</h3>
+          <p>Start a prescription refill request. A pharmacist reviews it; this demo does not.</p>
+        </li>
+        <li>
+          <span class="step-number">2</span>
+          <h3>Medication review</h3>
+          <p>A 15-minute conversation with a pharmacist about what you take and when.</p>
+        </li>
+        <li>
+          <span class="step-number">3</span>
+          <h3>Local delivery</h3>
+          <p>Same-day delivery in the district when the request arrives before 15:00.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="refill" class="slots-section" aria-labelledby="refill-heading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Refill intake</p>
+          <h2 id="refill-heading">Start a refill request</h2>
+        </div>
+        <p class="muted" id="hours-note">Mon–Sat 08:00–19:00 · Sun 10:00–16:00</p>
+      </div>
+
+      <form id="refill-form" class="booking" autocomplete="off">
+        <fieldset>
+          <legend>Refill details</legend>
+          <label for="patient-name">Patient name</label>
+          <input id="patient-name" name="patientName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
+          <label for="medication">Medication</label>
+          <input id="medication" name="medication" type="text" maxlength="120" placeholder="Amoxicillin 500 mg" required>
+          <button class="button primary" type="submit" id="refill-button">Request refill</button>
+          <p class="form-note">The site asks you to confirm. Nothing is sent to a pharmacy server in this demo.</p>
+        </fieldset>
+      </form>
+
+      <div id="requests" class="bookings" aria-live="polite"></div>
+    </section>
+
+    <section class="partner" aria-labelledby="clinic-heading">
+      <div>
+        <p class="eyebrow">Linked site</p>
+        <h2 id="clinic-heading">Riverside Clinic</h2>
+        <p>
+          The clinic hosts the caller runtime. Its network lists this pharmacy's
+          published network URL and exactly one allowed peer origin.
+        </p>
+        <p class="consent-copy">
+          The clinic's assistant cannot read this site's page actions while it runs
+          here. It gets this network's instructions and asks only what this site can
+          answer: services, hours, and how refill intake works.
+        </p>
+      </div>
+      <dl class="facts">
+        <div><dt>Network</dt><dd><code>pharmacy</code></dd></div>
+        <div><dt>Front agent</dt><dd><code>pharmacy_assistant</code></dd></div>
+        <div><dt>Live stock</dt><dd>not exposed</dd></div>
+      </dl>
+    </section>
+
+    <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+      <h2 id="assistant-heading">Ask Linden Pharmacy</h2>
+      <p>Start a refill request, hear what the pharmacy offers, or ask what it cannot do.</p>
+      <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
+      <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+      <div id="agent-app">
+        <div data-ns-slot="header"></div>
+        <div class="assistant-panels">
+          <div data-ns-slot="chat"></div>
+          <div data-ns-slot="agents"></div>
+        </div>
+        <div data-ns-slot="settings"></div>
+      </div>
+    </section>
+
+    <section class="proof" aria-labelledby="proof-heading">
+      <h2 id="proof-heading">What this site publishes</h2>
+      <ul>
+        <li><code>agent-manifest.json</code> with one network, <code>pharmacy</code>.</li>
+        <li><code>pharmacy.network.json</code>, the resolved agent graph.</li>
+        <li><code>links.json</code> and CORS-enabled public artifacts.</li>
+        <li>No private context, and no live inventory behind the agent.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Linden Pharmacy is a demo for the Open Agentic Web Challenge. Not a real pharmacy.</p>
+    <p><a href="https://github.com/pham-canh/care-relay">Source</a> · MIT</p>
+  </footer>
+</body>
+</html>

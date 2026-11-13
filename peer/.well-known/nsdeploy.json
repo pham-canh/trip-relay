@@ -1,0 +1,18 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "pharmacy",
+      "front_man": "pharmacy_assistant",
+      "aliases": [
+        "pharmacy",
+        "pharmacy_assistant"
+      ],
+      "url": "pharmacy"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

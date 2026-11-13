@@ -1,0 +1,78 @@
+{
+  "brand": "Linden Pharmacy Assistant",
+  "networks": [
+    {
+      "name": "pharmacy",
+      "front_man": "pharmacy_assistant",
+      "hocon": "./pharmacy.network.json",
+      "description": "Ask what Linden Pharmacy offers, when it is open, how local delivery works, and start a refill request.",
+      "tags": [
+        "agentified-website",
+        "open-agentic-web",
+        "health"
+      ],
+      "sample_queries": [
+        "What pharmacy services do you offer?",
+        "When are you open on Sunday?",
+        "How does local delivery work?",
+        "Can you check whether amoxicillin is in stock?"
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "Local agents and page-local actions only."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "pharmacy",
+    "front_man": "pharmacy_assistant",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#1d3f6e"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "pharmacy",
+        "front_man": "pharmacy_assistant",
+        "aliases": [
+          "pharmacy",
+          "pharmacy_assistant"
+        ],
+        "url": "pharmacy"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "get_pharmacy_state",
+      "request_refill"
+    ]
+  }
+}
