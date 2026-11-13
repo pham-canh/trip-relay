@@ -133,6 +133,17 @@ scripts/serve.mjs   dependency-free static server with CORS
 docs/               screenshots, demo script, Otari notes, spec map, Devpost copy
 ```
 
+## Credits
+
+The browser runtime in `site/runtime/` and `peer/runtime/` comes from the
+[Cognizant Agentic Web `agentify-website` skill](https://github.com/cognizant-ai-labs/agentic-web)
+and is licensed under Apache 2.0; its license is kept at
+`site/runtime/LICENSE.txt`. The site code, networks, actions, tests, and docs are
+this project's own work.
+
+Otari is Mozilla's open-source LLM router: <https://github.com/mozilla-ai/otari>.
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT for this project's code. See [LICENSE](LICENSE). The vendored runtime keeps
+its Apache 2.0 license.
