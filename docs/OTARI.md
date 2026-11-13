@@ -12,6 +12,8 @@ Care Relay is built on Mozilla's [Otari](https://github.com/mozilla-ai/otari) LL
 
 The network model is `alibaba/qwen-3.5-35b-a3b`. The settings panel adds an **Otari (Mozilla)** preset that fills the router, model, and the `tk-` key hint. Keys are stored only in the visitor's browser and sent only to the selected router as a bearer token; no key is committed to this repository, and the peer origin never receives it.
 
+The preset is a small, deliberate addition to the vendored settings UI (`site/runtime/ui.js` and `peer/runtime/ui.js`); the rest of the Apache-2.0 runtime is unchanged. If you re-copy the runtime from the Agentify skill, re-add the preset or enter the router and model manually.
+
 ## What worked
 
 - The OpenAI-compatible `/chat/completions` contract is all the demo needs. The runtime streams SSE, including tool-call deltas, and Otari's shape matches it without an adapter.
