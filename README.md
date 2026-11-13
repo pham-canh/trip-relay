@@ -107,7 +107,7 @@ A Playwright pass also exercised both pages in Chromium: manual booking and refi
 
 ## Otari
 
-Both manifests point at `https://api.otari.ai/api/v1`; the settings panel includes an **Otari (Mozilla)** preset with the challenge model `alibaba/qwen-3.5-35b-a3b`. The integration notes, the onboarding problem I hit, and the improvement I would make are in [docs/OTARI.md](docs/OTARI.md).
+Both manifests point at `https://api.otari.ai/api/v1`; the settings panel includes an **Otari (Mozilla)** preset with the challenge model `alibaba/qwen-3.5-35b-a3b`. The integration notes, the onboarding problem I hit, and the improvement I would make are in [docs/OTARI.md](docs/OTARI.md). Copy-ready Devpost fields are in [docs/DEVPOST.md](docs/DEVPOST.md).
 
 ## Deploying
 
@@ -130,7 +130,7 @@ site/               caller website plus generated network artifacts
 peer/               peer website plus generated network artifacts
 tests/              node:test suites and the runtime stubs they use
 scripts/serve.mjs   dependency-free static server with CORS
-docs/               screenshots, demo script, Otari notes, spec map
+docs/               screenshots, demo script, Otari notes, spec map, Devpost copy
 ```
 
 ## License
