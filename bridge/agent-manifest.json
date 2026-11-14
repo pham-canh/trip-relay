@@ -1,0 +1,10 @@
+{
+  "networks": [
+    {
+      "name": "skyline_air"
+    }
+  ],
+  "actions": {
+    "version": 1
+  }
+}

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skyline Air — book a flight, with an agent you can audit</title>
+  <meta name="description" content="An open agentic web demo: a browser agent books a flight and asks a hotel only after you approve the contact.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assistant.css">
+  <script type="module" src="site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span>
+        <strong>Skyline Air</strong>
+        <small>Open agentic web demo</small>
+      </span>
+    </div>
+    <nav aria-label="Primary">
+      <a href="#flights">Flights</a>
+      <a href="#partner">Hotel</a>
+      <a href="#assistant">Assistant</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">Open Agentic Web Challenge · Mozilla Otari</p>
+      <h1>Book a flight.<br>Then ask the hotel — with consent.</h1>
+      <p class="lede">
+        This page runs its own agent in your browser. It can hold a fare, book it,
+        and ask a second site for hotel details. Before it contacts anyone else,
+        it shows you the origin, the purpose, and the exact request.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#flights">See flights</a>
+        <a class="button ghost" href="#assistant">Ask the assistant</a>
+      </div>
+      <p class="fineprint">
+        Demo data only. No real tickets are issued and no payment is taken. Your model
+        key stays in this browser and goes to the router you choose.
+      </p>
+    </section>
+
+    <section class="how" aria-labelledby="how-heading">
+      <h2 id="how-heading">Three steps, one auditable trail</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-number">1</span>
+          <h3>Pick a real flight</h3>
+          <p>The page owns the schedule. The agent reads the same state you see.</p>
+        </li>
+        <li>
+          <span class="step-number">2</span>
+          <h3>Confirm the booking</h3>
+          <p>The browser asks before the write. The receipt is bound to the flight.</p>
+        </li>
+        <li>
+          <span class="step-number">3</span>
+          <h3>Approve the hand-off</h3>
+          <p>The hotel is a separate origin. Its agent loads only after you allow it.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="flights" class="booking-section" aria-labelledby="flights-heading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Schedule</p>
+          <h2 id="flights-heading">Flights to Da Nang</h2>
+        </div>
+        <p class="muted" id="schedule-note">Next three days · nonstop · one passenger</p>
+      </div>
+      <div id="flight-list" class="flight-list" aria-live="polite"></div>
+      <p id="flight-empty" class="empty" hidden>No flights left. Reset the demo below.</p>
+
+      <form id="booking-form" class="booking" autocomplete="off">
+        <fieldset>
+          <legend>Book the selected flight</legend>
+          <p class="selection" id="selection">No flight selected yet.</p>
+          <label for="passenger-name">Passenger name</label>
+          <input id="passenger-name" name="passengerName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
+          <label for="passenger-email">Email for the ticket</label>
+          <input id="passenger-email" name="email" type="email" maxlength="120" placeholder="alex@example.com" required>
+          <button class="button primary" type="submit" id="book-button" disabled>Book this flight</button>
+          <p class="form-note">The site asks you to confirm. This demo stores nothing on a server and takes no payment.</p>
+        </fieldset>
+      </form>
+
+      <div id="bookings" class="bookings" aria-live="polite"></div>
+      <button class="link-button" type="button" id="reset-demo">Reset demo data</button>
+    </section>
+
+    <section id="partner" class="partner" aria-labelledby="partner-heading">
+      <div>
+        <p class="eyebrow">Second origin</p>
+        <h2 id="partner-heading">Harbor Hotel</h2>
+        <p>
+          A separate agentic website. The airline assistant can ask it what rooms it
+          offers, how the airport shuttle works, and when check-in starts. It cannot
+          see this chat, the passenger's email, or the booking code.
+        </p>
+        <p class="consent-copy">
+          The first contact opens a consent card with the hotel's origin and the exact
+          request. Decline it, and nothing is fetched.
+        </p>
+        <a class="button ghost" href="https://pham-canh.github.io./" data-peer-link>Open the hotel site</a>
+      </div>
+      <dl class="facts">
+        <div><dt>Hand-off</dt><dd>user-approved, per origin</dd></div>
+        <div><dt>Private context</dt><dd>denied by default</dd></div>
+        <div><dt>Router</dt><dd>Otari, your key</dd></div>
+      </dl>
+    </section>
+
+    <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
+      <h2 id="assistant-heading">Ask Skyline Air</h2>
+      <p>Find a flight, check what the hotel offers, or ask what this page cannot do.</p>
+      <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
+      <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+      <div id="agent-app">
+        <div data-ns-slot="header"></div>
+        <div class="assistant-panels">
+          <div data-ns-slot="chat"></div>
+          <div data-ns-slot="agents"></div>
+        </div>
+        <div data-ns-slot="settings"></div>
+      </div>
+    </section>
+
+    <section class="proof" aria-labelledby="proof-heading">
+      <h2 id="proof-heading">What to inspect</h2>
+      <ul>
+        <li><code>agent-manifest.json</code> names the network, the front agent, and the router.</li>
+        <li><code>skyline_air.network.json</code> is the resolved, data-only network.</li>
+        <li><code>links.json</code> points at the hotel's published network.</li>
+        <li>The network's <code>allowed_peers</code> lists exactly one origin.</li>
+      </ul>
+      <p class="fineprint">
+        Built for the Open Agentic Web Challenge. Spec:
+        <a href="https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md">MVP Profile 0.2</a>.
+        Router:
+        <a href="https://github.com/mozilla-ai/otari">Mozilla Otari</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Skyline Air is a demo for the Open Agentic Web Challenge. Not a real airline.</p>
+    <p><a href="https://github.com/pham-canh/trip-relay">Source</a> · MIT</p>
+  </footer>
+</body>
+</html>

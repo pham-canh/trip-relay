@@ -1,0 +1,81 @@
+{
+  "brand": "Skyline Air Assistant",
+  "networks": [
+    {
+      "name": "skyline_air",
+      "front_man": "skyline_air_assistant",
+      "hocon": "./skyline_air.network.json",
+      "description": "Book a flight in your browser, then ask Harbor Hotel what it offers — with a consent card before the second site is contacted.",
+      "tags": [
+        "agentified-website",
+        "open-agentic-web",
+        "travel"
+      ],
+      "sample_queries": [
+        "Find a morning flight to Da Nang tomorrow.",
+        "Book the 08:10 flight for Alex Nguyen.",
+        "Can you ask Harbor Hotel whether it has a quiet room near the airport?",
+        "Do you sell travel insurance?"
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [
+    "https://pham-canh.github.io."
+  ],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "Calls only the Harbor Hotel network after the visitor agrees on the consent card, plus page-local actions."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "skyline_air",
+    "front_man": "skyline_air_assistant",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#0b4f8a"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "skyline_air",
+        "front_man": "skyline_air_assistant",
+        "aliases": [
+          "skyline_air",
+          "skyline_air_assistant"
+        ],
+        "url": "skyline_air"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "get_airline_state",
+      "select_flight",
+      "book_flight"
+    ]
+  }
+}

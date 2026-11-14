@@ -1,0 +1,18 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "skyline_air",
+      "front_man": "skyline_air_assistant",
+      "aliases": [
+        "skyline_air",
+        "skyline_air_assistant"
+      ],
+      "url": "skyline_air"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}
