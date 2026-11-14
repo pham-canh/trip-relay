@@ -2,13 +2,13 @@
   "protocol": "nsdeploy-link/v1",
   "exports": [
     {
-      "network": "riverside_clinic",
-      "front_man": "riverside_clinic_assistant",
+      "network": "skyline_air",
+      "front_man": "skyline_air_assistant",
       "aliases": [
-        "riverside_clinic",
-        "riverside_clinic_assistant"
+        "skyline_air",
+        "skyline_air_assistant"
       ],
-      "url": "riverside_clinic"
+      "url": "skyline_air"
     }
   ],
   "imports": [],

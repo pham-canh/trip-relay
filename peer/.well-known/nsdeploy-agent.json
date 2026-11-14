@@ -1,7 +1,7 @@
 {
   "protocol": "nsdeploy-agent-mcp/v1",
-  "network": "pharmacy",
-  "front_man": "pharmacy_assistant",
+  "network": "harbor_hotel",
+  "front_man": "harbor_hotel_assistant",
   "available": false,
   "reason": "This is a static bundle; a public MCP facade requires an application host."
 }

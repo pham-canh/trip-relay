@@ -15,7 +15,7 @@ export class AssistantMount {
   /**
    * The first chat message once the visitor has a key: what the assistant can do here.
    */
-  static GREETING = "I can find an open visit, hold a slot, and book it with your confirmation. I can also ask Linden Pharmacy what it offers, but only after you approve the contact.";
+  static GREETING = "I can find a flight, hold a fare, and book it with your confirmation. I can also ask Harbor Hotel what it offers, but only after you approve the contact.";
 
   /**
    * The confirmation dialog's words for each irreversible action. Name each button after
@@ -23,10 +23,10 @@ export class AssistantMount {
    * leave this empty.
    */
   static DIALOGS = {
-    book_slot: {
-      title: "Book this visit?",
-      sentence: "This writes an appointment and returns a reference code. The demo has no undo.",
-      confirm: "Book the visit",
+    book_flight: {
+      title: "Book this flight?",
+      sentence: "This writes a booking and returns a reference code. The demo takes no payment and has no undo.",
+      confirm: "Book the flight",
       decline: "Keep looking",
     },
   };
@@ -202,15 +202,17 @@ export class AssistantMount {
    * :return: Details by label, {refusal: reason}, or {} when the action has none.
    */
   static reviewDetails(action, args) {
-    if (action === "book_slot") {
+    if (action === "book_flight") {
       const check = App.page.checkBooking(args);
       if (!check.ok) {
         return { refusal: check.reason };
       }
       return {
-        "Patient": check.patientName,
-        "Doctor": `${check.slot.doctorName} (${check.slot.specialty})`,
-        "When": `${check.slot.dateLabel} at ${check.slot.time}`,
+        "Passenger": check.passengerName,
+        "Email": check.email,
+        "Flight": `${check.flight.number} · ${check.flight.from} → ${check.flight.to}`,
+        "When": `${check.flight.dateLabel}, ${check.flight.depart}–${check.flight.arrive}`,
+        "Fare": `${check.flight.fare} · $${check.flight.price}`,
       };
     }
     return {};

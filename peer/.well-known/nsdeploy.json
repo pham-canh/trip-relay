@@ -2,13 +2,13 @@
   "protocol": "nsdeploy-link/v1",
   "exports": [
     {
-      "network": "pharmacy",
-      "front_man": "pharmacy_assistant",
+      "network": "harbor_hotel",
+      "front_man": "harbor_hotel_assistant",
       "aliases": [
-        "pharmacy",
-        "pharmacy_assistant"
+        "harbor_hotel",
+        "harbor_hotel_assistant"
       ],
-      "url": "pharmacy"
+      "url": "harbor_hotel"
     }
   ],
   "imports": [],

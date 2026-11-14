@@ -1,6 +1,6 @@
 # Otari integration notes
 
-Care Relay is built on Mozilla's [Otari](https://github.com/mozilla-ai/otari) LLM router. Both manifests use the hosted endpoint:
+Trip Relay is built on Mozilla's [Otari](https://github.com/mozilla-ai/otari) LLM router. Both manifests use the hosted endpoint:
 
 ```json
 "llm_router": {
@@ -10,7 +10,7 @@ Care Relay is built on Mozilla's [Otari](https://github.com/mozilla-ai/otari) LL
 }
 ```
 
-The network model is `alibaba/qwen-3.5-35b-a3b`. The settings panel adds an **Otari (Mozilla)** preset that fills the router, model, and the `tk-` key hint. Keys are stored only in the visitor's browser and sent only to the selected router as a bearer token; no key is committed to this repository, and the peer origin never receives it.
+The network model is `alibaba/qwen-3.5-35b-a3b`. The settings panel adds an **Otari (Mozilla)** preset that fills the router, model, and the `tk-` key hint. Keys are stored only in the visitor's browser and sent only to the selected router as a bearer token; no key is committed to this repository, and the hotel origin never receives it.
 
 The preset is a small, deliberate addition to the vendored settings UI (`site/runtime/ui.js` and `peer/runtime/ui.js`); the rest of the Apache-2.0 runtime is unchanged. If you re-copy the runtime from the Agentify skill, re-add the preset or enter the router and model manually.
 
@@ -18,7 +18,7 @@ The preset is a small, deliberate addition to the vendored settings UI (`site/ru
 
 - The OpenAI-compatible `/chat/completions` contract is all the demo needs. The runtime streams SSE, including tool-call deltas, and Otari's shape matches it without an adapter.
 - Keeping `llm_router` metadata in the manifest makes the default router visible to a judge without reading the runtime.
-- The peer network is compiled with the caller's active router, so the second origin is public data only: no key, no credentials, no server-side session.
+- The hotel network is compiled with the caller's active router, so the second origin is public data only: no key, no credentials, no server-side session.
 
 ## Devpost Otari field
 
@@ -30,8 +30,8 @@ Devpost asks for three things when a project uses Otari. Fill in the first befor
 
 ## Verification status
 
-The 13 unit tests and the 16-check browser pass use a scripted model that speaks the same SSE/tool-call protocol, so they prove the integration boundary and the consent flow without spending tokens. A live Otari call needs the account email above and an Otari key; after adding the key, use **AI model settings -> Otari (Mozilla) -> Save and start** and ask *"Can you ask Linden Pharmacy whether they deliver?"*.
+The 13 unit tests and the 16-check browser pass use a scripted model that speaks the same SSE/tool-call protocol, so they prove the integration boundary and the consent flow without spending tokens. A live Otari call needs the account email above and an Otari key; after adding the key, use **AI model settings -> Otari (Mozilla) -> Save and start** and ask *"Can you ask Harbor Hotel whether it has a quiet room near the airport for two nights?"*.
 
 ## CORS note for a deployment
 
-The demo serves both sites from loopback, where the runtime fetches the peer's public JSON with CORS allowed by `scripts/serve.mjs`. For a hosted Otari deployment that calls the router directly from the browser, enable only the inference origins Otari documents (`cors_inference_origins`) and do not enable credentialed CORS. The page sends the key in the `Authorization` header, not in a URL or cookie.
+The demo serves both sites from loopback, where the runtime fetches the hotel's public JSON with CORS allowed by `scripts/serve.mjs`. For a hosted Otari deployment that calls the router directly from the browser, enable only the inference origins Otari documents (`cors_inference_origins`) and do not enable credentialed CORS. The page sends the key in the `Authorization` header, not in a URL or cookie.

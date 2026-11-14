@@ -1,27 +1,29 @@
 :root {
-  --ink: #14201f;
-  --ink-soft: #425755;
-  --teal: #0f5c53;
-  --teal-dark: #093d37;
-  --gold: #d9a441;
-  --cream: #f7f3ea;
-  --paper: #fffdf8;
-  --line: #d9d2c3;
+  --ink: #101c2b;
+  --ink-soft: #4a5a6a;
+  --teal: #0b5cad;
+  --teal-dark: #082f49;
+  --gold: #f0b429;
+  --cream: #f3f7fb;
+  --paper: #ffffff;
+  --line: #d5dee8;
   --danger: #a33225;
+  --focus: rgba(11, 92, 173, 0.32);
   --radius: 16px;
-  --shadow: 0 18px 50px rgba(20, 32, 31, 0.12);
+  --shadow: 0 18px 50px rgba(16, 28, 43, 0.12);
 }
 
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 6.5rem; }
 
 body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at 12% 0%, rgba(217, 164, 65, 0.18), transparent 34rem),
+    radial-gradient(circle at 12% 0%, rgba(240, 180, 41, 0.16), transparent 34rem),
     var(--cream);
   line-height: 1.55;
 }
@@ -76,7 +78,7 @@ main { overflow: hidden; }
 
 .hero,
 .how,
-.slots-section,
+.booking-section,
 .partner,
 .assistant,
 .proof,
@@ -136,7 +138,7 @@ h1 {
 .button.primary:hover { background: var(--teal-dark); color: #fff; }
 .button.primary:disabled { background: #9aa8a5; cursor: not-allowed; transform: none; }
 .button.ghost { border-color: currentColor; color: var(--teal-dark); background: transparent; }
-.button.ghost:hover { background: rgba(15, 92, 83, 0.08); }
+.button.ghost:hover { background: rgba(11, 92, 173, 0.08); }
 
 .fineprint { margin-top: 1rem; font-size: 0.86rem; color: var(--ink-soft); }
 
@@ -176,7 +178,7 @@ h1 {
   font-size: 0.9rem;
 }
 
-.slots-section {
+.booking-section {
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
   background: var(--paper);
   border-block: 1px solid var(--line);
@@ -193,7 +195,7 @@ h1 {
 .section-head h2 { margin-bottom: 0; }
 .muted { color: var(--ink-soft); font-size: 0.9rem; }
 
-.slot-list {
+.flight-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
   gap: 0.8rem;
@@ -201,7 +203,7 @@ h1 {
   max-width: 78rem;
 }
 
-.slot {
+.flight {
   text-align: left;
   background: var(--cream);
   border: 1px solid var(--line);
@@ -212,15 +214,15 @@ h1 {
   color: var(--ink);
   transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
 }
-.slot:hover { border-color: var(--teal); transform: translateY(-1px); }
-.slot[aria-pressed="true"] {
+.flight:hover { border-color: var(--teal); transform: translateY(-1px); }
+.flight[aria-pressed="true"] {
   border-color: var(--teal);
-  background: #e7f1ee;
+  background: #e8f1fb;
   box-shadow: inset 0 0 0 1px var(--teal);
 }
-.slot .day { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--teal); font-weight: 700; }
-.slot .time { display: block; font-size: 1.35rem; font-weight: 800; margin: 0.15rem 0; }
-.slot .doctor { display: block; font-size: 0.86rem; color: var(--ink-soft); }
+.flight .day { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--teal); font-weight: 700; }
+.flight .time { display: block; font-size: 1.35rem; font-weight: 800; margin: 0.15rem 0; }
+.flight .meta { display: block; font-size: 0.86rem; color: var(--ink-soft); }
 
 .empty { font-weight: 600; color: var(--danger); }
 
@@ -236,16 +238,18 @@ h1 {
 .booking legend { font-weight: 800; font-size: 1.1rem; margin-bottom: 0.6rem; }
 .selection { margin: 0 0 1rem; color: var(--ink-soft); font-weight: 600; }
 .booking label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem; }
-.booking input {
+.booking input,
+.booking select {
   width: 100%;
   padding: 0.75rem 0.8rem;
-  border: 1px solid #b9b1a0;
+  border: 1px solid #aebccb;
   border-radius: 10px;
   font: inherit;
   background: #fff;
   margin-bottom: 0.9rem;
 }
-.booking input:focus-visible { outline: 3px solid rgba(15, 92, 83, 0.3); outline-offset: 1px; }
+.booking input:focus-visible,
+.booking select:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
 .form-note { font-size: 0.8rem; color: var(--ink-soft); margin: 0.6rem 0 0; }
 
 .bookings { display: grid; gap: 0.6rem; max-width: 44rem; }
@@ -256,7 +260,7 @@ h1 {
   flex-wrap: wrap;
   padding: 0.8rem 1rem;
   border-left: 4px solid var(--teal);
-  background: #eaf3f0;
+  background: #eef5fb;
   border-radius: 0 10px 10px 0;
   font-size: 0.92rem;
 }

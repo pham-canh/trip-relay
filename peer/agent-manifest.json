@@ -1,21 +1,21 @@
 {
-  "brand": "Linden Pharmacy Assistant",
+  "brand": "Harbor Hotel Assistant",
   "networks": [
     {
-      "name": "pharmacy",
-      "front_man": "pharmacy_assistant",
-      "hocon": "./pharmacy.network.json",
-      "description": "Ask what Linden Pharmacy offers, when it is open, how local delivery works, and start a refill request.",
+      "name": "harbor_hotel",
+      "front_man": "harbor_hotel_assistant",
+      "hocon": "./harbor_hotel.network.json",
+      "description": "Compare Harbor Hotel's rooms and policies, and start a room request on its own origin.",
       "tags": [
         "agentified-website",
         "open-agentic-web",
-        "health"
+        "travel"
       ],
       "sample_queries": [
-        "What pharmacy services do you offer?",
-        "When are you open on Sunday?",
-        "How does local delivery work?",
-        "Can you check whether amoxicillin is in stock?"
+        "What rooms and rates do you have?",
+        "Is breakfast included?",
+        "How does the airport shuttle work?",
+        "Can you check live availability?"
       ]
     }
   ],
@@ -32,25 +32,25 @@
   },
   "agent_mcp": {
     "protocol": "nsdeploy-agent-mcp/v1",
-    "network": "pharmacy",
-    "front_man": "pharmacy_assistant",
+    "network": "harbor_hotel",
+    "front_man": "harbor_hotel_assistant",
     "available": false,
     "reason": "This is a static bundle; a public MCP facade requires an application host."
   },
   "theme": {
-    "primary": "#1d3f6e"
+    "primary": "#8a4b2a"
   },
   "linking": {
     "protocol": "nsdeploy-link/v1",
     "exports": [
       {
-        "network": "pharmacy",
-        "front_man": "pharmacy_assistant",
+        "network": "harbor_hotel",
+        "front_man": "harbor_hotel_assistant",
         "aliases": [
-          "pharmacy",
-          "pharmacy_assistant"
+          "harbor_hotel",
+          "harbor_hotel_assistant"
         ],
-        "url": "pharmacy"
+        "url": "harbor_hotel"
       }
     ],
     "imports": [],
@@ -71,8 +71,8 @@
     "module": "./site-actions.js",
     "bridge": "./bridge/action-bridge.html",
     "agentTools": [
-      "get_pharmacy_state",
-      "request_refill"
+      "get_hotel_state",
+      "request_room"
     ]
   }
 }

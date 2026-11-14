@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Linden Pharmacy — a second agentic website</title>
-  <meta name="description" content="The peer site in the Care Relay demo. Published agent network, browser runtime, and a consent card before the clinic contacts it.">
+  <title>Harbor Hotel — a second agentic website</title>
+  <meta name="description" content="The peer site in the Trip Relay demo. Published agent network, browser runtime, and a consent card before the airline contacts it.">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="assistant.css">
   <script type="module" src="site.js"></script>
@@ -14,15 +14,15 @@
 
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true">L</span>
+      <span class="brand-mark" aria-hidden="true">H</span>
       <span>
-        <strong>Linden Pharmacy</strong>
+        <strong>Harbor Hotel</strong>
         <small>Peer agentic website</small>
       </span>
     </div>
     <nav aria-label="Primary">
-      <a href="#services">Services</a>
-      <a href="#refill">Refill</a>
+      <a href="#rooms">Rooms</a>
+      <a href="#request">Request</a>
       <a href="#assistant">Assistant</a>
     </nav>
   </header>
@@ -30,88 +30,96 @@
   <main id="main">
     <section class="hero">
       <p class="eyebrow">Second origin · separate manifest</p>
-      <h1>Your pharmacy,<br>on its own origin.</h1>
+      <h1>Your hotel,<br>on its own origin.</h1>
       <p class="lede">
-        This site publishes its own agent network and manifest. When the clinic's
-        assistant asks it something, the clinic first shows you this origin and the
+        This site publishes its own agent network and manifest. When the airline's
+        assistant asks it something, the airline first shows you this origin and the
         request. Decline, and no file from this site is fetched.
       </p>
       <div class="hero-actions">
-        <a class="button primary" href="#refill">Request a refill</a>
-        <a class="button ghost" href="http://127.0.0.1:8080/">Back to the clinic</a>
+        <a class="button primary" href="#request">Request a room</a>
+        <a class="button ghost" href="http://127.0.0.1:8080/">Back to the airline</a>
       </div>
-      <p class="fineprint">Demo only. No prescription is dispensed, delivered, or stored.</p>
+      <p class="fineprint">Demo only. No room is reserved, charged, or stored on a server.</p>
     </section>
 
-    <section id="services" class="how" aria-labelledby="services-heading">
-      <h2 id="services-heading">What this pharmacy offers</h2>
+    <section id="rooms" class="how" aria-labelledby="rooms-heading">
+      <h2 id="rooms-heading">What this hotel offers</h2>
       <ol class="steps">
         <li>
           <span class="step-number">1</span>
-          <h3>Refill intake</h3>
-          <p>Start a prescription refill request. A pharmacist reviews it; this demo does not.</p>
+          <h3>Harbor Double · $84/night</h3>
+          <p>Queen bed, city side, 24 m². Breakfast and the airport shuttle are included.</p>
         </li>
         <li>
           <span class="step-number">2</span>
-          <h3>Medication review</h3>
-          <p>A 15-minute conversation with a pharmacist about what you take and when.</p>
+          <h3>Skyline King · $112/night</h3>
+          <p>King bed, harbor view, 32 m². Breakfast and the airport shuttle are included.</p>
         </li>
         <li>
           <span class="step-number">3</span>
-          <h3>Local delivery</h3>
-          <p>Same-day delivery in the district when the request arrives before 15:00.</p>
+          <h3>Family Suite · $156/night</h3>
+          <p>Two rooms, breakfast for four, 48 m². The airport shuttle is included.</p>
         </li>
       </ol>
     </section>
 
-    <section id="refill" class="slots-section" aria-labelledby="refill-heading">
+    <section id="request" class="booking-section" aria-labelledby="request-heading">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Refill intake</p>
-          <h2 id="refill-heading">Start a refill request</h2>
+          <p class="eyebrow">Room request</p>
+          <h2 id="request-heading">Start a room request</h2>
         </div>
-        <p class="muted" id="hours-note">Mon–Sat 08:00–19:00 · Sun 10:00–16:00</p>
+        <p class="muted" id="policy-note">Check-in 14:00 · Check-out 12:00 · Free cancellation until 48h</p>
       </div>
 
-      <form id="refill-form" class="booking" autocomplete="off">
+      <form id="request-form" class="booking" autocomplete="off">
         <fieldset>
-          <legend>Refill details</legend>
-          <label for="patient-name">Patient name</label>
-          <input id="patient-name" name="patientName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
-          <label for="medication">Medication</label>
-          <input id="medication" name="medication" type="text" maxlength="120" placeholder="Amoxicillin 500 mg" required>
-          <button class="button primary" type="submit" id="refill-button">Request refill</button>
-          <p class="form-note">The site asks you to confirm. Nothing is sent to a pharmacy server in this demo.</p>
+          <legend>Stay details</legend>
+          <label for="guest-name">Guest name</label>
+          <input id="guest-name" name="guestName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
+          <label for="check-in">Check-in</label>
+          <input id="check-in" name="checkIn" type="date" required>
+          <label for="check-out">Check-out</label>
+          <input id="check-out" name="checkOut" type="date" required>
+          <label for="room-type">Room type</label>
+          <select id="room-type" name="roomType" required>
+            <option value="harbor-double">Harbor Double · $84/night</option>
+            <option value="skyline-king">Skyline King · $112/night</option>
+            <option value="family-suite">Family Suite · $156/night</option>
+          </select>
+          <button class="button primary" type="submit" id="request-button">Request this room</button>
+          <p class="form-note">The site asks you to confirm. This demo takes no payment and does not reserve a room.</p>
         </fieldset>
       </form>
 
       <div id="requests" class="bookings" aria-live="polite"></div>
     </section>
 
-    <section class="partner" aria-labelledby="clinic-heading">
+    <section class="partner" aria-labelledby="airline-heading">
       <div>
         <p class="eyebrow">Linked site</p>
-        <h2 id="clinic-heading">Riverside Clinic</h2>
+        <h2 id="airline-heading">Skyline Air</h2>
         <p>
-          The clinic hosts the caller runtime. Its network lists this pharmacy's
-          published network URL and exactly one allowed peer origin.
+          The airline hosts the caller runtime. Its network lists this hotel's published
+          network URL and exactly one allowed peer origin.
         </p>
         <p class="consent-copy">
-          The clinic's assistant cannot read this site's page actions while it runs
+          The airline's assistant cannot read this site's page actions while it runs
           here. It gets this network's instructions and asks only what this site can
-          answer: services, hours, and how refill intake works.
+          answer: rooms, rates, policies, and how a request works.
         </p>
       </div>
       <dl class="facts">
-        <div><dt>Network</dt><dd><code>pharmacy</code></dd></div>
-        <div><dt>Front agent</dt><dd><code>pharmacy_assistant</code></dd></div>
-        <div><dt>Live stock</dt><dd>not exposed</dd></div>
+        <div><dt>Network</dt><dd><code>harbor_hotel</code></dd></div>
+        <div><dt>Front agent</dt><dd><code>harbor_hotel_assistant</code></dd></div>
+        <div><dt>Live inventory</dt><dd>not exposed</dd></div>
       </dl>
     </section>
 
     <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
-      <h2 id="assistant-heading">Ask Linden Pharmacy</h2>
-      <p>Start a refill request, hear what the pharmacy offers, or ask what it cannot do.</p>
+      <h2 id="assistant-heading">Ask Harbor Hotel</h2>
+      <p>Request a room, compare rates, or ask what this site cannot do.</p>
       <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
       <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
       <div id="agent-app">
@@ -127,8 +135,8 @@
     <section class="proof" aria-labelledby="proof-heading">
       <h2 id="proof-heading">What this site publishes</h2>
       <ul>
-        <li><code>agent-manifest.json</code> with one network, <code>pharmacy</code>.</li>
-        <li><code>pharmacy.network.json</code>, the resolved agent graph.</li>
+        <li><code>agent-manifest.json</code> with one network, <code>harbor_hotel</code>.</li>
+        <li><code>harbor_hotel.network.json</code>, the resolved agent graph.</li>
         <li><code>links.json</code> and CORS-enabled public artifacts.</li>
         <li>No private context, and no live inventory behind the agent.</li>
       </ul>
@@ -136,8 +144,8 @@
   </main>
 
   <footer class="footer">
-    <p>Linden Pharmacy is a demo for the Open Agentic Web Challenge. Not a real pharmacy.</p>
-    <p><a href="https://github.com/pham-canh/care-relay">Source</a> · MIT</p>
+    <p>Harbor Hotel is a demo for the Open Agentic Web Challenge. Not a real hotel.</p>
+    <p><a href="https://github.com/pham-canh/trip-relay">Source</a> · MIT</p>
   </footer>
 </body>
 </html>

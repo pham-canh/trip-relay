@@ -1,28 +1,27 @@
-const DOCTORS = [
-  { id: "linh", name: "Dr. Linh Tran", specialty: "Cardiology" },
-  { id: "minh", name: "Dr. Minh Pham", specialty: "General practice" },
-  { id: "an", name: "Dr. An Vo", specialty: "Dermatology" },
-];
-
-const SPECIALTIES = ["Cardiology", "General practice", "Dermatology"];
-
-const CLINIC = {
-  name: "Riverside Clinic",
-  address: "18 Riverside Walk, District 2",
-  phone: "+84 28 5550 0188",
-  hours: "Mon–Sat, 08:00–17:00",
+const ROUTE = {
+  from: "Ho Chi Minh City (SGN)",
+  to: "Da Nang (DAD)",
+  code: "SGN → DAD",
 };
 
-const PEER = {
-  name: "Linden Pharmacy",
+const AIRLINE = {
+  name: "Skyline Air",
+  hub: "Da Nang (DAD)",
+  phone: "+84 28 5550 0102",
+  hours: "Daily, 05:00–23:00",
+};
+
+const HOTEL = {
+  name: "Harbor Hotel",
   origin: "http://localhost:8081",
-  network: "http://localhost:8081/pharmacy",
-  services: [
-    "Prescription refill intake",
-    "Medication review with a pharmacist",
-    "Same-day local delivery (order before 15:00)",
-  ],
+  network: "http://localhost:8081/harbor_hotel",
 };
+
+const DEPARTURES = [
+  { depart: "08:10", arrive: "09:35", number: "SKY 210", fare: "Eco", price: 68 },
+  { depart: "13:40", arrive: "15:05", number: "SKY 214", fare: "Eco", price: 74 },
+  { depart: "18:20", arrive: "19:45", number: "SKY 218", fare: "Flex", price: 96 },
+];
 
 function pad(value) {
   return String(value).padStart(2, "0");
@@ -32,56 +31,46 @@ function localDateKey(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-function makeSlots() {
-  const slots = [];
+function makeFlights() {
+  const flights = [];
   const start = new Date();
   start.setHours(12, 0, 0, 0);
-  let index = 0;
-  for (let offset = 1; offset < 15 && slots.length < 9; offset += 1) {
+  for (let offset = 1; offset <= 3; offset += 1) {
     const day = new Date(start);
     day.setDate(start.getDate() + offset);
-    if (day.getDay() === 0) {
-      continue;
-    }
-    for (const time of ["09:00", "10:30", "14:00"]) {
-      if (slots.length >= 9) {
-        break;
-      }
-      const doctor = DOCTORS[index % DOCTORS.length];
-      slots.push({
-        id: `slot-${localDateKey(day)}-${time.replace(":", "")}`,
+    for (const departure of DEPARTURES) {
+      flights.push({
+        id: `flight-${localDateKey(day)}-${departure.depart.replace(":", "")}`,
         date: localDateKey(day),
         dateLabel: day.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }),
-        time,
-        doctorId: doctor.id,
-        doctorName: doctor.name,
-        specialty: doctor.specialty,
+        from: ROUTE.from,
+        to: ROUTE.to,
+        ...departure,
       });
-      index += 1;
     }
   }
-  return slots;
+  return flights;
 }
 
-const SLOTS = makeSlots();
+const FLIGHTS = makeFlights();
 
 const state = {
   version: 0,
-  selectedSlotId: null,
+  selectedFlightId: null,
   bookings: [],
 };
 
-function slotById(id) {
-  return SLOTS.find((slot) => slot.id === id) || null;
+function flightById(id) {
+  return FLIGHTS.find((flight) => flight.id === id) || null;
 }
 
-function availableSlots() {
-  const booked = new Set(state.bookings.map((booking) => booking.slotId));
-  return SLOTS.filter((slot) => !booked.has(slot.id));
+function availableFlights() {
+  const booked = new Set(state.bookings.map((booking) => booking.flightId));
+  return FLIGHTS.filter((flight) => !booked.has(flight.id));
 }
 
-function selectedSlot() {
-  return state.selectedSlotId ? slotById(state.selectedSlotId) : null;
+function selectedFlight() {
+  return state.selectedFlightId ? flightById(state.selectedFlightId) : null;
 }
 
 function reference() {
@@ -94,7 +83,7 @@ function reference() {
       bytes[index] = Math.floor(Math.random() * 256);
     }
   }
-  return `RVC-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
+  return `SKY-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
 }
 
 function refusal(reason, field) {
@@ -108,99 +97,109 @@ function refusal(reason, field) {
  */
 export class App {
   static page = {
-    clinic: CLINIC,
-    peer: PEER,
+    airline: AIRLINE,
+    route: ROUTE,
+    hotel: HOTEL,
 
-    slotIds() {
-      return availableSlots().map((slot) => slot.id);
+    flightIds() {
+      return availableFlights().map((flight) => flight.id);
     },
 
     getState() {
       return {
         version: state.version,
-        clinic: CLINIC,
-        specialties: SPECIALTIES,
-        doctors: DOCTORS,
-        slots: availableSlots(),
-        selected: selectedSlot(),
+        airline: AIRLINE,
+        route: ROUTE,
+        flights: availableFlights(),
+        selected: selectedFlight(),
         bookings: state.bookings,
-        pharmacy: {
-          name: PEER.name,
-          origin: PEER.origin,
-          network: PEER.network,
-          services: PEER.services,
-          note: "A separate agentic website. The clinic assistant asks it what it offers; it cannot see this chat or the booking.",
+        hotel: {
+          name: HOTEL.name,
+          origin: HOTEL.origin,
+          network: HOTEL.network,
+          note: "A separate agentic website. The airline assistant asks it what it offers; it cannot see this chat, the passenger's email, or the booking.",
         },
       };
     },
 
-    selectSlot(id) {
+    selectFlight(id) {
       if (typeof id !== "string" || id.length === 0) {
-        return refusal("Choose a slot id from the current schedule.", "id");
+        return refusal("Choose a flight id from the current schedule.", "id");
       }
-      const slot = slotById(id);
-      if (!slot) {
-        return refusal("That slot is not on this schedule. Read the current slots again.", "id");
+      const flight = flightById(id);
+      if (!flight) {
+        return refusal("That flight is not on this schedule. Read the current flights again.", "id");
       }
-      if (state.bookings.some((booking) => booking.slotId === id)) {
-        return refusal("That slot was just booked. Choose another one.", "id");
+      if (state.bookings.some((booking) => booking.flightId === id)) {
+        return refusal("That flight was just booked. Choose another one.", "id");
       }
-      state.selectedSlotId = id;
+      state.selectedFlightId = id;
       state.version += 1;
       render();
       return this.getState();
     },
 
     checkBooking(args = {}) {
-      const patientName = typeof args.patientName === "string" ? args.patientName.trim() : "";
-      if (patientName.length < 1 || patientName.length > 80) {
-        return refusal("Enter the patient's name, between 1 and 80 characters.", "patientName");
+      const passengerName = typeof args.passengerName === "string" ? args.passengerName.trim() : "";
+      const email = typeof args.email === "string" ? args.email.trim() : "";
+      if (passengerName.length < 1 || passengerName.length > 80) {
+        return refusal("Enter the passenger's name, between 1 and 80 characters.", "passengerName");
+      }
+      if (email.length > 120 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        return refusal("Enter an email for the ticket, such as alex@example.com.", "email");
       }
       if (!Number.isInteger(args.expectedVersion)) {
-        return refusal("Read the current clinic state first; expectedVersion is required.", "expectedVersion");
+        return refusal("Read the current flight state first; expectedVersion is required.", "expectedVersion");
       }
       if (args.expectedVersion !== state.version) {
-        return refusal("The page changed. Read the current clinic state again before booking.", "expectedVersion");
+        return refusal("The page changed. Read the current flight state again before booking.", "expectedVersion");
       }
-      const slot = selectedSlot();
-      if (!slot) {
-        return refusal("No slot is selected. Select a slot before booking.", "id");
+      const flight = selectedFlight();
+      if (!flight) {
+        return refusal("No flight is selected. Select a flight before booking.", "id");
       }
-      if (state.bookings.some((booking) => booking.slotId === slot.id)) {
-        return refusal("That slot was just booked. Choose another one.", "id");
+      if (state.bookings.some((booking) => booking.flightId === flight.id)) {
+        return refusal("That flight was just booked. Choose another one.", "id");
       }
-      return { ok: true, patientName, slot };
+      return { ok: true, passengerName, email, flight };
     },
 
-    bookSlot(args = {}) {
+    bookFlight(args = {}) {
       const check = App.page.checkBooking(args);
       if (!check.ok) {
         return check;
       }
-      const slot = check.slot;
-      const patientName = check.patientName;
+      const flight = check.flight;
       const receipt = {
         reference: reference(),
-        patientName,
-        slotId: slot.id,
-        doctorName: slot.doctorName,
-        specialty: slot.specialty,
-        date: slot.dateLabel,
-        time: slot.time,
+        passengerName: check.passengerName,
+        email: check.email,
+        flightId: flight.id,
+        number: flight.number,
+        route: ROUTE.code,
+        date: flight.dateLabel,
+        depart: flight.depart,
+        arrive: flight.arrive,
+        fare: flight.fare,
+        price: flight.price,
         bookedAt: new Date().toISOString(),
       };
       state.bookings.push(receipt);
-      state.selectedSlotId = null;
+      state.selectedFlightId = null;
       state.version += 1;
       render();
       return {
         ok: true,
         reference: receipt.reference,
-        slot: {
-          doctorName: slot.doctorName,
-          specialty: slot.specialty,
-          date: slot.dateLabel,
-          time: slot.time,
+        passenger: receipt.passengerName,
+        flight: {
+          number: receipt.number,
+          route: receipt.route,
+          date: receipt.date,
+          depart: receipt.depart,
+          arrive: receipt.arrive,
+          fare: receipt.fare,
+          price: receipt.price,
         },
         version: state.version,
       };
@@ -208,7 +207,7 @@ export class App {
 
     reset() {
       state.version += 1;
-      state.selectedSlotId = null;
+      state.selectedFlightId = null;
       state.bookings = [];
       render();
       return this.getState();
@@ -216,31 +215,31 @@ export class App {
   };
 }
 
-function slotButton(slot) {
+function flightButton(flight) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "slot";
-  button.dataset.slotId = slot.id;
-  button.setAttribute("aria-pressed", String(state.selectedSlotId === slot.id));
+  button.className = "flight";
+  button.dataset.flightId = flight.id;
+  button.setAttribute("aria-pressed", String(state.selectedFlightId === flight.id));
   const day = document.createElement("span");
   day.className = "day";
-  day.textContent = slot.dateLabel;
+  day.textContent = flight.dateLabel;
   const time = document.createElement("span");
   time.className = "time";
-  time.textContent = slot.time;
-  const doctor = document.createElement("span");
-  doctor.className = "doctor";
-  doctor.textContent = `${slot.doctorName} · ${slot.specialty}`;
-  button.append(day, time, doctor);
+  time.textContent = `${flight.depart} → ${flight.arrive}`;
+  const meta = document.createElement("span");
+  meta.className = "meta";
+  meta.textContent = `${flight.number} · ${flight.fare} · $${flight.price}`;
+  button.append(day, time, meta);
   button.addEventListener("click", () => {
-    App.page.selectSlot(slot.id);
+    App.page.selectFlight(flight.id);
   });
   return button;
 }
 
 function render() {
-  const list = document.querySelector("#slot-list");
-  const empty = document.querySelector("#slot-empty");
+  const list = document.querySelector("#flight-list");
+  const empty = document.querySelector("#flight-empty");
   const selection = document.querySelector("#selection");
   const bookButton = document.querySelector("#book-button");
   const bookings = document.querySelector("#bookings");
@@ -248,23 +247,23 @@ function render() {
     return;
   }
 
-  list.replaceChildren(...availableSlots().map(slotButton));
-  const open = availableSlots();
+  const open = availableFlights();
+  list.replaceChildren(...open.map(flightButton));
   empty.hidden = open.length > 0;
   list.hidden = open.length === 0;
 
-  const slot = selectedSlot();
-  selection.textContent = slot
-    ? `Selected: ${slot.dateLabel} at ${slot.time} with ${slot.doctorName}.`
-    : "No slot selected yet.";
-  bookButton.disabled = !slot;
+  const flight = selectedFlight();
+  selection.textContent = flight
+    ? `Selected: ${flight.dateLabel}, ${flight.depart}–${flight.arrive}, ${flight.number} (${flight.fare}, $${flight.price}).`
+    : "No flight selected yet.";
+  bookButton.disabled = !flight;
 
   bookings.replaceChildren(
     ...state.bookings.map((booking) => {
       const receipt = document.createElement("p");
       receipt.className = "receipt";
       const text = document.createElement("span");
-      text.textContent = `${booking.date} at ${booking.time} · ${booking.doctorName} · ${booking.patientName}`;
+      text.textContent = `${booking.date} ${booking.depart} · ${booking.number} · ${booking.passengerName}`;
       const code = document.createElement("strong");
       code.textContent = booking.reference;
       receipt.append(text, code);
@@ -281,17 +280,22 @@ function wirePage() {
   }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const input = document.querySelector("#patient-name");
-    const result = App.page.bookSlot({
-      patientName: input ? input.value : "",
+    const name = document.querySelector("#passenger-name");
+    const email = document.querySelector("#passenger-email");
+    const result = App.page.bookFlight({
+      passengerName: name ? name.value : "",
+      email: email ? email.value : "",
       expectedVersion: state.version,
     });
     if (!result.ok) {
       window.alert(result.reason);
       return;
     }
-    if (input) {
-      input.value = "";
+    if (name) {
+      name.value = "";
+    }
+    if (email) {
+      email.value = "";
     }
   });
   const reset = document.querySelector("#reset-demo");

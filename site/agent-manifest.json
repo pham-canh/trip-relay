@@ -1,21 +1,21 @@
 {
-  "brand": "Riverside Clinic Assistant",
+  "brand": "Skyline Air Assistant",
   "networks": [
     {
-      "name": "riverside_clinic",
-      "front_man": "riverside_clinic_assistant",
-      "hocon": "./riverside_clinic.network.json",
-      "description": "Book a clinic visit in your browser, then ask Linden Pharmacy what it offers — with a consent card before the second site is contacted.",
+      "name": "skyline_air",
+      "front_man": "skyline_air_assistant",
+      "hocon": "./skyline_air.network.json",
+      "description": "Book a flight in your browser, then ask Harbor Hotel what it offers — with a consent card before the second site is contacted.",
       "tags": [
         "agentified-website",
         "open-agentic-web",
-        "health"
+        "travel"
       ],
       "sample_queries": [
-        "Which cardiology slots are open this week?",
-        "Book the 10:30 slot for Alex Nguyen.",
-        "Can you ask Linden Pharmacy whether they deliver?",
-        "Do you handle insurance billing?"
+        "Find a morning flight to Da Nang tomorrow.",
+        "Book the 08:10 flight for Alex Nguyen.",
+        "Can you ask Harbor Hotel whether it has a quiet room near the airport?",
+        "Do you sell travel insurance?"
       ]
     }
   ],
@@ -30,29 +30,29 @@
   "peer_policy": {
     "mode": "closed",
     "deny_origins": [],
-    "note": "Calls only the Linden Pharmacy network after the visitor agrees on the consent card, plus page-local actions."
+    "note": "Calls only the Harbor Hotel network after the visitor agrees on the consent card, plus page-local actions."
   },
   "agent_mcp": {
     "protocol": "nsdeploy-agent-mcp/v1",
-    "network": "riverside_clinic",
-    "front_man": "riverside_clinic_assistant",
+    "network": "skyline_air",
+    "front_man": "skyline_air_assistant",
     "available": false,
     "reason": "This is a static bundle; a public MCP facade requires an application host."
   },
   "theme": {
-    "primary": "#0f5c53"
+    "primary": "#0b4f8a"
   },
   "linking": {
     "protocol": "nsdeploy-link/v1",
     "exports": [
       {
-        "network": "riverside_clinic",
-        "front_man": "riverside_clinic_assistant",
+        "network": "skyline_air",
+        "front_man": "skyline_air_assistant",
         "aliases": [
-          "riverside_clinic",
-          "riverside_clinic_assistant"
+          "skyline_air",
+          "skyline_air_assistant"
         ],
-        "url": "riverside_clinic"
+        "url": "skyline_air"
       }
     ],
     "imports": [],
@@ -73,9 +73,9 @@
     "module": "./site-actions.js",
     "bridge": "./bridge/action-bridge.html",
     "agentTools": [
-      "get_clinic_state",
-      "select_slot",
-      "book_slot"
+      "get_airline_state",
+      "select_flight",
+      "book_flight"
     ]
   }
 }

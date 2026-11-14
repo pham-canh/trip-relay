@@ -1,16 +1,26 @@
-const PHARMACY = {
-  name: "Linden Pharmacy",
-  address: "4 Linden Lane, District 2",
-  phone: "+84 28 5550 0421",
-  hours: "Mon–Sat 08:00–19:00 · Sun 10:00–16:00",
-  delivery: "Same-day in the district for requests before 15:00",
+const HOTEL = {
+  name: "Harbor Hotel",
+  address: "12 Harbor Quay, Da Nang",
+  phone: "+84 236 5550 0142",
+  hours: "Front desk 24/7",
+  checkIn: "14:00",
+  checkOut: "12:00",
+  shuttle: "Free airport shuttle, 07:00–22:00",
 };
 
-const SERVICES = [
-  { name: "Prescription refill intake", detail: "A pharmacist reviews the request before anything is prepared." },
-  { name: "Medication review", detail: "A 15-minute conversation about current medicines, timing and side effects." },
-  { name: "Local delivery", detail: "Same-day delivery in the district for requests before 15:00." },
+const ROOMS = [
+  { id: "harbor-double", name: "Harbor Double", rate: 84, detail: "Queen bed · city side · 24 m² · breakfast" },
+  { id: "skyline-king", name: "Skyline King", rate: 112, detail: "King bed · harbor view · 32 m² · breakfast" },
+  { id: "family-suite", name: "Family Suite", rate: 156, detail: "Two rooms · breakfast for four · 48 m²" },
 ];
+
+const POLICIES = {
+  cancellation: "Free cancellation until 48 hours before check-in",
+  checkIn: "Check-in from 14:00",
+  checkOut: "Check-out by 12:00",
+  shuttle: "Free airport shuttle, 07:00–22:00",
+  payment: "No payment is taken in this demo",
+};
 
 const state = {
   version: 0,
@@ -19,6 +29,44 @@ const state = {
 
 function refusal(reason, field) {
   return field ? { ok: false, reason, field } : { ok: false, reason };
+}
+
+function pad(value) {
+  return String(value).padStart(2, "0");
+}
+
+function localDateKey(date) {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function futureDateKey(offset) {
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return localDateKey(date);
+}
+
+function dayNumber(key) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(typeof key === "string" ? key : "");
+  if (!match) {
+    return null;
+  }
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const utc = new Date(Date.UTC(year, month - 1, day));
+  if (utc.getUTCFullYear() !== year || utc.getUTCMonth() !== month - 1 || utc.getUTCDate() !== day) {
+    return null;
+  }
+  return Math.floor(utc.getTime() / 86400000);
+}
+
+function todayNumber() {
+  const now = new Date();
+  return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+}
+
+function roomById(id) {
+  return ROOMS.find((room) => room.id === id) || null;
 }
 
 function reference() {
@@ -31,54 +79,84 @@ function reference() {
       bytes[index] = Math.floor(Math.random() * 256);
     }
   }
-  return `LP-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
+  return `HBR-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
 }
 
 /**
- * The page object the pharmacy assistant and the manual UI share.
+ * The page object the hotel assistant and the manual UI share.
  */
 export class App {
   static page = {
-    pharmacy: PHARMACY,
-    services: SERVICES,
+    hotel: HOTEL,
+    rooms: ROOMS,
+    policies: POLICIES,
+
+    roomIds() {
+      return ROOMS.map((room) => room.id);
+    },
 
     getState() {
       return {
         version: state.version,
-        pharmacy: PHARMACY,
-        services: SERVICES,
+        hotel: HOTEL,
+        rooms: ROOMS,
+        policies: POLICIES,
         requests: state.requests,
-        note: "No live stock, prices, insurance checks or controlled-substance requests are exposed here.",
+        today: localDateKey(new Date()),
+        note: "No live room inventory or payment is exposed here.",
       };
     },
 
-    checkRefill(args = {}) {
-      const patientName = typeof args.patientName === "string" ? args.patientName.trim() : "";
-      const medication = typeof args.medication === "string" ? args.medication.trim() : "";
-      if (patientName.length < 1 || patientName.length > 80) {
-        return refusal("Enter the patient's name, between 1 and 80 characters.", "patientName");
+    checkRoom(args = {}) {
+      const guestName = typeof args.guestName === "string" ? args.guestName.trim() : "";
+      if (guestName.length < 1 || guestName.length > 80) {
+        return refusal("Enter the guest's name, between 1 and 80 characters.", "guestName");
       }
-      if (medication.length < 1 || medication.length > 120) {
-        return refusal("Enter the medication and strength, between 1 and 120 characters.", "medication");
+      const room = roomById(args.roomType);
+      if (!room) {
+        return refusal("Choose a room type from the current list.", "roomType");
+      }
+      const checkInDay = dayNumber(args.checkIn);
+      if (checkInDay === null) {
+        return refusal("Choose a check-in date, such as 2026-12-12.", "checkIn");
+      }
+      const checkOutDay = dayNumber(args.checkOut);
+      if (checkOutDay === null) {
+        return refusal("Choose a check-out date, such as 2026-12-14.", "checkOut");
+      }
+      if (checkInDay < todayNumber()) {
+        return refusal("Check-in must be today or later.", "checkIn");
+      }
+      const nights = checkOutDay - checkInDay;
+      if (nights < 1) {
+        return refusal("Check-out must be after check-in.", "checkOut");
+      }
+      if (nights > 14) {
+        return refusal("This demo takes stays of up to 14 nights.", "checkOut");
       }
       if (!Number.isInteger(args.expectedVersion)) {
-        return refusal("Read the current pharmacy state first; expectedVersion is required.", "expectedVersion");
+        return refusal("Read the current hotel state first; expectedVersion is required.", "expectedVersion");
       }
       if (args.expectedVersion !== state.version) {
-        return refusal("The page changed. Read the current pharmacy state again.", "expectedVersion");
+        return refusal("The page changed. Read the current hotel state again.", "expectedVersion");
       }
-      return { ok: true, patientName, medication };
+      return { ok: true, guestName, room, checkIn: args.checkIn, checkOut: args.checkOut, nights, total: room.rate * nights };
     },
 
-    requestRefill(args = {}) {
-      const check = App.page.checkRefill(args);
+    requestRoom(args = {}) {
+      const check = App.page.checkRoom(args);
       if (!check.ok) {
         return check;
       }
       const request = {
         reference: reference(),
-        patientName: check.patientName,
-        medication: check.medication,
+        guestName: check.guestName,
+        roomId: check.room.id,
+        roomName: check.room.name,
+        checkIn: check.checkIn,
+        checkOut: check.checkOut,
+        nights: check.nights,
+        total: check.total,
         requestedAt: new Date().toISOString(),
       };
       state.requests.push(request);
@@ -87,9 +165,14 @@ export class App {
       return {
         ok: true,
         reference: request.reference,
-        medication: request.medication,
+        guest: request.guestName,
+        room: request.roomName,
+        checkIn: request.checkIn,
+        checkOut: request.checkOut,
+        nights: request.nights,
+        total: request.total,
         version: state.version,
-        note: "This demo does not send the request to a pharmacy. A real intake would now wait for a pharmacist.",
+        note: "This demo does not reserve a room. A real front desk would confirm the request.",
       };
     },
 
@@ -112,7 +195,7 @@ function render() {
       const receipt = document.createElement("p");
       receipt.className = "receipt";
       const text = document.createElement("span");
-      text.textContent = `${request.medication} · ${request.patientName}`;
+      text.textContent = `${request.roomName} · ${request.checkIn} → ${request.checkOut} · ${request.guestName}`;
       const code = document.createElement("strong");
       code.textContent = request.reference;
       receipt.append(text, code);
@@ -123,28 +206,35 @@ function render() {
 
 function wirePage() {
   render();
-  const form = document.querySelector("#refill-form");
+  const checkIn = document.querySelector("#check-in");
+  const checkOut = document.querySelector("#check-out");
+  if (checkIn && !checkIn.value) {
+    checkIn.value = futureDateKey(1);
+  }
+  if (checkOut && !checkOut.value) {
+    checkOut.value = futureDateKey(3);
+  }
+  const form = document.querySelector("#request-form");
   if (!form) {
     return;
   }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const name = document.querySelector("#patient-name");
-    const medication = document.querySelector("#medication");
-    const result = App.page.requestRefill({
-      patientName: name ? name.value : "",
-      medication: medication ? medication.value : "",
+    const guest = document.querySelector("#guest-name");
+    const room = document.querySelector("#room-type");
+    const result = App.page.requestRoom({
+      guestName: guest ? guest.value : "",
+      roomType: room ? room.value : "",
+      checkIn: checkIn ? checkIn.value : "",
+      checkOut: checkOut ? checkOut.value : "",
       expectedVersion: state.version,
     });
     if (!result.ok) {
       window.alert(result.reason);
       return;
     }
-    if (name) {
-      name.value = "";
-    }
-    if (medication) {
-      medication.value = "";
+    if (guest) {
+      guest.value = "";
     }
   });
 }

@@ -15,7 +15,7 @@ export class AssistantMount {
   /**
    * The first chat message once the visitor has a key: what the assistant can do here.
    */
-  static GREETING = "I can start a refill request, explain what this pharmacy offers, and tell you what it cannot check here.";
+  static GREETING = "I can explain the rooms, rates and policies, and start a room request with your confirmation.";
 
   /**
    * The confirmation dialog's words for each irreversible action. Name each button after
@@ -23,9 +23,9 @@ export class AssistantMount {
    * leave this empty.
    */
   static DIALOGS = {
-    request_refill: {
-      title: "Start this refill request?",
-      sentence: "This records a refill request on the page and returns a reference. The demo sends nothing to a pharmacy.",
+    request_room: {
+      title: "Start this room request?",
+      sentence: "This records a room request on the page and returns a reference. The demo reserves nothing and takes no payment.",
       confirm: "Start the request",
       decline: "Go back",
     },
@@ -202,14 +202,16 @@ export class AssistantMount {
    * :return: Details by label, {refusal: reason}, or {} when the action has none.
    */
   static reviewDetails(action, args) {
-    if (action === "request_refill") {
-      const check = App.page.checkRefill(args);
+    if (action === "request_room") {
+      const check = App.page.checkRoom(args);
       if (!check.ok) {
         return { refusal: check.reason };
       }
       return {
-        "Patient": check.patientName,
-        "Medication": check.medication,
+        "Guest": check.guestName,
+        "Room": `${check.room.name} · $${check.room.rate}/night`,
+        "Stay": `${check.checkIn} → ${check.checkOut} · ${check.nights} night${check.nights === 1 ? "" : "s"}`,
+        "Total": `$${check.total}`,
       };
     }
     return {};
