@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Harbor Hotel — a second agentic website</title>
-  <meta name="description" content="The peer site in the Trip Relay demo. Published agent network, browser runtime, and a consent card before the airline contacts it.">
+  <title>Harbor Hotel — a quieter way to plan your stay</title>
+  <meta name="description" content="Explore Harbor Hotel, understand the policies, and request a room with a clear confirmation step.">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="assistant.css">
   <script type="module" src="site.js"></script>
@@ -13,139 +13,57 @@
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">H</span>
-      <span>
-        <strong>Harbor Hotel</strong>
-        <small>Peer agentic website</small>
-      </span>
+    <div class="topbar-inner">
+      <a class="brand" href="./" aria-label="Harbor Hotel, back to home">
+        <span class="brand-mark" aria-hidden="true">H</span>
+        <span><strong>Harbor Hotel</strong><small>A small stay by the water</small></span>
+      </a>
+      <nav aria-label="Primary"><a class="nav-link is-active" href="#rooms">Rooms</a><a class="nav-link" href="#request">Your stay</a><a class="nav-link" href="#assistant">Assistant</a></nav>
+      <div class="topbar-actions"><span class="trust-badge"><span class="trust-dot" aria-hidden="true"></span>Consent-first</span><a class="assistant-link" href="#assistant"><span class="assistant-chip" aria-hidden="true">AI</span>Ask assistant</a></div>
     </div>
-    <nav aria-label="Primary">
-      <a href="#rooms">Rooms</a>
-      <a href="#request">Request</a>
-      <a href="#assistant">Assistant</a>
-    </nav>
   </header>
 
   <main id="main">
-    <section class="hero">
-      <p class="eyebrow">Second origin · separate manifest</p>
-      <h1>Your hotel,<br>on its own origin.</h1>
-      <p class="lede">
-        This site publishes its own agent network and manifest. When the airline's
-        assistant asks it something, the airline first shows you this origin and the
-        request. Decline, and no file from this site is fetched.
-      </p>
-      <div class="hero-actions">
-        <a class="button primary" href="#request">Request a room</a>
-        <a class="button ghost" href="http://127.0.0.1:8080/">Back to the airline</a>
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-copy">
+        <p class="hero-overline">Da Nang · 12 Harbor Quay</p>
+        <h1 id="hero-heading">A room to come back to.</h1>
+        <p class="hero-lede">Harbor Hotel is a small, independent stay for travelers who want the useful details up front: the room, the rate, the policy and what happens next.</p>
+        <div class="hero-actions"><a class="button primary" href="#rooms">Explore rooms</a><a class="text-link" href="#assistant">Ask about the stay <span aria-hidden="true">↗</span></a></div>
+        <p class="hero-note"><span class="note-mark" aria-hidden="true">✓</span> Demo property · no room reserved · no payment taken</p>
       </div>
-      <p class="fineprint">Demo only. No room is reserved, charged, or stored on a server.</p>
+      <div class="stay-card" aria-label="Hotel overview">
+        <div class="stay-card-top"><span>AT A GLANCE</span><span>YOUR OWN ORIGIN</span></div>
+        <div class="stay-card-title"><strong>Harbor Hotel</strong><span>Da Nang, Vietnam</span></div>
+        <div class="stay-rule" aria-hidden="true"></div>
+        <dl class="stay-meta"><div><dt>Check-in</dt><dd>14:00</dd></div><div><dt>Check-out</dt><dd>12:00</dd></div><div><dt>Getting here</dt><dd>Free shuttle · 07:00–22:00</dd></div></dl>
+      </div>
     </section>
 
-    <section id="rooms" class="how" aria-labelledby="rooms-heading">
-      <h2 id="rooms-heading">What this hotel offers</h2>
-      <ol class="steps">
-        <li>
-          <span class="step-number">1</span>
-          <h3>Harbor Double · $84/night</h3>
-          <p>Queen bed, city side, 24 m². Breakfast and the airport shuttle are included.</p>
-        </li>
-        <li>
-          <span class="step-number">2</span>
-          <h3>Skyline King · $112/night</h3>
-          <p>King bed, harbor view, 32 m². Breakfast and the airport shuttle are included.</p>
-        </li>
-        <li>
-          <span class="step-number">3</span>
-          <h3>Family Suite · $156/night</h3>
-          <p>Two rooms, breakfast for four, 48 m². The airport shuttle is included.</p>
-        </li>
+    <section id="rooms" class="rooms-section" aria-labelledby="rooms-heading">
+      <div class="section-heading"><div><p class="section-label">Choose your room</p><h2 id="rooms-heading">Three ways to settle in.</h2></div><p class="section-aside">Breakfast included · airport shuttle included</p></div>
+      <ol class="room-grid">
+        <li class="room-card"><div class="room-card-top"><span class="room-index">01</span><span class="room-price">$84 <small>/ night</small></span></div><h3>Harbor Double</h3><p>Queen bed · city side · 24 m²</p><span class="room-detail">Breakfast and airport shuttle included</span></li>
+        <li class="room-card featured"><div class="room-card-top"><span class="room-index">02</span><span class="room-price">$112 <small>/ night</small></span></div><h3>Skyline King</h3><p>King bed · harbor view · 32 m²</p><span class="room-detail">Breakfast and airport shuttle included</span></li>
+        <li class="room-card"><div class="room-card-top"><span class="room-index">03</span><span class="room-price">$156 <small>/ night</small></span></div><h3>Family Suite</h3><p>Two rooms · 48 m²</p><span class="room-detail">Breakfast for four · airport shuttle included</span></li>
       </ol>
     </section>
 
     <section id="request" class="booking-section" aria-labelledby="request-heading">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Room request</p>
-          <h2 id="request-heading">Start a room request</h2>
-        </div>
-        <p class="muted" id="policy-note">Check-in 14:00 · Check-out 12:00 · Free cancellation until 48h</p>
+      <div class="section-heading"><div><p class="section-label">Plan the details</p><h2 id="request-heading">Start a room request.</h2></div><p class="section-aside" id="policy-note">Free cancellation until 48 hours before check-in</p></div>
+      <div class="booking-layout">
+        <div class="policy-panel"><p class="policy-lead">A good stay begins with a clear expectation.</p><p>Choose your dates and room below. The browser checks the details, shows you what will be requested, then asks for confirmation.</p><dl><div><dt>Front desk</dt><dd>Open 24/7</dd></div><div><dt>Payment</dt><dd>Not taken in this demo</dd></div><div><dt>Inventory</dt><dd>Not exposed</dd></div></dl></div>
+        <form id="request-form" class="booking" autocomplete="off"><fieldset><legend>Stay details</legend><label for="guest-name">Guest name</label><input id="guest-name" name="guestName" type="text" maxlength="80" placeholder="Alex Nguyen" required><div class="date-grid"><div><label for="check-in">Check-in</label><input id="check-in" name="checkIn" type="date" required></div><div><label for="check-out">Check-out</label><input id="check-out" name="checkOut" type="date" required></div></div><label for="room-type">Room type</label><select id="room-type" name="roomType" required><option value="harbor-double">Harbor Double · $84/night</option><option value="skyline-king">Skyline King · $112/night</option><option value="family-suite">Family Suite · $156/night</option></select><button class="button primary" type="submit" id="request-button">Review room request</button><p class="form-note">You will confirm before a request is created. This demo does not reserve a room.</p></fieldset></form>
       </div>
-
-      <form id="request-form" class="booking" autocomplete="off">
-        <fieldset>
-          <legend>Stay details</legend>
-          <label for="guest-name">Guest name</label>
-          <input id="guest-name" name="guestName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
-          <label for="check-in">Check-in</label>
-          <input id="check-in" name="checkIn" type="date" required>
-          <label for="check-out">Check-out</label>
-          <input id="check-out" name="checkOut" type="date" required>
-          <label for="room-type">Room type</label>
-          <select id="room-type" name="roomType" required>
-            <option value="harbor-double">Harbor Double · $84/night</option>
-            <option value="skyline-king">Skyline King · $112/night</option>
-            <option value="family-suite">Family Suite · $156/night</option>
-          </select>
-          <button class="button primary" type="submit" id="request-button">Request this room</button>
-          <p class="form-note">The site asks you to confirm. This demo takes no payment and does not reserve a room.</p>
-        </fieldset>
-      </form>
-
       <div id="requests" class="bookings" aria-live="polite"></div>
     </section>
 
-    <section class="partner" aria-labelledby="airline-heading">
-      <div>
-        <p class="eyebrow">Linked site</p>
-        <h2 id="airline-heading">Skyline Air</h2>
-        <p>
-          The airline hosts the caller runtime. Its network lists this hotel's published
-          network URL and exactly one allowed peer origin.
-        </p>
-        <p class="consent-copy">
-          The airline's assistant cannot read this site's page actions while it runs
-          here. It gets this network's instructions and asks only what this site can
-          answer: rooms, rates, policies, and how a request works.
-        </p>
-      </div>
-      <dl class="facts">
-        <div><dt>Network</dt><dd><code>harbor_hotel</code></dd></div>
-        <div><dt>Front agent</dt><dd><code>harbor_hotel_assistant</code></dd></div>
-        <div><dt>Live inventory</dt><dd>not exposed</dd></div>
-      </dl>
-    </section>
+    <section class="partner" aria-labelledby="airline-heading"><div class="partner-copy"><p class="section-label">Linked site</p><h2 id="airline-heading">Arriving with Skyline Air?</h2><p>The airline can ask this hotel about rooms, rates and policies, but it cannot read this page's actions while it runs. It receives only the published network's instructions.</p><p class="consent-note"><span class="consent-icon" aria-hidden="true">↗</span><span><strong>One origin, one decision.</strong> The airline must show you the hotel origin and request before it contacts this site.</span></p><a class="button secondary" href="http://127.0.0.1:8080/">Back to Skyline Air</a></div><dl class="facts"><div><dt>Network</dt><dd><code>harbor_hotel</code></dd></div><div><dt>Front agent</dt><dd><code>harbor_hotel_assistant</code></dd></div><div><dt>Live inventory</dt><dd>Not exposed</dd></div></dl></section>
 
-    <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
-      <h2 id="assistant-heading">Ask Harbor Hotel</h2>
-      <p>Request a room, compare rates, or ask what this site cannot do.</p>
-      <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
-      <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
-      <div id="agent-app">
-        <div data-ns-slot="header"></div>
-        <div class="assistant-panels">
-          <div data-ns-slot="chat"></div>
-          <div data-ns-slot="agents"></div>
-        </div>
-        <div data-ns-slot="settings"></div>
-      </div>
-    </section>
+    <section id="assistant" class="assistant" aria-labelledby="assistant-heading"><div class="assistant-heading"><div><p class="section-label">A helpful local voice</p><h2 id="assistant-heading">Ask Harbor Hotel</h2></div><p>Compare rooms, ask about the shuttle or understand what this site can and cannot do.</p></div><p class="assistant-note">Your messages and this page's data go to the LLM provider you choose below. You confirm anything that cannot be undone.</p><p id="assistant-status" role="status">Connecting the assistant… If this message stays, you can still use the page directly.</p><div id="agent-app"><div data-ns-slot="header"></div><div class="assistant-panels"><div data-ns-slot="chat"></div><div data-ns-slot="agents"></div></div><div data-ns-slot="settings"></div></div></section>
 
-    <section class="proof" aria-labelledby="proof-heading">
-      <h2 id="proof-heading">What this site publishes</h2>
-      <ul>
-        <li><code>agent-manifest.json</code> with one network, <code>harbor_hotel</code>.</li>
-        <li><code>harbor_hotel.network.json</code>, the resolved agent graph.</li>
-        <li><code>links.json</code> and CORS-enabled public artifacts.</li>
-        <li>No private context, and no live inventory behind the agent.</li>
-      </ul>
-    </section>
+    <section class="proof" aria-labelledby="proof-heading"><div><p class="section-label">Open by design</p><h2 id="proof-heading">A hotel site with nothing hidden.</h2></div><p>This site publishes its manifest, network, peer links and rules. It does not expose live inventory or private context.</p></section>
   </main>
-
-  <footer class="footer">
-    <p>Harbor Hotel is a demo for the Open Agentic Web Challenge. Not a real hotel.</p>
-    <p><a href="https://github.com/pham-canh/trip-relay">Source</a> · MIT</p>
-  </footer>
+  <footer class="footer"><p>Harbor Hotel is a demo for the Open Agentic Web Challenge. Not a real hotel.</p><p><a href="https://github.com/pham-canh/trip-relay">Source</a> · MIT</p></footer>
 </body>
 </html>

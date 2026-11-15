@@ -1,5 +1,5 @@
-/* Assistant layout. Append to the site's stylesheet and set the colors to the site's palette. */
-.assistant { margin-top: 48px; }
+/* Assistant layout aligned with the Harbor Hotel visual system. */
+.assistant { margin-top: 0; }
 
 /* The runtime reads these variables for its chat, settings and agent panels.
    The chat background below also uses --ns-bg. White text sits on --ns-primary (the
@@ -7,15 +7,15 @@
    (Send while a turn is steered), so give both at least 4.5:1 contrast with white.
    --ns-accent also underlines the chat header. */
 #agent-app {
-  --ns-font: system-ui, sans-serif;
-  --ns-bg: #ffffff;
-  --ns-fg: #1f2328;
-  --ns-primary: #2563eb;
-  --ns-accent: #2563eb;
-  --ns-border: #d0d7de;
-  --ns-panelbg: #ffffff;
-  --ns-msgbg: #f6f8fa;
-  --ns-muted: #59636e;
+  --ns-font: inherit;
+  --ns-bg: var(--surface);
+  --ns-fg: var(--ink);
+  --ns-primary: var(--brand);
+  --ns-accent: var(--accent);
+  --ns-border: var(--line);
+  --ns-panelbg: var(--surface);
+  --ns-msgbg: var(--surface-soft);
+  --ns-muted: var(--muted);
 }
 
 .assistant-panels {
@@ -27,7 +27,7 @@
 
 /* Set the height once the runtime has mounted the chat, so a failed load leaves no
    empty box. */
-#agent-app.ns-composed-app [data-ns-slot="chat"] { height: 720px; }
+#agent-app.ns-composed-app [data-ns-slot="chat"] { height: 650px; }
 /* The runtime gives the chat no background of its own. Keep --ns-msgbg different from
    --ns-bg, or bot replies lose their bubble. */
 #agent-app .ns-chat { background: var(--ns-bg); }
@@ -57,10 +57,10 @@
    their dark text. Keep the runtime's own backgrounds. */
 #agent-app .ns-devtoggle:not(.on):hover,
 #agent-app .ns-modal-close:hover { background: transparent; }
-#agent-app .ns-w-choice:disabled:hover { background: #fafbfc; }
+#agent-app .ns-w-choice:disabled:hover { background: var(--surface-soft); }
 /* The runtime's message rule hides the partner consent card's own background, and its
    Decline label then has too little contrast. */
-#agent-app .ns-consent { background: #fffbeb; }
+#agent-app .ns-consent { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
 /* While a consent card waits, the status line above it already says "Contacting", though
    nothing has been sent. Hide it until the visitor answers. */
 #agent-app .ns-msgs:has(.ns-consent-actions) > .ns-turn-status { display: none; }
@@ -75,11 +75,11 @@
 /* site.js and the runtime add their confirmation dialogs to <body>, outside #agent-app.
    Site h2 rules reach the heading, and the two buttons touch. A right margin keeps
    wrapped buttons lined up on the left. */
-body > dialog h2 { margin: 0 0 12px; font: 700 1.25em system-ui, sans-serif; }
+body > dialog h2 { margin: 0 0 12px; font-size: 1.25em; font-weight: 780; font-family: inherit; }
 body > dialog button { margin-right: 8px; }
 /* site.js's dialog: the details in two columns, and a plain decline button, so the two
    choices do not look the same. */
-.assistant-review { max-width: 640px; width: 85%; max-height: 85vh; overflow: auto; border: 1px solid #888; border-radius: 12px; padding: 24px; font: 16px system-ui, sans-serif; }
+.assistant-review { max-width: 640px; width: 85%; max-height: 85vh; overflow: auto; border: 1px solid var(--line); border-radius: 14px; padding: 24px; color: var(--ink); background: var(--surface); font-size: 16px; line-height: 1.5; font-family: inherit; box-shadow: var(--shadow); }
 .assistant-review dl { display: grid; grid-template-columns: fit-content(40%) 1fr; gap: 4px 16px; margin: 12px 0; }
 .assistant-review dt { font-weight: 600; }
 .assistant-review dd { margin: 0; overflow-wrap: anywhere; }
