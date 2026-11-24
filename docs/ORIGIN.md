@@ -40,6 +40,8 @@ Deployment check, no key and no browser:
 npm run check:origins
 ```
 
+The same check runs as a manual GitHub Actions workflow. The first live run passed on 2026-11-24: <https://github.com/pham-canh/trip-relay/actions/runs/45318205435>.
+
 Local pair:
 
 ```bash
