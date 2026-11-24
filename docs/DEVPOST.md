@@ -28,7 +28,7 @@ Trip Relay is a **reference implementation of a consent-gated agent handoff**, n
 
 <https://youtu.be/lDLhXmqXv6I>
 
-The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. It is narrated in Vietnamese by the entrant, with English subtitles burned into the picture and a full English transcript in [`VIDEO-TRANSCRIPT.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md). The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The entrant-voice file, the silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](DUB-VI.md).
+The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. It is narrated in Vietnamese by the entrant, with English subtitles burned into the picture and a full English transcript in [`VIDEO-TRANSCRIPT.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md). The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair defaults to Otari. The entrant-voice file, the silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](DUB-VI.md).
 
 ## How we built it
 
@@ -38,14 +38,14 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
 - 14 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push. The demo recording uses a scripted SSE router; the public pair defaults to Otari.
 
-## Verification status
+### Verification status
 
 - **Protocol and consent:** 14 `node:test` checks and a 16-check Playwright pass, both with a scripted model. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**.
 - **Hosted boundary:** the same consent flow was run against the public pair. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
 - **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in **AI model settings** and repeat the question. We do not claim a live provider call.
 - **Scope:** demo data only. No real inventory, payment, or reservation. The contribution is the boundary, not the travel inventory.
 
-## Challenges
+## Challenges we ran into
 
 - **Consent before contact.** The runtime must not prefetch peer metadata to render a nice card. The card shows the origin first and upgrades to the published brand only after approval.
 - **Two origins without a second owner.** Locally, `127.0.0.1` and `localhost` are different origins; using two ports on one hostname would not exercise the boundary. On GitHub Pages, a project path shares the user origin, so the hosted pair uses the trailing-dot form of the same host (`pham-canh.github.io` vs `pham-canh.github.io.`), which browsers treat as a distinct origin.
@@ -54,7 +54,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - **Writes without false success.** Flight booking and room requests both require a current `expectedVersion`; a stale call is refused, and an unknown outcome is never retried.
 - **Honest travel data.** Flights are generated for the next three days, rates are demo data, and the hotel takes requests only: the page says clearly that it has no live inventory and takes no payment.
 
-## Accomplishments
+## Accomplishments that we're proud of
 
 - A visible, testable cross-origin consent gate with zero peer requests before approval.
 - A two-agent caller network and a separate hotel network, both running in a normal browser tab.
@@ -67,7 +67,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 
 Consent has to live at the transport boundary. A sentence in the system prompt is not a control; the runtime must pause before the fetch and show the destination and payload. Treating peer networks as untrusted public data also keeps the key and the user's context on the caller's side.
 
-## What's next
+## What's next for Trip Relay
 
 - Record a take against a live Otari key over the same picture; the current entrant-voice cut uses a scripted, reproducible endpoint.
 - Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
