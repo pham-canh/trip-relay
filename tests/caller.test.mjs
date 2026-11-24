@@ -22,6 +22,7 @@ globalThis.document = StubDocument.fromHtml(await readFile(new URL("../site/inde
 globalThis.Option = StubOption;
 const { registerActions } = await import("../site/site-actions.js");
 const { AssistantMount } = await import("../site/site.js");
+const { providerForApiKey } = await import("../site/runtime/ui.js");
 
 const load = async () => {
   const config = JSON.parse(await readFile(new URL(`../site/${NETWORK}.network.json`, import.meta.url), "utf8"));
@@ -273,4 +274,18 @@ test("every irreversible action has dialog words named after what the buttons do
     }
   }
   assert.ok(loaded.manifest.actions.agentTools.includes(IRREVERSIBLE));
+});
+
+test("Otari keys select the matching regional router", () => {
+  const eu = providerForApiKey("otk_v1_eu_test-key");
+  assert.equal(eu?.name, "Otari (Mozilla, EU)");
+  assert.equal(eu?.router, "https://eu.api.otari.ai/api/v1");
+
+  const global = providerForApiKey("otk_test-key");
+  assert.equal(global?.name, "Otari (Mozilla)");
+  assert.equal(global?.router, "https://api.otari.ai/api/v1");
+
+  assert.equal(providerForApiKey("tk-legacy-key")?.router, "https://api.otari.ai/api/v1");
+  assert.equal(providerForApiKey("sk-proj-test-key")?.name, "OpenAI");
+  assert.equal(providerForApiKey("unknown-key"), null);
 });

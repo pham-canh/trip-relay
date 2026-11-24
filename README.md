@@ -6,22 +6,33 @@ Two travel agentic websites, one visible consent boundary.
 
 ![Skyline Air landing page](docs/screenshots/airline-hero.png)
 
-Trip Relay is an entry for the [Open Agentic Web Challenge](https://cognizant-agenticweb.devpost.com/), built on the MVP Profile 0.2 and Mozilla's [Otari](https://otari.ai/) router. It is a working pair of static sites:
+Trip Relay is an entry for the [Open Agentic Web Challenge](https://cognizant-agenticweb.devpost.com/), built on the MVP Profile 0.2 and Mozilla's [Otari](https://otari.ai/) router.
 
-- **Skyline Air** (`127.0.0.1:8080`) is the caller. Its network has a front agent and a `fare_agent` specialist that reads flights, holds a fare, and books it after the visitor confirms.
-- **Harbor Hotel** (`localhost:8081`) is a separate origin. Its assistant knows its rooms, rates, policies, airport shuttle, and room-request flow.
+It is a **reference implementation of a consent-gated agent handoff**, demonstrated with a working pair of static travel sites. The contribution is the boundary, not the travel inventory: the airline is the caller, the hotel is a separate origin, and the browser pauses before the first peer request. The full pattern, threat model, and limitations are in [PROTOCOL.md](PROTOCOL.md).
+
+**Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The second URL has a deliberate trailing dot: browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
+
+The two sites are:
+
+- **Skyline Air** (`127.0.0.1:8080` locally; `https://pham-canh.github.io/trip-relay/` hosted) is the caller. Its network has a front agent and a `fare_agent` specialist that reads flights, holds a fare, and books it after the visitor confirms.
+- **Harbor Hotel** (`localhost:8081` locally; `https://pham-canh.github.io./` hosted) is a separate origin. Its assistant knows its rooms, rates, policies, airport shuttle, and room-request flow.
 - The airline's assistant can hand a hotel question to the second site. **Before any request reaches the hotel origin, the visitor sees the exact origin and request and must allow it.** Nothing is fetched on page load.
 
-The two hostnames are deliberate: `127.0.0.1` and `localhost` are different origins, so the demo exercises the real cross-origin path on one machine.
+The two hostnames are deliberate: `127.0.0.1` and `localhost` are different origins locally; the hosted pair uses the trailing-dot form of the GitHub Pages host. In both cases the demo exercises the real cross-origin path, not two paths on one origin.
 
 ## Why this is a cross-site problem
 
-An agent that can use other sites is useful only if the user can tell when it crosses a boundary. Trip Relay makes that boundary the product:
+An agent that can use other sites is useful only if the user can tell when it crosses a boundary. Trip Relay makes that boundary the product. This is the part intended to outlive the demo:
 
-- The hand-off is a tool call with a natural-language request. The runtime pauses and renders a consent card naming `localhost:8081`, the purpose, and the request text.
-- Declining cancels the tool call. The hotel manifest, network, and actions are never fetched.
-- Allowing fetches only the hotel's public artifacts. The hotel runs in the caller's browser with the caller's router. It never receives the chat history, the page state, the passenger's email, or the API key.
-- Irreversible writes stay on their owning page. Flight booking and room requests both have their own confirmation dialog and a stale-version check.
+- **Consent before contact.** The runtime pauses before the first peer fetch. Declining means the hotel manifest is never requested.
+- **Exact network, no fallback.** `http://localhost:8081/harbor_hotel` must match a published network name. A missing name fails closed instead of running a different network.
+- **Private context by exception.** The runtime forwards the declared request, not the caller's chat history, page state, passenger record, or API key. The consent card shows the exact text that will cross.
+- **Writes stay owned.** Flight booking and room requests require confirmation and a current version on the owning origin.
+- **The boundary is testable.** The browser pass asserts zero hotel requests before **Allow**; the unit suite checks policy, the exact link, and write refusal paths.
+
+The travel flow is the demonstration. The reusable idea is a small policy-and-consent layer that any publisher could put in front of a peer agent network.
+
+The hand-off is a tool call with a natural-language request. The runtime pauses and renders a consent card naming the peer origin (`localhost:8081` locally; `pham-canh.github.io.` hosted), the purpose, and the request text. Declining cancels the call; **Allow** fetches only the hotel's public artifacts. The hotel runs in the caller's browser with the caller's router. The runtime forwards only the request text; it does not forward the chat history, page state, airline passenger record, or key.
 
 ![Consent card before the hotel is contacted](docs/screenshots/consent.png)
 
@@ -39,9 +50,17 @@ npm run serve:airline
 npm run serve:hotel
 ```
 
-Open <http://127.0.0.1:8080/>. In **AI model settings**, choose **Otari (Mozilla)** and paste a `tk-...` key, or choose another provider and enter its key and model. The key is stored in this browser and sent only to the router you choose.
+Open <http://127.0.0.1:8080/>. In **AI model settings**, choose **Otari (Mozilla)** and paste an `otk_...` key, or choose another provider and enter its key and model. Global Otari keys use `https://api.otari.ai/api/v1`; EU keys start with `otk_v1_eu_` and use `https://eu.api.otari.ai/api/v1`. The preset detects the EU prefix and fills the right router. The key is stored in this browser and sent only to the router you choose.
 
-The manual pages work without a key, so the demo never depends on a provider being available.
+The manual pages work without a key, so the demo never depends on a provider being available. A live model call is the only part that needs Otari or another OpenAI-compatible endpoint.
+
+### Five-minute review
+
+1. `npm test` — 14 unit checks, no network.
+2. Start both servers, open <http://127.0.0.1:8080/>, and book a flight manually.
+3. Read the handoff sequence in [PROTOCOL.md](PROTOCOL.md), then run the cross-site question below.
+4. Inspect the consent card, the trace rail, and the spec map.
+5. The browser pass in `docs/DEMO.md` is the reproducible version of the consent check.
 
 Try the cross-site path:
 
@@ -51,6 +70,8 @@ Try the cross-site path:
 4. Ask again and press **Allow**: the airline loads the hotel's manifest and network, runs it locally, and summarizes the reply.
 
 ## How it works
+
+The sequence below is the short version. [PROTOCOL.md](PROTOCOL.md) names the actors, artifacts, policy gates, failure modes, and the invariants the tests assert.
 
 ```
 Browser tab, caller origin 127.0.0.1:8080
@@ -84,7 +105,7 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 ## Safety and privacy
 
 - **Consent precedes contact.** The browser test asserts zero requests to `localhost:8081` before **Allow**.
-- **Private context by exception.** The hotel receives only the natural-language `request` field. Chat history, page state, passenger names, emails, and the key are not forwarded.
+- **Private context by exception.** For the peer answer, the hotel receives only the natural-language `request` field. Chat history, page state, the airline passenger's name/email, and the key are not forwarded. A hotel room request is a separate action owned by the hotel and confirmed there.
 - **Closed peer policy.** The airline's manifest lists exactly one allowed peer origin; the hotel lists none.
 - **No key sharing.** The hotel network is fetched as public data and executed in the caller's browser. The key goes only to the configured router.
 - **Two gates for writes.** `book_flight` and `request_room` require a visitor confirmation and a current `expectedVersion`; a stale call is refused with a readable reason.
@@ -98,26 +119,35 @@ npm test
 
 The suite runs the real runtime with a scripted model, no network:
 
-- 8 caller tests: network validation, two-agent delegation, manifest/action agreement, read tool, flight write, confirmation gating, decline, approval, stale versions, dialog words.
+- 9 caller tests: network validation, two-agent delegation, manifest/action agreement, read tool, flight write, confirmation gating, decline, approval, stale versions, dialog words, and Otari regional-router selection.
 - 5 peer tests: closed policy, grounded read, room-request confirmation, refusal paths, dialog words.
 
-Thirteen tests in total.
+Fourteen tests in total.
 
-A Playwright pass also exercised both pages in Chromium: manual flight booking and room request, the consent card, the no-contact-before-consent assertion, the approved cross-site answer, and zero console errors. See [docs/DEMO.md](docs/DEMO.md).
+A Playwright pass also exercised both pages in Chromium: manual flight booking and room request, the consent card, the no-contact-before-consent assertion, the approved cross-site answer, and zero console errors. A second pass ran the same cross-origin flow against the public GitHub Pages pair, including the trailing-dot hotel origin. See [docs/DEMO.md](docs/DEMO.md).
 
 ## Otari
 
-Both manifests point at `https://api.otari.ai/api/v1`; the settings panel includes an **Otari (Mozilla)** preset with the challenge model `alibaba/qwen-3.5-35b-a3b`. The integration notes, the onboarding problem I hit, and the improvement I would make are in [docs/OTARI.md](docs/OTARI.md). Copy-ready Devpost fields are in [docs/DEVPOST.md](docs/DEVPOST.md).
+Both manifests publish `https://api.otari.ai/api/v1` as the default; the settings panel includes **Otari (Mozilla)** for global keys and **Otari (Mozilla, EU)** for keys that start with `otk_v1_eu_`, both with the challenge model `alibaba/qwen-3.5-35b-a3b`. The EU preset exists because a key sent to the wrong regional host returns HTTP 421 and names the host it belongs to. The integration notes, the onboarding problems I hit, and the improvement I would make are in [docs/OTARI.md](docs/OTARI.md). Copy-ready Devpost fields are in [docs/DEVPOST.md](docs/DEVPOST.md).
+
+The unit and browser checks use a scripted model. A live Otari answer is a manual step after adding a key; the repository does not contain one.
 
 ## Deploying
 
-The demo needs **two different origins**, not two paths on one host. GitHub Pages alone cannot provide that: `user.github.io/a` and `user.github.io/b` share an origin. Use two static hosts, or a host plus a subdomain.
+The public pair is live:
 
-1. Publish `site/` at origin A and `peer/` at origin B. Keep the CORS headers on the hotel's public files.
-2. Update the hotel URL in `site/skyline_air.hocon` (`tools` and `link_labels`), `HOTEL` in `site/app.js`, and `allowed_peers` in `site/agent-manifest.json`.
-3. Update the airline URL in `peer/index.html`, and the hotel's display links.
-4. Regenerate the published network JSON with the [Agentify Website skill](https://github.com/cognizant-ai-labs/agentic-web) build script, then rerun `npm test`.
-5. Use HTTPS. Loopback HTTP is only for local development.
+- Airline: <https://pham-canh.github.io/trip-relay/>
+- Hotel: <https://pham-canh.github.io./>
+
+The hotel uses the trailing-dot form of the same GitHub Pages host. That is a real, distinct browser origin, not a path trick: `pham-canh.github.io` and `pham-canh.github.io.` have different origins, and GitHub Pages serves both with `Access-Control-Allow-Origin: *`. It avoids requiring a second owner or a custom domain. The airline is the `gh-pages` branch of `pham-canh/trip-relay`; the hotel is the `main` branch of the user Pages repo `pham-canh/pham-canh.github.io`. Some corporate proxies and VPNs reject trailing-dot hosts; the airline's hotel link is the tested path, and the local pair remains the fallback. A custom domain is the cleaner long-term option and only requires changing `PEER_URL`.
+
+`npm run build:pages` copies `site/` and `peer/` into `dist-pages/airline` and `dist-pages/peer` and rewrites the local URLs. Override `AIRLINE_URL` and `PEER_URL` to target another host:
+
+```bash
+AIRLINE_URL=https://airline.example/ PEER_URL=https://hotel.example/ npm run build:pages
+```
+
+The generated directories are gitignored; publish each one at its origin root. The build fails if both URLs share an origin. Keep CORS on the hotel's public files. Use HTTPS except for loopback development. After any URL change, rebuild the published network JSON if you edited the HOCON, run `npm test`, and repeat the cross-origin browser check.
 
 ## Spec mapping
 
@@ -130,7 +160,9 @@ site/               airline website plus generated network artifacts
 peer/               hotel website plus generated network artifacts
 tests/              node:test suites and the runtime stubs they use
 scripts/serve.mjs   dependency-free static server with CORS
+scripts/build_public.mjs  two-origin public build with URL rewriting
 docs/               screenshots, demo script, Otari notes, spec map, Devpost copy
+PROTOCOL.md         the consent-gated handoff pattern, failure modes, and limitations
 ```
 
 ## Credits

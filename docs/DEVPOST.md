@@ -18,23 +18,26 @@ Trip Relay is a working pair of agentic websites:
 
 - **Skyline Air** lets a visitor find a flight from Ho Chi Minh City to Da Nang, hold a fare, and book it. Its front agent delegates flight writes to a `fare_agent` specialist, and every write needs a current version and a visitor confirmation.
 - **Harbor Hotel** is a separate origin with its own manifest, network, rooms, rates, policies, airport shuttle, and room-request intake.
-- The airline's assistant can hand a hotel question to the second site. Before any request reaches `localhost:8081`, the visitor sees a consent card with the exact origin, purpose, and request text. **Decline** cancels the call; the hotel manifest is never fetched. **Allow** loads only the hotel's public network and runs it in the caller's browser with the caller's router. The hotel never receives the chat history, page state, passenger name, email, or API key.
+- The airline's assistant can hand a hotel question to the second site. Before any request reaches the hotel origin (`localhost:8081` locally; `pham-canh.github.io.` hosted), the visitor sees a consent card with the exact origin, purpose, and request text. **Decline** cancels the call; the hotel manifest is never fetched. **Allow** loads only the hotel's public network and runs it in the caller's browser with the caller's router. The runtime forwards only the request text, which the consent card shows. It does not forward the chat history, page state, airline passenger record, or API key. A hotel room request is a separate action confirmed on the hotel origin.
 
-The demo runs both sites locally on two origins (`127.0.0.1:8080` and `localhost:8081`) and works without a model key for the manual flight-booking and room-request paths.
+The public demo runs at <https://pham-canh.github.io/trip-relay/> with the hotel at <https://pham-canh.github.io./>; the trailing dot is a deliberate second browser origin. The same pages run locally on `127.0.0.1:8080` and `localhost:8081` and work without a model key for the manual flight-booking and room-request paths.
+
+Trip Relay is a **reference implementation of a consent-gated agent handoff**, not a travel-booking product. Travel is the demonstration domain. The reusable contribution is the boundary: a peer network is public data, the browser pauses before the first peer fetch, the exact network is resolved with no fallback, and the peer receives the declared request rather than the caller's private context. The pattern, threat model, failure modes, and limitations are documented in [`PROTOCOL.md`](https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md).
 
 ## How we built it
 
 - Two static sites, each with an `agent-manifest.json`, a resolved Neuro SAN HOCON network, `links.json`, a browser runtime, and a small action module.
-- The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link.
+- The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
-- Mozilla Otari is the default router in both manifests; the settings panel adds an Otari preset with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 13 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push.
+- Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
+- 14 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push.
 
 ## Challenges
 
 - **Consent before contact.** The runtime must not prefetch peer metadata to render a nice card. The card shows the origin first and upgrades to the published brand only after approval.
-- **Two origins on one machine.** `127.0.0.1` and `localhost` are different origins; using two ports on one hostname would not exercise the boundary.
+- **Two origins without a second owner.** Locally, `127.0.0.1` and `localhost` are different origins; using two ports on one hostname would not exercise the boundary. On GitHub Pages, a project path shares the user origin, so the hosted pair uses the trailing-dot form of the same host (`pham-canh.github.io` vs `pham-canh.github.io.`), which browsers treat as a distinct origin.
 - **Otari onboarding.** The local gateway needs Python 3.13 and uv 0.13+, and Docker was unavailable on the build machine, so the demo targets the hosted endpoint and documents the browser CORS requirement. The exact feedback is in `docs/OTARI.md`.
+- **Otari regions.** An EU key sent to the global host returns HTTP 421 and names the correct host. The key prefix now selects the matching regional preset, so a judge does not have to discover the region by error. This was the most concrete integration bug we fixed.
 - **Writes without false success.** Flight booking and room requests both require a current `expectedVersion`; a stale call is refused, and an unknown outcome is never retried.
 - **Honest travel data.** Flights are generated for the next three days, rates are demo data, and the hotel takes requests only: the page says clearly that it has no live inventory and takes no payment.
 
@@ -43,7 +46,8 @@ The demo runs both sites locally on two origins (`127.0.0.1:8080` and `localhost
 - A visible, testable cross-origin consent gate with zero peer requests before approval.
 - A two-agent caller network and a separate hotel network, both running in a normal browser tab.
 - Per-origin private-context rules: only the natural-language request crosses the boundary.
-- 13 unit tests, 16 browser checks, and GitHub Actions on every push.
+- 14 unit tests, 16 browser checks, and GitHub Actions on every push.
+- The same consent ordering was verified against the hosted GitHub Pages pair, including the trailing-dot second origin.
 - A complete spec map, demo script, screenshots, and a reproducible local setup with no server dependencies.
 
 ## What we learned
@@ -52,25 +56,44 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 ## What's next
 
-- Deploy the two sites to two public origins (the README has the exact changes) and record the live flow with Otari.
+- Record the live flow with Otari, including the consent card and a decline.
+- Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
+- Extract the consent/policy layer into a small reusable library and add signed publisher identity.
 - Add a second peer with a different trust level to show per-origin policies.
 - Add an optional MCP facade and an A2A card.
-- Publish the Otari onboarding feedback and a browser quickstart.
 
 ## Built with
 
 HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions.
 
+## Try it
+
+Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in **AI model settings**; the regional preset fills the matching Otari router.
+
+Local:
+
+```bash
+npm test
+npm run serve:airline   # terminal 1
+npm run serve:hotel     # terminal 2
+```
+
+Open <http://127.0.0.1:8080/>.
+
 ## Links
 
 - Repository: <https://github.com/pham-canh/trip-relay>
+- Protocol note: <https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md>
+- Live demo: <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>)
 - Demo video: `[ADD YOUTUBE LINK]`
-- Otari account email: `[ADD OTARI ACCOUNT EMAIL]`
+- Otari account email: `crytobot459@gmail.com`
 
 ## Before submitting
 
+- [x] **Publish the two sites to two public origins.** Airline: <https://pham-canh.github.io/trip-relay/>; hotel: <https://pham-canh.github.io./> (trailing-dot origin).
 - [ ] Record the under-two-minute narrated video and replace the link above.
 - [ ] Add the Otari account email and check the problem/improvement text in `docs/OTARI.md`.
+- [ ] Revoke any Otari key used during development and confirm no key is in the repo or screenshots.
 - [ ] Confirm the repository is public and the license is visible.
 - [ ] Upload the repository social preview (`docs/social-preview.png`) and pin the repo if it belongs in the portfolio.
 - [ ] Re-run `npm test` after any deployment URL change.

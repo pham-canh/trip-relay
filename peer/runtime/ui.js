@@ -34,8 +34,16 @@ export const API_KEY_PROVIDERS = [
     keyUrl: "https://otari.ai/",
     router: "https://api.otari.ai/api/v1",
     model: "alibaba/qwen-3.5-35b-a3b",
-    keyPrefixes: ["tk-"],
-    accessNote: "Mozilla's LLM router",
+    keyPrefixes: ["otk_", "tk-"],
+    accessNote: "Mozilla's LLM router (global)",
+  },
+  {
+    name: "Otari (Mozilla, EU)",
+    keyUrl: "https://otari.ai/",
+    router: "https://eu.api.otari.ai/api/v1",
+    model: "alibaba/qwen-3.5-35b-a3b",
+    keyPrefixes: ["otk_v1_eu_"],
+    accessNote: "EU region of Mozilla's router",
   },
   {
     name: "Google AI Studio",
@@ -73,10 +81,17 @@ export const API_KEY_PROVIDERS = [
 
 export function providerForApiKey(apiKey) {
   const key = String(apiKey || "").trim();
+  let match = null;
+  let matchLength = 0;
   for (const provider of API_KEY_PROVIDERS) {
-    if (provider.keyPrefixes.some((prefix) => key.startsWith(prefix))) return provider;
+    for (const prefix of provider.keyPrefixes) {
+      if (key.startsWith(prefix) && prefix.length > matchLength) {
+        match = provider;
+        matchLength = prefix.length;
+      }
+    }
   }
-  return null;
+  return match;
 }
 
 const BASE_CSS = PRESENTATION_CSS + `
