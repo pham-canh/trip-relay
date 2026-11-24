@@ -8,9 +8,9 @@ Two travel agentic websites, one visible consent boundary.
 
 Trip Relay is an entry for the [Open Agentic Web Challenge](https://cognizant-agenticweb.devpost.com/), built on the MVP Profile 0.2 and Mozilla's [Otari](https://otari.ai/) router.
 
-It is a **reference implementation of a consent-gated agent handoff**, demonstrated with a working pair of static travel sites. The contribution is the boundary, not the travel inventory: the airline is the caller, the hotel is a separate origin, and the browser pauses before the first peer request. The full pattern, threat model, and limitations are in [PROTOCOL.md](PROTOCOL.md).
+It is a **reference implementation of a consent-gated agent handoff**, demonstrated with a working pair of static travel sites. The airline and hotel are fictional, the inventory is generated, and no payment or real reservation is made. The contribution is the boundary, not the travel inventory: the airline is the caller, the hotel is a separate origin, and the browser pauses before the first peer request. The full pattern, threat model, and limitations are in [PROTOCOL.md](PROTOCOL.md).
 
-**Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The second URL has a deliberate trailing dot: browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
+**Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./> — the trailing dot is part of the host. Browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. **Do not drop the dot:** without it the hotel is on the airline's origin. The browser evidence and the one-command deployment check are in [`docs/ORIGIN.md`](docs/ORIGIN.md). The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
 
 **Demo video:** [`docs/trip-relay-demo.mp4`](docs/trip-relay-demo.mp4) (1:45). It was recorded against the local pair with a scripted OpenAI-compatible endpoint, so the assistant header says `⚠ MOCK LLM — no real model`; the public pair defaults to Otari. The silent cut, the narration script, and the dubbing steps are in [`docs/DEMO.md`](docs/DEMO.md) and [`docs/DUB.md`](docs/DUB.md).
 
@@ -20,7 +20,7 @@ The two sites are:
 - **Harbor Hotel** (`localhost:8081` locally; `https://pham-canh.github.io./` hosted) is a separate origin. Its assistant knows its rooms, rates, policies, airport shuttle, and room-request flow.
 - The airline's assistant can hand a hotel question to the second site. **Before any request reaches the hotel origin, the visitor sees the exact origin and request and must allow it.** Nothing is fetched on page load.
 
-The two hostnames are deliberate: `127.0.0.1` and `localhost` are different origins locally; the hosted pair uses the trailing-dot form of the GitHub Pages host. In both cases the demo exercises the real cross-origin path, not two paths on one origin.
+The two hostnames are deliberate: `127.0.0.1` and `localhost` are different origins locally; the hosted pair uses the trailing-dot form of the GitHub Pages host. In both cases the demo exercises the real cross-origin path, not two paths on one origin. [`docs/ORIGIN.md`](docs/ORIGIN.md) records the browser proof and the URL to use for the hotel.
 
 ## Why this is a cross-site problem
 
@@ -117,16 +117,25 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 
 ```bash
 npm test
+npm run check:origins
 ```
 
-The suite runs the real runtime with a scripted model, no network:
+The unit suite runs the real runtime with a scripted model, no network:
 
 - 9 caller tests: network validation, two-agent delegation, manifest/action agreement, read tool, flight write, confirmation gating, decline, approval, stale versions, dialog words, and Otari regional-router selection.
 - 5 peer tests: closed policy, grounded read, room-request confirmation, refusal paths, dialog words.
 
 Fourteen tests in total.
 
-A Playwright pass also exercised both pages in Chromium: manual flight booking and room request, the consent card, the no-contact-before-consent assertion, the approved cross-site answer, and zero console errors. A second pass ran the same cross-origin flow against the public GitHub Pages pair, including the trailing-dot hotel origin. See [docs/DEMO.md](docs/DEMO.md).
+| Check | Result | What it covers |
+| --- | --- | --- |
+| Unit suite | 14/14 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection |
+| Local browser pass | 16 checks | both pages, manual booking, consent card, zero hotel requests before **Allow**, approved cross-site answer, zero console errors |
+| Hosted browser pass | pass | the same consent flow against the public pair, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, then the hotel answer |
+| Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |
+| Live Otari call | not yet recorded | add a key in **AI model settings** and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |
+
+The unit and browser passes use a scripted model that speaks the same SSE/tool-call protocol. They prove the boundary and the consent flow; they are **not** a live Otari call. The public manifests default to Otari, and the repository contains no key. The hosted evidence, including the two `location.origin` values and the `localStorage` isolation probe, is in [`docs/ORIGIN.md`](docs/ORIGIN.md).
 
 ## Otari
 
@@ -141,7 +150,7 @@ The public pair is live:
 - Airline: <https://pham-canh.github.io/trip-relay/>
 - Hotel: <https://pham-canh.github.io./>
 
-The hotel uses the trailing-dot form of the same GitHub Pages host. That is a real, distinct browser origin, not a path trick: `pham-canh.github.io` and `pham-canh.github.io.` have different origins, and GitHub Pages serves both with `Access-Control-Allow-Origin: *`. It avoids requiring a second owner or a custom domain. The airline is the `gh-pages` branch of `pham-canh/trip-relay`; the hotel is the `main` branch of the user Pages repo `pham-canh/pham-canh.github.io`. Some corporate proxies and VPNs reject trailing-dot hosts; the airline's hotel link is the tested path, and the local pair remains the fallback. A custom domain is the cleaner long-term option and only requires changing `PEER_URL`.
+The hotel uses the trailing-dot form of the same GitHub Pages host. That is a real, distinct browser origin, not a path trick: `pham-canh.github.io` and `pham-canh.github.io.` have different origins, and GitHub Pages serves both with `Access-Control-Allow-Origin: *`. It avoids requiring a second owner or a custom domain. The airline is the `gh-pages` branch of `pham-canh/trip-relay`; the hotel is the `main` branch of the user Pages repo `pham-canh/pham-canh.github.io`. Some corporate proxies and VPNs reject trailing-dot hosts; the airline's hotel link is the tested path, and the local pair remains the fallback. A custom domain is the cleaner long-term option and only requires changing `PEER_URL`. The browser proof and the caveat are in [`docs/ORIGIN.md`](docs/ORIGIN.md).
 
 `npm run build:pages` copies `site/` and `peer/` into `dist-pages/airline` and `dist-pages/peer` and rewrites the local URLs. Override `AIRLINE_URL` and `PEER_URL` to target another host:
 
@@ -149,7 +158,7 @@ The hotel uses the trailing-dot form of the same GitHub Pages host. That is a re
 AIRLINE_URL=https://airline.example/ PEER_URL=https://hotel.example/ npm run build:pages
 ```
 
-The generated directories are gitignored; publish each one at its origin root. The build fails if both URLs share an origin. Keep CORS on the hotel's public files. Use HTTPS except for loopback development. After any URL change, rebuild the published network JSON if you edited the HOCON, run `npm test`, and repeat the cross-origin browser check.
+The generated directories are gitignored; publish each one at its origin root. The build fails if both URLs share an origin. Keep CORS on the hotel's public files. Use HTTPS except for loopback development. After any URL change, rebuild the published network JSON if you edited the HOCON, run `npm test`, run `npm run check:origins`, and repeat the cross-origin browser check.
 
 ## Spec mapping
 
@@ -163,7 +172,7 @@ peer/               hotel website plus generated network artifacts
 tests/              node:test suites and the runtime stubs they use
 scripts/serve.mjs   dependency-free static server with CORS
 scripts/build_public.mjs  two-origin public build with URL rewriting
-docs/               screenshots, demo script, Otari notes, spec map, Devpost copy
+docs/               screenshots, demo script, origin proof, Otari notes, spec map, Devpost copy
 PROTOCOL.md         the consent-gated handoff pattern, failure modes, and limitations
 ```
 

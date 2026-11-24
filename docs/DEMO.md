@@ -67,7 +67,7 @@ A Playwright pass against Chromium covered:
 8. A manual room request returns an `HBR-` reference.
 9. The hotel has no console errors.
 10. Chat is usable with a saved key.
-11. The consent card names Harbor Hotel and `localhost:8081`.
+11. The consent card names Harbor Hotel and `localhost:8081` locally, or `pham-canh.github.io.` hosted.
 12. Zero hotel requests occur before consent.
 13. The hotel manifest is fetched only after allow.
 14. The cross-site answer has no tool error.
@@ -75,6 +75,8 @@ A Playwright pass against Chromium covered:
 16. The assistant run has no console errors.
 
 The browser pass uses a scripted SSE router, not a live provider, so it proves the protocol and the boundary without spending tokens. A live Otari run is a separate recording step; do not imply the scripted pass spent real tokens.
+
+The hosted pair was checked separately. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the consent flow produced **0** hotel requests before **Allow**, **0** after **Decline**, and **11** after **Allow**. `npm run check:origins` repeats the deployment check without a key. The evidence and the trailing-dot caveat are in [`docs/ORIGIN.md`](ORIGIN.md). The hosted run also used a scripted endpoint; no live Otari call is claimed.
 
 ## Screenshots
 
