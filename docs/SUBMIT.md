@@ -4,7 +4,7 @@ Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repo
 
 ## 1. Repository status
 
-`main` is pushed through `23d005a` (2026-11-24). The `test` job and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, and `docs/trip-relay-demo.mp4` load on GitHub, and the README now says 14 tests with `crytobot459@gmail.com` as the Otari contact.
+`main` is pushed with the entrant-voice cut (2026-11-24). The `test` job and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README now says 14 tests with `crytobot459@gmail.com` as the Otari contact.
 
 The live site is already current: the deployed airline and hotel files match the local `dist-pages` build (verified by hash). `gh-pages` and the hotel repo `pham-canh/pham-canh.github.io` do not need a rebuild unless you change `site/` or `peer/`. The docs and the origin-check script live on `main` only.
 
@@ -22,6 +22,7 @@ Verify:
 - <https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md>
 - <https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md>
 - <https://github.com/pham-canh/trip-relay/blob/main/docs/trip-relay-demo.mp4>
+- <https://github.com/pham-canh/trip-relay/blob/main/docs/trip-relay-demo-own-voice.mp4>
 
 ## 2. Verify the hosted boundary
 
