@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the video cut are ready; the remaining steps need your YouTube and Devpost logins.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the video are ready; the remaining step needs your Devpost login.
 
 ## 1. Repository status
 
@@ -74,12 +74,12 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 
 ## 6. Final checks
 
-- [ ] The YouTube link plays in a private window, without signing in, and is under two minutes.
-- [ ] Both live origins return HTTP 200.
-- [ ] `npm run check:origins` passes.
-- [ ] The hosted consent flow shows 0 hotel requests before **Allow**.
-- [ ] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
-- [ ] The GitHub README says 14 tests (not 13) and the Otari email is filled in.
-- [ ] No API key appears in the repo, screenshots, video, or Devpost copy.
+- [x] The YouTube link plays without signing in and is under two minutes: <https://youtu.be/uXQRyKOMyxQ> (1:45, public).
+- [x] Both live origins return HTTP 200.
+- [x] `npm run check:origins` passes, and the manual Actions run is green.
+- [x] The hosted consent flow shows 0 hotel requests before **Allow**.
+- [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
+- [x] The GitHub README says 14 tests (not 13) and the Otari email is filled in.
+- [x] No API key appears in the repository or the Devpost copy; the recording uses a scripted endpoint.
 - [ ] The social preview is uploaded in **Settings → Social preview** (`docs/social-preview.png`).
 - [ ] The Devpost form is submitted before the deadline; keep the confirmation email.
