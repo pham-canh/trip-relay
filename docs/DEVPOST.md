@@ -26,11 +26,11 @@ Trip Relay is a **reference implementation of a consent-gated agent handoff**, n
 
 ## Demo video
 
-> **Internal note — do not paste:** the challenge rules require the entrant to explain the project in their own voice (**not AI generated**). The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4` (1:45.5). Upload it with the retimed Vietnamese and English captions, then replace the link below. **Do not submit the link below** — it is the synthetic timing cut.
+> **Internal note — do not paste:** the challenge rules require the entrant to explain the project in their own voice (**not AI generated**). The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4` (1:45.5), with English subtitles burned into the picture. Upload it with the retimed Vietnamese and English captions, then replace the link below. **Do not submit the link below** — it is the synthetic timing cut.
 
 <https://youtu.be/uXQRyKOMyxQ> (synthetic timing cut — demo only)
 
-The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The final cut is narrated in Vietnamese by the entrant, with an embedded English subtitle track, English captions, and a full English transcript in [`VIDEO-TRANSCRIPT.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md). The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The entrant-voice file, the silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](DUB-VI.md).
+The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The final cut is narrated in Vietnamese by the entrant, with English subtitles burned into the picture, English captions, and a full English transcript in [`VIDEO-TRANSCRIPT.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md). The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The entrant-voice file, the silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](DUB-VI.md).
 
 ## How we built it
 

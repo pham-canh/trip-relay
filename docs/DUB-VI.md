@@ -1,6 +1,6 @@
 # Ghi lời bình bằng tiếng Việt
 
-> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC) with an embedded English subtitle track (`mov_text`, default). The recording steps below remain for a re-record. Upload the own-voice file, not the synthetic timing cut.
+> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC) with English subtitles burned into the picture, so they are visible without enabling a track. The recording steps below remain for a re-record. Upload the own-voice file, not the synthetic timing cut.
 
 The challenge rules say the video **must include the Entrant explaining the Project**, and the language rule allows a non-English video if you provide an **English translation**:
 
@@ -57,7 +57,9 @@ The last line should end around 1:45. If your take runs long, speak a little fas
 
 ## Mux
 
-`ffmpeg` is not installed on this machine. The current take was muxed with macOS AVFoundation, encoded as mono AAC at 48 kbps, and checked at 1:45.5 with the video stream copied unchanged. If you prefer to do it yourself on another machine:
+The current take was muxed with macOS AVFoundation, encoded as mono AAC at 48 kbps, and checked at 1:45.5 with the video stream copied unchanged. The English subtitles were then burned into the picture with `ffmpeg` and `libass`, using the retimed English cues split into shorter lines. The output is H.264/AAC at 1600×900, 1:45.5, with the audio stream copied through unchanged.
+
+To re-mux the narration on another machine:
 
 ```bash
 ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a \
@@ -67,7 +69,7 @@ ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a \
 ## Upload
 
 - Upload `docs/trip-relay-demo-own-voice.mp4` as a new YouTube video, **Public**. Do not upload the synthetic timing cut.
-- The MP4 already carries an embedded English subtitle track, but YouTube's caption uploader uses sidecar files. Add two caption tracks:
+- The MP4 already has the English subtitles burned into the picture, so viewers see them without enabling captions. YouTube's caption uploader still uses sidecar files; add two caption tracks:
   - **Vietnamese:** `docs/trip-relay-demo-vi.srt`.
   - **English:** `docs/trip-relay-demo.srt` — this is the required English translation.
 - The caption files are retimed to this take; the long “allow” section is split into three cues.

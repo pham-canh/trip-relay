@@ -29,7 +29,7 @@ Chapters:
 
 Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key.
 
-Language: Vietnamese narration by the entrant, with English captions. English transcript: https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md
+Language: Vietnamese narration by the entrant, with English captions burned into the picture. English transcript: https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md
 
 Built for the Open Agentic Web Challenge. MIT licensed.
 ```
@@ -49,7 +49,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 5. Under **Subtitles**, upload both tracks:
    - `docs/trip-relay-demo-vi.srt` as **Vietnamese**.
    - `docs/trip-relay-demo.srt` as **English** — the required translation.
-   The MP4 also carries an embedded English `mov_text` track, but YouTube's caption uploader uses the sidecar SRT; upload it explicitly.
+   The MP4 also has the English subtitles burned into the picture, so they are visible without enabling captions. YouTube's caption uploader uses the sidecar SRT; upload it explicitly.
 6. Audience: **Not made for kids**. Visibility: **Public**.
 7. Wait for HD processing to finish, then copy the watch URL.
 8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
@@ -65,4 +65,4 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 
 ## Own-voice cut
 
-The entrant's Vietnamese take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC). The picture is `docs/trip-relay-demo-silent.mp4`; the narration is the entrant's own voice, not synthetic. The caption files are retimed to this take, with the long “allow” section split into three cues. Upload this file as the submission video and keep the timing cut only as a public demo.
+The entrant's Vietnamese take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC). The picture is `docs/trip-relay-demo-silent.mp4`; the narration is the entrant's own voice, not synthetic. The English subtitles are burned into the picture, and the caption files are retimed to this take, with the long “allow” section split into three cues. Upload this file as the submission video and keep the timing cut only as a public demo.

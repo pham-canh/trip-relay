@@ -42,7 +42,7 @@ The rules say the video **must include the Entrant explaining the Project (not A
 
 The entrant-voice cut is ready:
 
-- File: `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, H.264 + mono AAC, embedded English `mov_text` subtitle track).
+- File: `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, H.264 + mono AAC, English subtitles burned into the picture).
 - Silent picture: `docs/trip-relay-demo-silent.mp4`.
 - Vietnamese script and pronunciation notes: [`docs/DUB-VI.md`](DUB-VI.md).
 - Vietnamese captions: `docs/trip-relay-demo-vi.srt` (retimed to this take).
@@ -51,7 +51,7 @@ The entrant-voice cut is ready:
 
 Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **Public**, add both caption tracks, then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form. Keep the same title, description, tags, and thumbnail: [`docs/YOUTUBE.md`](YOUTUBE.md). The synthetic link can stay up as a demo, but the submission must point at the own-voice cut.
 
-The mux was done with macOS AVFoundation; `ffmpeg` is not installed on this machine. The output was checked for duration, video/audio tracks, and audio sync against the picture cues.
+The mux was done with macOS AVFoundation, and the English subtitles were burned in with `ffmpeg`/`libass`. The output was checked for duration, video/audio tracks, and audio sync against the picture cues; the audio stream is identical to the muxed take.
 
 ## 4. Fill the Devpost form
 
