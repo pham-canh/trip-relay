@@ -6,7 +6,7 @@
 - Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, English subtitles burned into the picture, submission video.
 - Silent cut: [`docs/trip-relay-demo-silent.mp4`](trip-relay-demo-silent.mp4) — same picture, no audio, for recording your own narration.
 - Thumbnail: [`docs/youtube-thumbnail.png`](youtube-thumbnail.png) — 1280×720.
-- Captions: [`docs/trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt) (Vietnamese) and [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) (English), retimed to the entrant-voice cut.
+- Caption sources: [`docs/trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt) (Vietnamese) and [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) (English, burned into the picture), retimed to the entrant-voice cut.
 - The screen recording is the real local pair: the airline at `127.0.0.1:8084` and the hotel at `localhost:8081`. The airline copy used for the take publishes a **scripted OpenAI-compatible endpoint** as its mock router, so the assistant header shows `⚠ MOCK LLM — no real model` for the whole run. The public pair is unchanged and still uses Otari. The narration says this out loud.
 - The timing cut uses macOS `say` (Samantha) for timing. The submission cut replaces it with the entrant's Vietnamese take; the English script below documents the demo, and the Vietnamese script is in [`docs/DUB-VI.md`](DUB-VI.md).
 
