@@ -112,6 +112,14 @@ Upload the screenshots in this order; each caption is under 140 characters.
 - Video transcript (English): <https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md>
 - Otari account email: `crytobot459@gmail.com`
 
+## Additional info (judges only)
+
+- **Public open agentic site:** <https://pham-canh.github.io/trip-relay/> (the airline entry point; the hotel is the separate origin at <https://pham-canh.github.io./>).
+- **Screenshot:** `docs/screenshots/airline-hero.png`.
+- **Upload a file:** leave blank; the public repository, `PROTOCOL.md`, `docs/ORIGIN.md`, and the transcript are the evidence bundle.
+- **Additional tool URL:** <https://github.com/pham-canh/trip-relay/blob/main/scripts/check_origins.mjs>.
+- **Additional tool description:** `scripts/check_origins.mjs` is a dependency-free Node.js check for the deployed pair. It verifies that the airline and hotel resolve to different browser origins (the hotel host keeps its deliberate trailing dot), that both manifests are reachable, that the hotel manifest is CORS-readable from the airline, that the airline lists the hotel origin as an allowed peer, that the hotel allows no further peers, and that the hotel network publishes tools. Run it with `npm run check:origins`; the browser-level evidence, including localStorage isolation and the 0/0/11 consent request counts, is in `docs/ORIGIN.md`.
+
 ## Before submitting
 
 - [x] **Publish the two sites to two public origins.** Airline: <https://pham-canh.github.io/trip-relay/>; hotel: <https://pham-canh.github.io./> (trailing-dot origin).
