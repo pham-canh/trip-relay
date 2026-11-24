@@ -50,6 +50,13 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
 9. Open the link in a private window to confirm it plays without signing in.
 
+## Published
+
+- URL: <https://youtu.be/uXQRyKOMyxQ>
+- Visibility: Public
+- Duration: 1:45 (105 seconds)
+- Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
+
 ## If the rules require the entrant's own voice
 
 The current cut uses a synthetic narration track for timing. Record the script in [`docs/DUB.md`](DUB.md) over `docs/trip-relay-demo-silent.mp4`, mux the result, and upload that file instead. Keep the same title, description, and disclosure.

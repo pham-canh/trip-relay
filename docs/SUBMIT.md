@@ -35,16 +35,16 @@ Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
-## 3. Upload the video
+## 3. Video is published
 
+- URL: <https://youtu.be/uXQRyKOMyxQ>
 - File: `docs/trip-relay-demo.mp4` (1:45, 1600×900).
+- Visibility: **Public**, confirmed without cookies (`isPrivate: false`, `isUnlisted: false`).
+- The link is already in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`).
 - Title, description, tags: [`docs/YOUTUBE.md`](YOUTUBE.md).
-- Visibility: **Public**.
 - Thumbnail: `docs/youtube-thumbnail.png`.
 - Captions: `docs/trip-relay-demo.srt`.
-- If the rules require the entrant's own voice, record over `docs/trip-relay-demo-silent.mp4` with [`docs/DUB.md`](DUB.md) and upload that cut instead.
-
-Paste the watch URL into `docs/DEVPOST.md` (the `Demo video:` line and the `## Demo video` section), then commit and push that change.
+- If the rules require the entrant's own voice, record over `docs/trip-relay-demo-silent.mp4` with [`docs/DUB.md`](DUB.md) and replace the upload.
 
 ## 4. Fill the Devpost form
 
