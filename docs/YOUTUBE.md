@@ -20,7 +20,7 @@ Protocol: https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md
 
 Chapters:
 0:00 Two sites, two origins
-0:08 Book a flight
+0:09 Book a flight
 0:24 The consent card
 0:48 Decline: zero requests
 0:57 Allow: the handoff
