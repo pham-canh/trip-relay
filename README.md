@@ -112,6 +112,7 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 - **No key sharing.** The hotel network is fetched as public data and executed in the caller's browser. The key goes only to the configured router.
 - **Two gates for writes.** `book_flight` and `request_room` require a visitor confirmation and a current `expectedVersion`; a stale call is refused with a readable reason.
 - **Demo data only.** State lives in memory, resets on reload, takes no payment, and no request is sent to a real airline or hotel.
+- **Planned adversarial hardening.** A hostile-peer DLP and audit benchmark is specified in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md). It is not part of the submitted demo.
 
 ## Tests
 

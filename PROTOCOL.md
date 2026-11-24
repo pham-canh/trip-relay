@@ -130,7 +130,7 @@ These are honest boundaries, not hidden claims:
 
 - **No cryptographic attestation.** The demo verifies published names and origins, not signatures or publisher identity.
 - **No server-side policy enforcement.** The consent gate lives in the browser runtime. A production system should mirror the policy at a trusted gateway.
-- **No persistent audit log.** The trace is visible in the page but is not exported to a tamper-evident store.
+- **No persistent audit log.** The trace is visible in the page but is not exported to a tamper-evident store. A concrete hostile-peer DLP and audit benchmark plan is in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
 - **No real inventory, payment, or booking.** Travel data is generated demo data.
 - **No general-purpose authenticated action API beyond the shipped bridge.** The runtime can call a peer's declared actions through its action bridge; this demo uses that for the hotel's own actions, and writes still require confirmation on the owning origin. A production system would add authorization and audit controls around that bridge.
 
