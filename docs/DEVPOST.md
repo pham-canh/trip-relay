@@ -24,13 +24,19 @@ The public demo runs at <https://pham-canh.github.io/trip-relay/> with the hotel
 
 Trip Relay is a **reference implementation of a consent-gated agent handoff**, not a travel-booking product. Travel is the demonstration domain. The reusable contribution is the boundary: a peer network is public data, the browser pauses before the first peer fetch, the exact network is resolved with no fallback, and the peer receives the declared request rather than the caller's private context. The pattern, threat model, failure modes, and limitations are documented in [`PROTOCOL.md`](https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md).
 
+## Demo video
+
+`[ADD YOUTUBE LINK]`
+
+The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The silent cut and the entrant-voice dubbing steps are in [`docs/DUB.md`](DUB.md).
+
 ## How we built it
 
 - Two static sites, each with an `agent-manifest.json`, a resolved Neuro SAN HOCON network, `links.json`, a browser runtime, and a small action module.
 - The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 14 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push.
+- 14 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push. The demo recording uses a scripted SSE router; the public pair defaults to Otari.
 
 ## Challenges
 
@@ -56,7 +62,7 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 ## What's next
 
-- Record the live flow with Otari, including the consent card and a decline.
+- Record a live Otari take with the entrant's own voice; the current cut is a scripted, reproducible take.
 - Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
 - Extract the consent/policy layer into a small reusable library and add signed publisher identity.
 - Add a second peer with a different trust level to show per-origin policies.
@@ -91,9 +97,12 @@ Open <http://127.0.0.1:8080/>.
 ## Before submitting
 
 - [x] **Publish the two sites to two public origins.** Airline: <https://pham-canh.github.io/trip-relay/>; hotel: <https://pham-canh.github.io./> (trailing-dot origin).
-- [ ] Record the under-two-minute narrated video and replace the link above.
-- [ ] Add the Otari account email and check the problem/improvement text in `docs/OTARI.md`.
+- [x] Record the 1:45 cut (`docs/trip-relay-demo.mp4`) and the silent cut (`docs/trip-relay-demo-silent.mp4`).
+- [ ] Upload the video to YouTube and replace the link above. Use `docs/YOUTUBE.md`; re-record the voice with `docs/DUB.md` if the rules require the entrant's own voice.
+- [x] Add the Otari account email (`crytobot459@gmail.com`) and check the problem/improvement text in `docs/OTARI.md`.
 - [ ] Revoke any Otari key used during development and confirm no key is in the repo or screenshots.
-- [ ] Confirm the repository is public and the license is visible.
+- [x] Confirm the repository is public and the license is visible.
 - [ ] Upload the repository social preview (`docs/social-preview.png`) and pin the repo if it belongs in the portfolio.
-- [ ] Re-run `npm test` after any deployment URL change.
+- [x] Re-run `npm test` after the last code change (14/14 pass).
+- [ ] Push `main` so `PROTOCOL.md`, `scripts/build_public.mjs`, and the demo docs stop 404ing on GitHub.
+- [ ] Open the Devpost form, paste this copy, add the screenshots and video link, and submit.

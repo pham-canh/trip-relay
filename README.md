@@ -12,6 +12,8 @@ It is a **reference implementation of a consent-gated agent handoff**, demonstra
 
 **Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The second URL has a deliberate trailing dot: browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
 
+**Demo video:** [`docs/trip-relay-demo.mp4`](docs/trip-relay-demo.mp4) (1:45). It was recorded against the local pair with a scripted OpenAI-compatible endpoint, so the assistant header says `⚠ MOCK LLM — no real model`; the public pair defaults to Otari. The silent cut, the narration script, and the dubbing steps are in [`docs/DEMO.md`](docs/DEMO.md) and [`docs/DUB.md`](docs/DUB.md).
+
 The two sites are:
 
 - **Skyline Air** (`127.0.0.1:8080` locally; `https://pham-canh.github.io/trip-relay/` hosted) is the caller. Its network has a front agent and a `fare_agent` specialist that reads flights, holds a fare, and books it after the visitor confirms.
