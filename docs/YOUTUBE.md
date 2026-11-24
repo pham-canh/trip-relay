@@ -42,6 +42,8 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 
 ## Upload steps
 
+The submission upload is complete at <https://youtu.be/lDLhXmqXv6I>. These steps remain for a re-upload.
+
 1. Open <https://studio.youtube.com/> and sign in with `crytobot459@gmail.com`.
 2. **Create → Upload videos**, then choose `docs/trip-relay-demo-own-voice.mp4` — the entrant-voice cut, not the synthetic timing cut.
 3. Paste the title and description above. Add the tags.
@@ -54,12 +56,12 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 
 ## Published
 
-- Synthetic timing cut (demo only): <https://youtu.be/uXQRyKOMyxQ>
-- Visibility: Public
-- Duration: 1:45 (105 seconds)
-- Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
-- **Do not submit the timing cut.** It uses the synthetic narration track. The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4`; the English subtitles are burned in, and the Vietnamese track is optional. Upload it, then replace the link above in `docs/DEVPOST.md` and in the Devpost form. Keep the same title, description, thumbnail, and tags.
+- **Submission video:** <https://youtu.be/lDLhXmqXv6I> — Public, 1:46, entrant-voice cut with English subtitles burned into the picture.
+- Synthetic timing cut (demo only): <https://youtu.be/uXQRyKOMyxQ> — Public, 1:45, synthetic narration; do not submit.
+- Checked on 2026-11-24 without cookies: oEmbed 200, public, downloadable. Frames at 0:00, 0:17, 0:49, 1:20, and 1:44 show the burned-in English subtitles.
+- **Thumbnail:** the current YouTube thumbnail is a video frame with the developer panel. Replace it with `docs/youtube-thumbnail.png` in YouTube Studio before submitting. If the account has no custom-thumbnail option, verify the channel at <https://www.youtube.com/verify>.
+- The video is 360p in the anonymous download; check that higher resolutions finish processing before sharing.
 
 ## Own-voice cut
 
-The entrant's Vietnamese take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC). The picture is `docs/trip-relay-demo-silent.mp4`; the narration is the entrant's own voice, not synthetic. The English subtitles are burned into the picture, and the caption files are retimed to this take, with the long “allow” section split into three cues. Upload this file as the submission video and keep the timing cut only as a public demo.
+The entrant's Vietnamese take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, AAC) and published at <https://youtu.be/lDLhXmqXv6I>. The picture is `docs/trip-relay-demo-silent.mp4`; the narration is the entrant's own voice, not synthetic. The English subtitles are burned into the picture, and the caption files are retimed to this take, with the long “allow” section split into three cues. Keep the timing cut only as a public demo.

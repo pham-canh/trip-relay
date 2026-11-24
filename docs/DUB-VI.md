@@ -1,6 +1,6 @@
 # Ghi lời bình bằng tiếng Việt
 
-> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC) with English subtitles burned into the picture, so they are visible without enabling a track. The recording steps below remain for a re-record. Upload the own-voice file, not the synthetic timing cut.
+> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC) with English subtitles burned into the picture, so they are visible without enabling a track. It is published at <https://youtu.be/lDLhXmqXv6I> (Public, 1:46). The recording steps below remain for a re-record. Do not submit the synthetic timing cut.
 
 The challenge rules say the video **must include the Entrant explaining the Project**, and the language rule allows a non-English video if you provide an **English translation**:
 
@@ -68,9 +68,9 @@ ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a \
 
 ## Upload
 
-- Upload `docs/trip-relay-demo-own-voice.mp4` as a new YouTube video, **Public**. Do not upload the synthetic timing cut.
+- Published at <https://youtu.be/lDLhXmqXv6I> (Public, 1:46). For a re-upload, use `docs/trip-relay-demo-own-voice.mp4`; do not upload the synthetic timing cut.
 - The MP4 already has the English subtitles burned into the picture, so viewers see them without enabling captions. **Do not upload `docs/trip-relay-demo.srt` as an English caption track** — it would duplicate the burned-in text. The English SRT stays in the repo as the translation source and is linked from the transcript.
 - Optional: upload `docs/trip-relay-demo-vi.srt` as the **Vietnamese** caption track. It is retimed to this take; the long “allow” section is split into three cues.
 - Put the English transcript link in the description: <https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md>.
-- Use the title, description, tags, and thumbnail in [`YOUTUBE.md`](YOUTUBE.md).
-- Send me the new watch URL; I will update the Devpost copy and push.
+- Use the title, description, tags, and thumbnail in [`YOUTUBE.md`](YOUTUBE.md). The current YouTube thumbnail is a developer-panel frame; replace it with `docs/youtube-thumbnail.png`.
+- The watch URL is in `docs/DEVPOST.md`; paste it into the Devpost form.

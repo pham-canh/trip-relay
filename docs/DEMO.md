@@ -3,7 +3,7 @@
 ## Recorded take
 
 - Timing cut: [`docs/trip-relay-demo.mp4`](trip-relay-demo.mp4) — 1:45, 1600×900, 30 fps, H.264/AAC, synthetic narration, demo only.
-- Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, English subtitles burned into the picture, submission video.
+- Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, English subtitles burned into the picture, submission video. Published at <https://youtu.be/lDLhXmqXv6I>.
 - Silent cut: [`docs/trip-relay-demo-silent.mp4`](trip-relay-demo-silent.mp4) — same picture, no audio, for recording your own narration.
 - Thumbnail: [`docs/youtube-thumbnail.png`](youtube-thumbnail.png) — 1280×720.
 - Caption sources: [`docs/trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt) (Vietnamese) and [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) (English, burned into the picture), retimed to the entrant-voice cut.
@@ -89,9 +89,9 @@ The hosted pair was checked separately. `location.origin` is `https://pham-canh.
 
 ## Publishing
 
-1. Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **public** (the Devpost rules require a public video). Do not upload the synthetic timing cut as the submission.
-2. The English subtitles are burned into the picture, so no English track is needed. Optionally add the Vietnamese track.
-3. Use the title, description, and tags in [`docs/YOUTUBE.md`](YOUTUBE.md).
-4. Set the thumbnail to `docs/youtube-thumbnail.png` if the account allows custom thumbnails.
-5. Paste the YouTube URL into `docs/DEVPOST.md` and the Devpost form.
+1. Uploaded to YouTube as **public**: <https://youtu.be/lDLhXmqXv6I> (1:46). The synthetic timing cut is demo-only.
+2. The English subtitles are burned into the picture, so no English track is needed. The Vietnamese track is optional.
+3. The title, description, tags, and chapters in [`docs/YOUTUBE.md`](YOUTUBE.md) are live.
+4. Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`; the current thumbnail is a developer-panel frame.
+5. The URL is in `docs/DEVPOST.md`; paste it into the Devpost form.
 6. Verify the link in a private browser window before submitting.

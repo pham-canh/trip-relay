@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the entrant-voice cut are ready. The only video step left is the public YouTube upload and replacing the synthetic link in the Devpost copy. The narration is in **Vietnamese**; English subtitles burned into the picture and a transcript satisfy the language rule.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the entrant-voice video are ready. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: replace the YouTube thumbnail, then submit the Devpost form.
 
 ## 1. Repository status
 
@@ -36,11 +36,11 @@ Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
-## 3. Upload the entrant-voice video
+## 3. Entrant-voice video (uploaded)
 
-The rules say the video **must include the Entrant explaining the Project (not AI generated)**. The current upload at <https://youtu.be/uXQRyKOMyxQ> uses the synthetic narration track, so it does **not** meet that clause. Do not submit it.
+The rules say the video **must include the Entrant explaining the Project (not AI generated)**. The uploaded submission video is <https://youtu.be/lDLhXmqXv6I> — Public, 1:46, Vietnamese narration, English subtitles burned into the picture. The synthetic timing cut at <https://youtu.be/uXQRyKOMyxQ> remains demo-only; do not submit it.
 
-The entrant-voice cut is ready:
+The entrant-voice cut:
 
 - File: `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, H.264 + mono AAC, English subtitles burned into the picture).
 - Silent picture: `docs/trip-relay-demo-silent.mp4`.
@@ -49,7 +49,7 @@ The entrant-voice cut is ready:
 - English translation source: `docs/trip-relay-demo.srt` (retimed to this take; burned into the picture).
 - English transcript: [`docs/VIDEO-TRANSCRIPT.md`](VIDEO-TRANSCRIPT.md).
 
-Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **Public**. The English subtitles are burned in, so no English caption track is needed; optionally add the Vietnamese track `docs/trip-relay-demo-vi.srt`. Then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form. Keep the same title, description, tags, and thumbnail: [`docs/YOUTUBE.md`](YOUTUBE.md). The synthetic link can stay up as a demo, but the submission must point at the own-voice cut.
+The upload is done. Remaining YouTube step: set the thumbnail to `docs/youtube-thumbnail.png`; the current thumbnail is a frame with the developer panel. The English subtitles are burned in, so no English caption track is needed; the Vietnamese track is optional. Keep the title, description, tags, and chapters in [`docs/YOUTUBE.md`](YOUTUBE.md). The link is already in [`docs/DEVPOST.md`](DEVPOST.md).
 
 The mux was done with macOS AVFoundation, and the English subtitles were burned in with `ffmpeg`/`libass`. The output was checked for duration, video/audio tracks, and audio sync against the picture cues; the audio stream is identical to the muxed take.
 
@@ -62,7 +62,7 @@ Use the sections in [`docs/DEVPOST.md`](DEVPOST.md):
 - **Description:** Inspiration, What it does, How we built it, Verification status, Challenges, Accomplishments, What we learned, What's next.
 - **Built with:** HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions.
 - **Try it:** <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>).
-- **Video:** the YouTube URL.
+- **Video:** <https://youtu.be/lDLhXmqXv6I>.
 - **Screenshots:** `docs/screenshots/airline-hero.png`, `airline-booking.png`, `consent.png`, `assistant-answer.png`, `hotel-mobile.png`.
 - **Repository:** <https://github.com/pham-canh/trip-relay>.
 - **Otari account email:** `crytobot459@gmail.com`.
@@ -81,7 +81,8 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 
 ## 6. Final checks
 
-- [ ] The final YouTube upload uses the entrant's own voice (not AI-generated), plays without signing in, and is under two minutes.
+- [x] The final YouTube upload uses the entrant's own voice (not AI-generated), plays without signing in, is 1:46, and has English subtitles burned into the picture.
+- [ ] Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`.
 - [x] Both live origins return HTTP 200.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**.
