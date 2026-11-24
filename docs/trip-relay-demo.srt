@@ -1,0 +1,41 @@
+1
+00:00:00,400 --> 00:00:08,110
+Two travel websites. Two separate origins. One assistant
+that can cross between them, but only with your permission.
+
+2
+00:00:08,900 --> 00:00:18,940
+Start on Skyline Air. Pick a flight, enter a passenger,
+and book it. The page holds the state, issues the reference,
+and never leaves the browser.
+
+3
+00:00:24,900 --> 00:00:47,160
+Now ask the concierge about a hotel. The model wants to call
+Harbor Hotel, a different origin published by a different site.
+This take uses a scripted model endpoint, so the handoff is
+reproducible. The same page runs Otari with a key. Before
+anything leaves the page, you see who will be contacted, why,
+and the exact request.
+
+4
+00:00:48,900 --> 00:00:56,160
+Decline. The runtime stops the call. Zero requests reach
+the hotel, and the assistant tells you so.
+
+5
+00:00:57,900 --> 00:01:11,870
+Ask again, and allow. The runtime fetches the hotel's published
+manifest, checks its policy, and runs its network. Harbor Hotel
+receives the request, not your chat history, and not your model key.
+
+6
+00:01:23,900 --> 00:01:31,990
+The trace shows every hop. Origin, peer, consent, and result.
+Fourteen tests cover the runtime and the boundary.
+
+7
+00:01:33,400 --> 00:01:45,200
+Trip Relay. Two sites, one visible boundary. Live on GitHub Pages.
+MIT licensed. Built on the MVP Profile, with Mozilla Otari as the
+default router.

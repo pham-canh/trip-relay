@@ -44,10 +44,11 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 2. **Create → Upload videos**, then choose `docs/trip-relay-demo.mp4`.
 3. Paste the title and description above. Add the tags.
 4. Upload `docs/youtube-thumbnail.png` as the thumbnail if the account allows custom thumbnails.
-5. Audience: **Not made for kids**. Visibility: **Public**.
-6. Wait for HD processing to finish, then copy the watch URL.
-7. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
-8. Open the link in a private window to confirm it plays without signing in.
+5. Under **Subtitles**, upload `docs/trip-relay-demo.srt` as English (or paste it in the editor).
+6. Audience: **Not made for kids**. Visibility: **Public**.
+7. Wait for HD processing to finish, then copy the watch URL.
+8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
+9. Open the link in a private window to confirm it plays without signing in.
 
 ## If the rules require the entrant's own voice
 

@@ -5,6 +5,7 @@
 - Video: [`docs/trip-relay-demo.mp4`](trip-relay-demo.mp4) — 1:45, 1600×900, 30 fps, H.264/AAC.
 - Silent cut: [`docs/trip-relay-demo-silent.mp4`](trip-relay-demo-silent.mp4) — same picture, no audio, for recording your own narration.
 - Thumbnail: [`docs/youtube-thumbnail.png`](youtube-thumbnail.png) — 1280×720.
+- Captions: [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) — English, timed to the recorded narration.
 - The screen recording is the real local pair: the airline at `127.0.0.1:8084` and the hotel at `localhost:8081`. The airline copy used for the take publishes a **scripted OpenAI-compatible endpoint** as its mock router, so the assistant header shows `⚠ MOCK LLM — no real model` for the whole run. The public pair is unchanged and still uses Otari. The narration says this out loud.
 - The narration in this cut is macOS `say` (Samantha) used for timing. If the challenge requires the entrant's own voice, record the script below over the silent cut and mux it; see [`docs/DUB.md`](DUB.md).
 
