@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair and the repository are ready. The video needs one more pass: the rules require the entrant's own voice, and the current upload uses synthetic narration.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair and the repository are ready. The video needs one more pass: the rules require the entrant's own voice, and the current upload uses synthetic narration. You can record in **Vietnamese**; English captions and a transcript satisfy the language rule.
 
 ## 1. Repository status
 
@@ -39,14 +39,19 @@ If an external reviewer says the two sites share an origin, check the URL: they 
 
 The rules say the video **must include the Entrant explaining the Project (not AI generated)**. The current upload at <https://youtu.be/uXQRyKOMyxQ> uses the synthetic narration track, so it does **not** meet that clause. Replace it before submitting.
 
+You do **not** need to speak English. The language rule allows a non-English video when an English translation is provided. Record the Vietnamese script; upload the English caption track and link the English transcript.
+
 - Silent picture: `docs/trip-relay-demo-silent.mp4` (1:45, 1600×900).
-- Script and recording steps: [`docs/DUB.md`](DUB.md).
+- Vietnamese script, pronunciation notes, and recording steps: [`docs/DUB-VI.md`](DUB-VI.md).
+- Vietnamese captions: `docs/trip-relay-demo-vi.srt`.
+- English translation captions: `docs/trip-relay-demo.srt`.
+- English transcript: [`docs/VIDEO-TRANSCRIPT.md`](VIDEO-TRANSCRIPT.md).
 - Mux: `ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a -c:v copy -c:a aac -b:a 192k -shortest docs/trip-relay-demo-own-voice.mp4`.
 - Upload the own-voice cut to YouTube as **Public**, then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form.
 - Keep the same title, description, tags, thumbnail, and captions: [`docs/YOUTUBE.md`](YOUTUBE.md).
 - The old link can stay up as a demo, but the submission must point at the own-voice cut.
 
-If you record `voice.m4a`, I can mux it and check the duration and audio sync.
+`ffmpeg` is not installed on this machine. If you record `voice.m4a`, I can mux it with macOS AVFoundation and check the duration and audio sync.
 
 ## 4. Fill the Devpost form
 

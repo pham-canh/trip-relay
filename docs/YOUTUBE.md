@@ -29,6 +29,8 @@ Chapters:
 
 Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key.
 
+Language: Vietnamese narration by the entrant, with English captions. English transcript: https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md
+
 Built for the Open Agentic Web Challenge. MIT licensed.
 ```
 
@@ -56,7 +58,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 - Visibility: Public
 - Duration: 1:45 (105 seconds)
 - Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
-- **This upload uses the synthetic narration track.** The challenge rules require the entrant's own voice, so record over `docs/trip-relay-demo-silent.mp4` with `docs/DUB.md` and replace this upload before submitting. Keep the same title, description, thumbnail, and captions.
+- **This upload uses the synthetic narration track.** The challenge rules require the entrant's own voice, so record the Vietnamese script in `docs/DUB-VI.md` over `docs/trip-relay-demo-silent.mp4`, upload the own-voice cut, and replace this upload before submitting. Add the Vietnamese and English caption tracks; keep the same title, description, thumbnail, and tags.
 
 ## If the rules require the entrant's own voice
 

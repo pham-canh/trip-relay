@@ -2,6 +2,8 @@
 
 The recorded cut uses a synthetic voice for timing. If the challenge requires the entrant's own voice, record this script over the silent video and mux the result.
 
+**If you prefer to narrate in Vietnamese, use [`DUB-VI.md`](DUB-VI.md) instead.** The challenge language rule allows a non-English video when an English translation is provided; the English captions and transcript are in `docs/trip-relay-demo.srt` and `docs/VIDEO-TRANSCRIPT.md`.
+
 ## What you need
 
 - `docs/trip-relay-demo-silent.mp4` — the final picture, no audio, 1:45.

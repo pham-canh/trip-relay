@@ -12,7 +12,7 @@ It is a **reference implementation of a consent-gated agent handoff**, demonstra
 
 **Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./> — the trailing dot is part of the host. Browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. **Do not drop the dot:** without it the hotel is on the airline's origin. The browser evidence and the one-command deployment check are in [`docs/ORIGIN.md`](docs/ORIGIN.md). The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
 
-**Demo video:** [Watch on YouTube](https://youtu.be/uXQRyKOMyxQ) or [`docs/trip-relay-demo.mp4`](docs/trip-relay-demo.mp4) (1:45). It was recorded against the local pair with a scripted OpenAI-compatible endpoint, so the assistant header says `⚠ MOCK LLM — no real model`; the public pair defaults to Otari. The silent cut, the narration script, and the dubbing steps are in [`docs/DEMO.md`](docs/DEMO.md) and [`docs/DUB.md`](docs/DUB.md).
+**Demo video:** [timing cut on YouTube](https://youtu.be/uXQRyKOMyxQ) or [`docs/trip-relay-demo.mp4`](docs/trip-relay-demo.mp4) (1:45). The final submission cut will be narrated in Vietnamese by the entrant, with English captions and a transcript in [`docs/VIDEO-TRANSCRIPT.md`](docs/VIDEO-TRANSCRIPT.md); the timing cut uses synthetic narration. It was recorded against the local pair with a scripted OpenAI-compatible endpoint, so the assistant header says `⚠ MOCK LLM — no real model`; the public pair defaults to Otari. The silent cut and the Vietnamese script are in [`docs/DUB-VI.md`](docs/DUB-VI.md).
 
 The two sites are:
 

@@ -1,0 +1,47 @@
+1
+00:00:00,400 --> 00:00:08,110
+Hai website du lịch. Hai origin riêng biệt.
+Một trợ lý có thể đi qua, nhưng chỉ khi bạn cho phép.
+
+2
+00:00:08,900 --> 00:00:18,940
+Bắt đầu ở Skyline Air. Chọn chuyến bay,
+nhập tên hành khách, rồi đặt vé.
+Trang tự giữ trạng thái, tự cấp mã vé,
+và không gửi dữ liệu đi đâu.
+
+3
+00:00:24,900 --> 00:00:47,160
+Giờ hỏi trợ lý khách sạn. Mô hình muốn gọi
+Harbor Hotel — một origin khác, do một website khác công bố.
+Bản ghi này dùng endpoint mô phỏng theo kịch bản,
+nên tái lập được. Cùng trang đó chạy Otari khi có khóa.
+Trước khi bất cứ thứ gì rời khỏi trang,
+bạn thấy ai sẽ được liên hệ, vì sao,
+và đúng nội dung yêu cầu.
+
+4
+00:00:48,900 --> 00:00:56,160
+Từ chối. Bộ chạy dừng cuộc gọi.
+Không có yêu cầu nào đến khách sạn,
+và trợ lý nói rõ điều đó.
+
+5
+00:00:57,900 --> 00:01:11,870
+Hỏi lại, rồi cho phép. Bộ chạy tải manifest
+công khai của khách sạn, kiểm tra chính sách,
+và chạy network đó. Harbor Hotel nhận được yêu cầu —
+không phải lịch sử chat, cũng không phải khóa mô hình của bạn.
+
+6
+00:01:23,900 --> 00:01:31,990
+Dấu vết hiển thị từng bước.
+Origin, đối tác, đồng ý, và kết quả.
+Mười bốn test kiểm tra bộ chạy và ranh giới.
+
+7
+00:01:33,400 --> 00:01:45,200
+Trip Relay. Hai site, một ranh giới hữu hình.
+Chạy thật trên GitHub Pages. Giấy phép MIT.
+Xây trên MVP Profile, với Mozilla Otari
+làm bộ định tuyến mặc định.

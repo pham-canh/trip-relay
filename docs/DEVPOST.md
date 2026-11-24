@@ -26,11 +26,11 @@ Trip Relay is a **reference implementation of a consent-gated agent handoff**, n
 
 ## Demo video
 
-> **Internal note — do not paste:** the challenge rules require the entrant to explain the project in their own voice (**not AI generated**). The link below is the synthetic timing cut. Record over `docs/trip-relay-demo-silent.mp4` with [`DUB.md`](DUB.md), upload the own-voice cut, and replace this link before submitting.
+> **Internal note — do not paste:** the challenge rules require the entrant to explain the project in their own voice (**not AI generated**). The link below is the synthetic timing cut. Record the Vietnamese script in [`DUB-VI.md`](DUB-VI.md) over `docs/trip-relay-demo-silent.mp4`, upload the own-voice cut with English captions, and replace this link before submitting. The language rule allows Vietnamese when an English translation is provided.
 
 <https://youtu.be/uXQRyKOMyxQ>
 
-The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The silent cut and the entrant-voice dubbing steps are in [`docs/DUB.md`](DUB.md).
+The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The final cut is narrated in Vietnamese by the entrant, with English captions and a full English transcript in [`VIDEO-TRANSCRIPT.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md). The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](DUB-VI.md).
 
 ## How we built it
 
@@ -101,13 +101,15 @@ Open <http://127.0.0.1:8080/>.
 - Protocol note: <https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md>
 - Live demo: <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>)
 - Demo video: <https://youtu.be/uXQRyKOMyxQ>
+- Video transcript (English): <https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md>
 - Otari account email: `crytobot459@gmail.com`
 
 ## Before submitting
 
 - [x] **Publish the two sites to two public origins.** Airline: <https://pham-canh.github.io/trip-relay/>; hotel: <https://pham-canh.github.io./> (trailing-dot origin).
 - [x] Record the 1:45 cut (`docs/trip-relay-demo.mp4`) and the silent cut (`docs/trip-relay-demo-silent.mp4`).
-- [ ] Replace the YouTube upload with the entrant-voice cut. The current link uses synthetic narration and does not meet the "Entrant explaining the Project (not AI generated)" rule. Record over `docs/trip-relay-demo-silent.mp4` with `docs/DUB.md`, upload, and update the link above.
+- [ ] Replace the YouTube upload with the entrant-voice cut. The current link uses synthetic narration and does not meet the "Entrant explaining the Project (not AI generated)" rule. Record the Vietnamese script in `docs/DUB-VI.md` over `docs/trip-relay-demo-silent.mp4`, add the Vietnamese and English captions, upload, and update the link above.
+- [ ] Confirm the final video has English captions and that `docs/VIDEO-TRANSCRIPT.md` is linked in the submission. The language rule allows Vietnamese audio with an English translation.
 - [x] Add the Otari account email (`crytobot459@gmail.com`) and check the problem/improvement text in `docs/OTARI.md`.
 - [ ] Revoke any Otari key used during development and confirm no key is in the repo or screenshots.
 - [x] Confirm the repository is public and the license is visible.
