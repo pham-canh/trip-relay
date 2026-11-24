@@ -1,19 +1,21 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair and the video cut are ready; the remaining steps need your GitHub and Devpost logins.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the video cut are ready; the remaining steps need your YouTube and Devpost logins.
 
-## 1. Push `main`
+## 1. Repository status
 
-GitHub `main` is still at `c575f79`. The local `main` has the protocol note, the two-origin build script, the demo video, the origin proof, and the updated docs. Until you push, `PROTOCOL.md`, `docs/ORIGIN.md`, and `docs/trip-relay-demo.mp4` 404 on GitHub, and the GitHub README still says "13 tests" and carries the old Otari placeholder. Those stale docs are what an external reviewer sees.
+`main` is pushed through `23d005a` (2026-11-24). The `test` job and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, and `docs/trip-relay-demo.mp4` load on GitHub, and the README now says 14 tests with `crytobot459@gmail.com` as the Otari contact.
+
+The live site is already current: the deployed airline and hotel files match the local `dist-pages` build (verified by hash). `gh-pages` and the hotel repo `pham-canh/pham-canh.github.io` do not need a rebuild unless you change `site/` or `peer/`. The docs and the origin-check script live on `main` only.
+
+If a later change needs pushing, `gh` is authenticated on this machine with `repo` and `workflow` scopes:
 
 ```bash
 cd /Users/phamcanh/harness/devpost/trip-relay
 git push origin main
 ```
 
-The live site is already current: the deployed airline and hotel files match the local `dist-pages` build (verified by hash). `gh-pages` and the hotel repo `pham-canh/pham-canh.github.io` do not need a rebuild unless you change `site/` or `peer/`. The docs and the origin-check script live on `main` only.
-
-If the push asks for credentials, authenticate first with `gh auth login`, an SSH key, or a personal access token. Do not put a token in the remote URL or in a tracked file.
+Do not put a token in the remote URL or in a tracked file.
 
 Verify:
 
@@ -31,7 +33,7 @@ npm run check:origins
 
 Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable, the airline allows only `https://pham-canh.github.io.`, and the hotel allows no further peers. The browser evidence (two `location.origin` values, isolated `localStorage`, 0 requests before **Allow**, 0 after **Decline**, 11 after **Allow**) is in [`docs/ORIGIN.md`](ORIGIN.md). After a deployment, you can also run the manual **origin-check** workflow in GitHub Actions.
 
-If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot, or the stale README on GitHub `main`. The trailing dot is the boundary.
+If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
 ## 3. Upload the video
 
