@@ -91,7 +91,7 @@ The peer's public files are CORS-enabled. The visitor's key is **not** sent to t
 
 ### 5. Local execution
 
-The peer network runs in the caller's browser with the caller's router, model policy, and execution budget. The runtime does not forward a server-side session, the caller's chat history, the caller's page state, the airline passenger record, or the API key.
+The peer network runs in the caller's browser with the caller's router, model policy, and execution budget. The runtime does not forward a server-side session, the caller's chat history, the caller's page state, the airline passenger record (name and email), or the API key.
 
 Only the declared request text crosses the boundary; the consent card shows it before the fetch. Private context is deny-by-default; a network must explicitly permit fields to pass. In this demo, the hotel receives only the `request` string. If the hotel's own write action is invoked, its arguments go to the hotel origin through the action bridge and are confirmed there, not silently forwarded from the caller's page state.
 

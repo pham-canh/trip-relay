@@ -28,7 +28,7 @@ An agent that can use other sites is useful only if the user can tell when it cr
 
 - **Consent before contact.** The runtime pauses before the first peer fetch. Declining means the hotel manifest is never requested.
 - **Exact network, no fallback.** `http://localhost:8081/harbor_hotel` must match a published network name. A missing name fails closed instead of running a different network.
-- **Private context by exception.** The runtime forwards the declared request, not the caller's chat history, page state, passenger record, or API key. The consent card shows the exact text that will cross.
+- **Private context by exception.** The runtime forwards the declared request, not the caller's chat history, page state, passenger record (name and email), or API key. The consent card shows the exact text that will cross.
 - **Writes stay owned.** Flight booking and room requests require confirmation and a current version on the owning origin.
 - **The boundary is testable.** The browser pass asserts zero hotel requests before **Allow**; the unit suite checks policy, the exact link, and write refusal paths.
 
