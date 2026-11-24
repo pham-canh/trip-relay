@@ -79,6 +79,19 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions, GitHub Pages.
 
+Devpost tags, one per entry:
+
+- HTML
+- CSS
+- JavaScript
+- Node.js
+- Neuro SAN
+- Mozilla Otari
+- GitHub
+- GitHub Actions
+- Playwright
+- GitHub Pages
+
 ## Try it
 
 Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in **AI model settings**; the regional preset fills the matching Otari router.
