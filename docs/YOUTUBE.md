@@ -49,6 +49,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 5. Under **Subtitles**, upload both tracks:
    - `docs/trip-relay-demo-vi.srt` as **Vietnamese**.
    - `docs/trip-relay-demo.srt` as **English** — the required translation.
+   The MP4 also carries an embedded English `mov_text` track, but YouTube's caption uploader uses the sidecar SRT; upload it explicitly.
 6. Audience: **Not made for kids**. Visibility: **Public**.
 7. Wait for HD processing to finish, then copy the watch URL.
 8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.

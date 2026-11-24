@@ -42,7 +42,7 @@ The rules say the video **must include the Entrant explaining the Project (not A
 
 The entrant-voice cut is ready:
 
-- File: `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, H.264 + mono AAC).
+- File: `docs/trip-relay-demo-own-voice.mp4` (1:45.5, 1600×900, H.264 + mono AAC, embedded English `mov_text` subtitle track).
 - Silent picture: `docs/trip-relay-demo-silent.mp4`.
 - Vietnamese script and pronunciation notes: [`docs/DUB-VI.md`](DUB-VI.md).
 - Vietnamese captions: `docs/trip-relay-demo-vi.srt` (retimed to this take).

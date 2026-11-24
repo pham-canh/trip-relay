@@ -3,7 +3,7 @@
 ## Recorded take
 
 - Timing cut: [`docs/trip-relay-demo.mp4`](trip-relay-demo.mp4) — 1:45, 1600×900, 30 fps, H.264/AAC, synthetic narration, demo only.
-- Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, submission video.
+- Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, embedded English subtitle track, submission video.
 - Silent cut: [`docs/trip-relay-demo-silent.mp4`](trip-relay-demo-silent.mp4) — same picture, no audio, for recording your own narration.
 - Thumbnail: [`docs/youtube-thumbnail.png`](youtube-thumbnail.png) — 1280×720.
 - Captions: [`docs/trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt) (Vietnamese) and [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) (English), retimed to the entrant-voice cut.

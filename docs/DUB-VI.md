@@ -1,6 +1,6 @@
 # Ghi lời bình bằng tiếng Việt
 
-> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC). The recording steps below remain for a re-record. Upload the own-voice file, not the synthetic timing cut.
+> **Status:** the entrant's take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC) with an embedded English subtitle track (`mov_text`, default). The recording steps below remain for a re-record. Upload the own-voice file, not the synthetic timing cut.
 
 The challenge rules say the video **must include the Entrant explaining the Project**, and the language rule allows a non-English video if you provide an **English translation**:
 
@@ -67,7 +67,7 @@ ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a \
 ## Upload
 
 - Upload `docs/trip-relay-demo-own-voice.mp4` as a new YouTube video, **Public**. Do not upload the synthetic timing cut.
-- Add two caption tracks:
+- The MP4 already carries an embedded English subtitle track, but YouTube's caption uploader uses sidecar files. Add two caption tracks:
   - **Vietnamese:** `docs/trip-relay-demo-vi.srt`.
   - **English:** `docs/trip-relay-demo.srt` — this is the required English translation.
 - The caption files are retimed to this take; the long “allow” section is split into three cues.
