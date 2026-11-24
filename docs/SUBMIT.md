@@ -29,7 +29,7 @@ The hotel URL is <https://pham-canh.github.io./> **with a trailing dot**. Do not
 npm run check:origins
 ```
 
-Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable, the airline allows only `https://pham-canh.github.io.`, and the hotel allows no further peers. The browser evidence (two `location.origin` values, isolated `localStorage`, 0 requests before **Allow**, 0 after **Decline**, 11 after **Allow**) is in [`docs/ORIGIN.md`](ORIGIN.md).
+Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable, the airline allows only `https://pham-canh.github.io.`, and the hotel allows no further peers. The browser evidence (two `location.origin` values, isolated `localStorage`, 0 requests before **Allow**, 0 after **Decline**, 11 after **Allow**) is in [`docs/ORIGIN.md`](ORIGIN.md). After a deployment, you can also run the manual **origin-check** workflow in GitHub Actions.
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot, or the stale README on GitHub `main`. The trailing dot is the boundary.
 

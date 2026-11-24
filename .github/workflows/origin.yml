@@ -1,0 +1,18 @@
+name: origin-check
+
+# Manual deployment check. It hits the live pair, so it is not part of the
+# push/PR test job: a Pages deploy or a proxy can be temporarily unavailable.
+# Run it from Actions -> origin-check -> Run workflow after a deployment.
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the live pair
+        run: npm run check:origins

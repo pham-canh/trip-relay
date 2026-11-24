@@ -135,7 +135,7 @@ Fourteen tests in total.
 | Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |
 | Live Otari call | not yet recorded | add a key in **AI model settings** and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |
 
-The unit and browser passes use a scripted model that speaks the same SSE/tool-call protocol. They prove the boundary and the consent flow; they are **not** a live Otari call. The public manifests default to Otari, and the repository contains no key. The hosted evidence, including the two `location.origin` values and the `localStorage` isolation probe, is in [`docs/ORIGIN.md`](docs/ORIGIN.md).
+The unit and browser passes use a scripted model that speaks the same SSE/tool-call protocol. They prove the boundary and the consent flow; they are **not** a live Otari call. The public manifests default to Otari, and the repository contains no key. The hosted evidence, including the two `location.origin` values and the `localStorage` isolation probe, is in [`docs/ORIGIN.md`](docs/ORIGIN.md). GitHub Actions also has a manual **origin-check** workflow (**Actions → origin-check → Run workflow**) that runs `npm run check:origins` against the live pair.
 
 ## Otari
 
