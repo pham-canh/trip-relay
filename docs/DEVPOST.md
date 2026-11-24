@@ -69,7 +69,7 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 ## What's next
 
-- Record a live Otari take with the entrant's own voice over the same picture; the current cut uses a scripted, reproducible endpoint.
+- Record a take against a live Otari key over the same picture; the current entrant-voice cut uses a scripted, reproducible endpoint.
 - Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
 - Extract the consent/policy layer into a small reusable library and add signed publisher identity.
 - Add a second peer with a different trust level to show per-origin policies.
