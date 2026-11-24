@@ -2,12 +2,13 @@
 
 ## Recorded take
 
-- Video: [`docs/trip-relay-demo.mp4`](trip-relay-demo.mp4) — 1:45, 1600×900, 30 fps, H.264/AAC.
+- Timing cut: [`docs/trip-relay-demo.mp4`](trip-relay-demo.mp4) — 1:45, 1600×900, 30 fps, H.264/AAC, synthetic narration, demo only.
+- Entrant-voice cut: [`docs/trip-relay-demo-own-voice.mp4`](trip-relay-demo-own-voice.mp4) — same picture, Vietnamese narration by the entrant, 1:45.5, submission video.
 - Silent cut: [`docs/trip-relay-demo-silent.mp4`](trip-relay-demo-silent.mp4) — same picture, no audio, for recording your own narration.
 - Thumbnail: [`docs/youtube-thumbnail.png`](youtube-thumbnail.png) — 1280×720.
-- Captions: [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) — English, timed to the recorded narration.
+- Captions: [`docs/trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt) (Vietnamese) and [`docs/trip-relay-demo.srt`](trip-relay-demo.srt) (English), retimed to the entrant-voice cut.
 - The screen recording is the real local pair: the airline at `127.0.0.1:8084` and the hotel at `localhost:8081`. The airline copy used for the take publishes a **scripted OpenAI-compatible endpoint** as its mock router, so the assistant header shows `⚠ MOCK LLM — no real model` for the whole run. The public pair is unchanged and still uses Otari. The narration says this out loud.
-- The narration in this cut is macOS `say` (Samantha) used for timing. If the challenge requires the entrant's own voice, record the script below over the silent cut and mux it; see [`docs/DUB.md`](DUB.md).
+- The timing cut uses macOS `say` (Samantha) for timing. The submission cut replaces it with the entrant's Vietnamese take; the English script below documents the demo, and the Vietnamese script is in [`docs/DUB-VI.md`](DUB-VI.md).
 
 The recording proves the protocol and the boundary without spending tokens. It does **not** claim a live Otari call. A live Otari run is a separate take: add an `otk_...` key in **AI model settings** and repeat the same steps.
 
@@ -88,8 +89,9 @@ The hosted pair was checked separately. `location.origin` is `https://pham-canh.
 
 ## Publishing
 
-1. Upload `docs/trip-relay-demo.mp4` to YouTube as **public** (the Devpost rules require a public video).
-2. Use the title, description, and tags in [`docs/YOUTUBE.md`](YOUTUBE.md).
-3. Set the thumbnail to `docs/youtube-thumbnail.png` if the account allows custom thumbnails.
-4. Paste the YouTube URL into `docs/DEVPOST.md` and the Devpost form.
-5. Verify the link in a private browser window before submitting.
+1. Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **public** (the Devpost rules require a public video). Do not upload the synthetic timing cut as the submission.
+2. Add the Vietnamese and English caption tracks.
+3. Use the title, description, and tags in [`docs/YOUTUBE.md`](YOUTUBE.md).
+4. Set the thumbnail to `docs/youtube-thumbnail.png` if the account allows custom thumbnails.
+5. Paste the YouTube URL into `docs/DEVPOST.md` and the Devpost form.
+6. Verify the link in a private browser window before submitting.

@@ -43,10 +43,12 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 ## Upload steps
 
 1. Open <https://studio.youtube.com/> and sign in with `crytobot459@gmail.com`.
-2. **Create → Upload videos**, then choose `docs/trip-relay-demo.mp4`.
+2. **Create → Upload videos**, then choose `docs/trip-relay-demo-own-voice.mp4` — the entrant-voice cut, not the synthetic timing cut.
 3. Paste the title and description above. Add the tags.
 4. Upload `docs/youtube-thumbnail.png` as the thumbnail if the account allows custom thumbnails.
-5. Under **Subtitles**, upload `docs/trip-relay-demo.srt` as English (or paste it in the editor).
+5. Under **Subtitles**, upload both tracks:
+   - `docs/trip-relay-demo-vi.srt` as **Vietnamese**.
+   - `docs/trip-relay-demo.srt` as **English** — the required translation.
 6. Audience: **Not made for kids**. Visibility: **Public**.
 7. Wait for HD processing to finish, then copy the watch URL.
 8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
@@ -54,12 +56,12 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 
 ## Published
 
-- URL: <https://youtu.be/uXQRyKOMyxQ>
+- Synthetic timing cut (demo only): <https://youtu.be/uXQRyKOMyxQ>
 - Visibility: Public
 - Duration: 1:45 (105 seconds)
 - Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
-- **This upload uses the synthetic narration track.** The challenge rules require the entrant's own voice, so record the Vietnamese script in `docs/DUB-VI.md` over `docs/trip-relay-demo-silent.mp4`, upload the own-voice cut, and replace this upload before submitting. Add the Vietnamese and English caption tracks; keep the same title, description, thumbnail, and tags.
+- **Do not submit the timing cut.** It uses the synthetic narration track. The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4`; upload it with the Vietnamese and English captions, then replace the link above in `docs/DEVPOST.md` and in the Devpost form. Keep the same title, description, thumbnail, and tags.
 
-## If the rules require the entrant's own voice
+## Own-voice cut
 
-The current cut uses a synthetic narration track for timing. Record the script in [`docs/DUB.md`](DUB.md) over `docs/trip-relay-demo-silent.mp4`, mux the result, and upload that file instead. Keep the same title, description, and disclosure.
+The entrant's Vietnamese take is muxed into `docs/trip-relay-demo-own-voice.mp4` (1:45, 1600×900, AAC). The picture is `docs/trip-relay-demo-silent.mp4`; the narration is the entrant's own voice, not synthetic. The caption files are retimed to this take, with the long “allow” section split into three cues. Upload this file as the submission video and keep the timing cut only as a public demo.
