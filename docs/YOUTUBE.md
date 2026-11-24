@@ -56,6 +56,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 - Visibility: Public
 - Duration: 1:45 (105 seconds)
 - Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
+- **This upload uses the synthetic narration track.** The challenge rules require the entrant's own voice, so record over `docs/trip-relay-demo-silent.mp4` with `docs/DUB.md` and replace this upload before submitting. Keep the same title, description, thumbnail, and captions.
 
 ## If the rules require the entrant's own voice
 

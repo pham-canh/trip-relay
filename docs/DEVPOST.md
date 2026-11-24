@@ -26,6 +26,8 @@ Trip Relay is a **reference implementation of a consent-gated agent handoff**, n
 
 ## Demo video
 
+> **Internal note — do not paste:** the challenge rules require the entrant to explain the project in their own voice (**not AI generated**). The link below is the synthetic timing cut. Record over `docs/trip-relay-demo-silent.mp4` with [`DUB.md`](DUB.md), upload the own-voice cut, and replace this link before submitting.
+
 <https://youtu.be/uXQRyKOMyxQ>
 
 The 1:45 cut shows a manual booking, the consent card, a decline with zero hotel requests, and an allow that loads the hotel's public network. The recording uses a scripted OpenAI-compatible endpoint so the take is reproducible; the assistant header says `⚠ MOCK LLM — no real model`, and the narration says so. The public pair uses Otari. The silent cut and the entrant-voice dubbing steps are in [`docs/DUB.md`](DUB.md).
@@ -105,7 +107,7 @@ Open <http://127.0.0.1:8080/>.
 
 - [x] **Publish the two sites to two public origins.** Airline: <https://pham-canh.github.io/trip-relay/>; hotel: <https://pham-canh.github.io./> (trailing-dot origin).
 - [x] Record the 1:45 cut (`docs/trip-relay-demo.mp4`) and the silent cut (`docs/trip-relay-demo-silent.mp4`).
-- [x] Upload the video to YouTube: <https://youtu.be/uXQRyKOMyxQ> (1:45, public).
+- [ ] Replace the YouTube upload with the entrant-voice cut. The current link uses synthetic narration and does not meet the "Entrant explaining the Project (not AI generated)" rule. Record over `docs/trip-relay-demo-silent.mp4` with `docs/DUB.md`, upload, and update the link above.
 - [x] Add the Otari account email (`crytobot459@gmail.com`) and check the problem/improvement text in `docs/OTARI.md`.
 - [ ] Revoke any Otari key used during development and confirm no key is in the repo or screenshots.
 - [x] Confirm the repository is public and the license is visible.

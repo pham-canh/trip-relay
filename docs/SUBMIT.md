@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the video are ready; the remaining step needs your Devpost login.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair and the repository are ready. The video needs one more pass: the rules require the entrant's own voice, and the current upload uses synthetic narration.
 
 ## 1. Repository status
 
@@ -35,16 +35,18 @@ Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
-## 3. Video is published
+## 3. Replace the video with your own voice
 
-- URL: <https://youtu.be/uXQRyKOMyxQ>
-- File: `docs/trip-relay-demo.mp4` (1:45, 1600×900).
-- Visibility: **Public**, confirmed without cookies (`isPrivate: false`, `isUnlisted: false`).
-- The link is already in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`).
-- Title, description, tags: [`docs/YOUTUBE.md`](YOUTUBE.md).
-- Thumbnail: `docs/youtube-thumbnail.png`.
-- Captions: `docs/trip-relay-demo.srt`.
-- If the rules require the entrant's own voice, record over `docs/trip-relay-demo-silent.mp4` with [`docs/DUB.md`](DUB.md) and replace the upload.
+The rules say the video **must include the Entrant explaining the Project (not AI generated)**. The current upload at <https://youtu.be/uXQRyKOMyxQ> uses the synthetic narration track, so it does **not** meet that clause. Replace it before submitting.
+
+- Silent picture: `docs/trip-relay-demo-silent.mp4` (1:45, 1600×900).
+- Script and recording steps: [`docs/DUB.md`](DUB.md).
+- Mux: `ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a -c:v copy -c:a aac -b:a 192k -shortest docs/trip-relay-demo-own-voice.mp4`.
+- Upload the own-voice cut to YouTube as **Public**, then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form.
+- Keep the same title, description, tags, thumbnail, and captions: [`docs/YOUTUBE.md`](YOUTUBE.md).
+- The old link can stay up as a demo, but the submission must point at the own-voice cut.
+
+If you record `voice.m4a`, I can mux it and check the duration and audio sync.
 
 ## 4. Fill the Devpost form
 
@@ -74,7 +76,7 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 
 ## 6. Final checks
 
-- [x] The YouTube link plays without signing in and is under two minutes: <https://youtu.be/uXQRyKOMyxQ> (1:45, public).
+- [ ] The final YouTube upload uses the entrant's own voice (not AI-generated), plays without signing in, and is under two minutes.
 - [x] Both live origins return HTTP 200.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**.
