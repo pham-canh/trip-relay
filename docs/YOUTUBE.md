@@ -46,10 +46,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 2. **Create → Upload videos**, then choose `docs/trip-relay-demo-own-voice.mp4` — the entrant-voice cut, not the synthetic timing cut.
 3. Paste the title and description above. Add the tags.
 4. Upload `docs/youtube-thumbnail.png` as the thumbnail if the account allows custom thumbnails.
-5. Under **Subtitles**, upload both tracks:
-   - `docs/trip-relay-demo-vi.srt` as **Vietnamese**.
-   - `docs/trip-relay-demo.srt` as **English** — the required translation.
-   The MP4 also has the English subtitles burned into the picture, so they are visible without enabling captions. YouTube's caption uploader uses the sidecar SRT; upload it explicitly.
+5. Under **Subtitles**, the English text is already burned into the picture, so do **not** upload `docs/trip-relay-demo.srt` as an English track — it would duplicate the burned-in text. Optionally upload `docs/trip-relay-demo-vi.srt` as **Vietnamese**. The English SRT stays in the repo as the translation source.
 6. Audience: **Not made for kids**. Visibility: **Public**.
 7. Wait for HD processing to finish, then copy the watch URL.
 8. Put the URL in `docs/DEVPOST.md` (`Demo video:`) and in the Devpost form.
@@ -61,7 +58,7 @@ agentic web, AI agents, consent, Mozilla Otari, Neuro SAN, cross-origin, privacy
 - Visibility: Public
 - Duration: 1:45 (105 seconds)
 - Checked on 2026-11-24 without cookies: oEmbed 200, `isPrivate: false`, `isUnlisted: false`.
-- **Do not submit the timing cut.** It uses the synthetic narration track. The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4`; upload it with the Vietnamese and English captions, then replace the link above in `docs/DEVPOST.md` and in the Devpost form. Keep the same title, description, thumbnail, and tags.
+- **Do not submit the timing cut.** It uses the synthetic narration track. The entrant-voice cut is ready at `docs/trip-relay-demo-own-voice.mp4`; the English subtitles are burned in, and the Vietnamese track is optional. Upload it, then replace the link above in `docs/DEVPOST.md` and in the Devpost form. Keep the same title, description, thumbnail, and tags.
 
 ## Own-voice cut
 

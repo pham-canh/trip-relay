@@ -1,10 +1,10 @@
 # Video transcript and English translation
 
-The final submission video is **narrated in Vietnamese by the entrant**, with **English captions** and this **English translation**. The challenge language rule allows a non-English video when an English translation is provided:
+The final submission video is **narrated in Vietnamese by the entrant**, with **English subtitles burned into the picture** and this **English translation**. The challenge language rule allows a non-English video when an English translation is provided:
 
 > All Submission materials must be in English or, if not in English, the Entrant must provide an English translation of the demonstration video, text description, and testing instructions as well as all other materials submitted.
 
-The spoken Vietnamese script is in [`DUB-VI.md`](DUB-VI.md). The entrant-voice cut is `docs/trip-relay-demo-own-voice.mp4` (1:45.5) and has English subtitles burned into the picture. The English caption track is [`trip-relay-demo.srt`](trip-relay-demo.srt). The Vietnamese caption track is [`trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt). Both caption files are retimed to this take; the long “allow” section is split into three cues.
+The spoken Vietnamese script is in [`DUB-VI.md`](DUB-VI.md). The entrant-voice cut is `docs/trip-relay-demo-own-voice.mp4` (1:45.5) and has English subtitles burned into the picture. The English caption source is [`trip-relay-demo.srt`](trip-relay-demo.srt); it is burned into the picture. The Vietnamese caption track is [`trip-relay-demo-vi.srt`](trip-relay-demo-vi.srt). Both caption files are retimed to this take; the long “allow” section is split into three cues.
 
 ## Transcript
 

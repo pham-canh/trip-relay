@@ -6,7 +6,7 @@ The challenge rules say the video **must include the Entrant explaining the Proj
 
 > All Submission materials must be in English or, if not in English, the Entrant must provide an English translation of the demonstration video, text description, and testing instructions as well as all other materials submitted.
 
-So you can narrate in Vietnamese. Upload the English captions and link the English transcript; the written submission is already in English.
+So you can narrate in Vietnamese. The English subtitles are burned into the picture, and the English transcript is linked; the written submission is already in English.
 
 ## What you need
 
@@ -69,10 +69,8 @@ ffmpeg -i docs/trip-relay-demo-silent.mp4 -i voice.m4a \
 ## Upload
 
 - Upload `docs/trip-relay-demo-own-voice.mp4` as a new YouTube video, **Public**. Do not upload the synthetic timing cut.
-- The MP4 already has the English subtitles burned into the picture, so viewers see them without enabling captions. YouTube's caption uploader still uses sidecar files; add two caption tracks:
-  - **Vietnamese:** `docs/trip-relay-demo-vi.srt`.
-  - **English:** `docs/trip-relay-demo.srt` — this is the required English translation.
-- The caption files are retimed to this take; the long “allow” section is split into three cues.
+- The MP4 already has the English subtitles burned into the picture, so viewers see them without enabling captions. **Do not upload `docs/trip-relay-demo.srt` as an English caption track** — it would duplicate the burned-in text. The English SRT stays in the repo as the translation source and is linked from the transcript.
+- Optional: upload `docs/trip-relay-demo-vi.srt` as the **Vietnamese** caption track. It is retimed to this take; the long “allow” section is split into three cues.
 - Put the English transcript link in the description: <https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md>.
 - Use the title, description, tags, and thumbnail in [`YOUTUBE.md`](YOUTUBE.md).
 - Send me the new watch URL; I will update the Devpost copy and push.

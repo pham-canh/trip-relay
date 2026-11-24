@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the entrant-voice cut are ready. The only video step left is the public YouTube upload and replacing the synthetic link in the Devpost copy. The narration is in **Vietnamese**; English captions and a transcript satisfy the language rule.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the entrant-voice cut are ready. The only video step left is the public YouTube upload and replacing the synthetic link in the Devpost copy. The narration is in **Vietnamese**; English subtitles burned into the picture and a transcript satisfy the language rule.
 
 ## 1. Repository status
 
@@ -46,10 +46,10 @@ The entrant-voice cut is ready:
 - Silent picture: `docs/trip-relay-demo-silent.mp4`.
 - Vietnamese script and pronunciation notes: [`docs/DUB-VI.md`](DUB-VI.md).
 - Vietnamese captions: `docs/trip-relay-demo-vi.srt` (retimed to this take).
-- English translation captions: `docs/trip-relay-demo.srt` (retimed to this take).
+- English translation source: `docs/trip-relay-demo.srt` (retimed to this take; burned into the picture).
 - English transcript: [`docs/VIDEO-TRANSCRIPT.md`](VIDEO-TRANSCRIPT.md).
 
-Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **Public**, add both caption tracks, then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form. Keep the same title, description, tags, and thumbnail: [`docs/YOUTUBE.md`](YOUTUBE.md). The synthetic link can stay up as a demo, but the submission must point at the own-voice cut.
+Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **Public**. The English subtitles are burned in, so no English caption track is needed; optionally add the Vietnamese track `docs/trip-relay-demo-vi.srt`. Then update the link in [`docs/DEVPOST.md`](DEVPOST.md) (`Demo video:` and `## Demo video`) and in the Devpost form. Keep the same title, description, tags, and thumbnail: [`docs/YOUTUBE.md`](YOUTUBE.md). The synthetic link can stay up as a demo, but the submission must point at the own-voice cut.
 
 The mux was done with macOS AVFoundation, and the English subtitles were burned in with `ffmpeg`/`libass`. The output was checked for duration, video/audio tracks, and audio sync against the picture cues; the audio stream is identical to the muxed take.
 

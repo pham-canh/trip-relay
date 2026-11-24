@@ -90,7 +90,7 @@ The hosted pair was checked separately. `location.origin` is `https://pham-canh.
 ## Publishing
 
 1. Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **public** (the Devpost rules require a public video). Do not upload the synthetic timing cut as the submission.
-2. Add the Vietnamese and English caption tracks.
+2. The English subtitles are burned into the picture, so no English track is needed. Optionally add the Vietnamese track.
 3. Use the title, description, and tags in [`docs/YOUTUBE.md`](YOUTUBE.md).
 4. Set the thumbnail to `docs/youtube-thumbnail.png` if the account allows custom thumbnails.
 5. Paste the YouTube URL into `docs/DEVPOST.md` and the Devpost form.
