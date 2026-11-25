@@ -96,6 +96,7 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**, 0 after **Decline**, and 11 after **Allow**; the receipt chain verifies.
 - [x] `npm run check:browser` passes 27/27 locally and `npm run check:browser:live` passes 12/12 against the deployed pair.
+- [x] Opened PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85) adding Trip Relay to the official agentic websites list.
 - [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
 - [x] The GitHub README says 27 tests plus the DLP benchmark, and the Otari email is filled in.
 - [x] `npm test` passes 27/27 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.

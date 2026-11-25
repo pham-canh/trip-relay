@@ -171,6 +171,8 @@ AIRLINE_URL=https://airline.example/ PEER_URL=https://hotel.example/ npm run bui
 
 The generated directories are gitignored; publish each one at its origin root. The build fails if both URLs share an origin. Keep CORS on the hotel's public files. Use HTTPS except for loopback development. After any URL change, rebuild the published network JSON if you edited the HOCON, run `npm test`, run `npm run check:origins`, and repeat the cross-origin browser check.
 
+The pair is also proposed for the challenge's official [agentic websites list](https://github.com/cognizant-ai-labs/agentic-web/pull/85).
+
 ## Spec mapping
 
 The requirement-by-requirement map is in [docs/SPEC-MAPPING.md](docs/SPEC-MAPPING.md).
