@@ -32,6 +32,40 @@ export class AssistantMount {
   };
 
   /**
+   * Visitor-facing names for the audit events and DLP rules shown in the receipt.
+   */
+  static RECEIPT_LABELS = {
+    consent_requested: "Consent asked",
+    consent_allowed: "Contact allowed",
+    consent_declined: "Contact declined",
+    consent_reused: "Approval reused",
+    peer_fetch: "Peer loaded",
+    dlp_block: "Data blocked",
+    tool_denied: "Tool denied",
+    policy_denied: "Origin denied",
+    write_confirmed: "Write confirmed",
+    write_refused: "Write refused",
+  };
+
+  static RECEIPT_RULES = {
+    canary: "test canary",
+    email: "email address",
+    "otari-key": "API key",
+    "openai-key": "API key",
+    "bearer-token": "bearer token",
+    "private-key": "private key",
+  };
+
+  static RECEIPT_BOUNDARIES = {
+    peer_egress: "before the hotel request",
+    peer_response: "in the hotel reply",
+    peer_sly_data: "in private context",
+    coded_tool: "before a coded tool",
+    mcp_egress: "before an MCP call",
+    presentation: "in a presentation",
+  };
+
+  /**
    * Boot the runtime and report the result in the status line.
    *
    * :return: The runtime engine, or null when boot failed.
@@ -51,6 +85,7 @@ export class AssistantMount {
       booted.engine.onActionConfirm = AssistantMount.review;
       AssistantMount.defaultConsent = booted.engine.onConsent;
       booted.engine.onConsent = AssistantMount.consent;
+      AssistantMount.mountReceipt(booted.engine);
       // Without a key the chat cannot answer yet. This is the same test as the
       // runtime's "API key required" badge in runtime/ui.js.
       const needsKey = !booted.engine.mockLLM
@@ -216,6 +251,135 @@ export class AssistantMount {
       };
     }
     return {};
+  }
+
+  /**
+   * Mount the visitor-facing privacy receipt under the assistant. It reads the same
+   * hash-chained audit log the runtime writes, and patches append() so a new boundary
+   * event appears without a reload. The log stays in this tab.
+   *
+   * :param engine: The booted runtime engine.
+   */
+  static mountReceipt(engine) {
+    const details = document.querySelector("#privacy-receipt");
+    const list = document.querySelector("#receipt-events");
+    const count = document.querySelector("#receipt-count");
+    const status = document.querySelector("#receipt-status");
+    const verifyButton = document.querySelector("#receipt-verify");
+    const downloadButton = document.querySelector("#receipt-download");
+    if (!details || !list || !count || !status || !engine?.audit) {
+      return;
+    }
+    const LIMIT = 12;
+    let verifyToken = 0;
+
+    const label = (kind) => AssistantMount.RECEIPT_LABELS[kind] || kind.replaceAll("_", " ");
+    const ruleName = (rule) => AssistantMount.RECEIPT_RULES[rule] || rule || "protected value";
+    const boundaryName = (boundary) => AssistantMount.RECEIPT_BOUNDARIES[boundary] || boundary || "boundary";
+    const describe = (event) => {
+      const peer = event.peerOrigin ? `Harbor Hotel at ${event.peerOrigin}` : "";
+      switch (event.kind) {
+        case "consent_requested":
+          return peer ? `Asked before contacting ${peer}` : "Asked for consent";
+        case "consent_allowed":
+          return peer ? `You allowed contact with ${peer}` : "Contact allowed";
+        case "consent_declined":
+          return peer ? `You declined contact with ${peer}` : "Contact declined";
+        case "consent_reused":
+          return peer ? `Reused the scoped approval for ${peer}` : "Scoped approval reused";
+        case "peer_fetch":
+          return [event.network ? `Loaded ${event.network}` : "Loaded peer network", peer].filter(Boolean).join(" from ");
+        case "dlp_block":
+          return `${ruleName(event.rule)} blocked ${boundaryName(event.boundary)}`;
+        case "tool_denied":
+          return `Denied ${event.tool || "a tool"}: ${event.reason || "not callable here"}`;
+        case "policy_denied":
+          return `Denied ${event.peerOrigin || "an unlisted origin"}: ${event.reason || "not in allowed_peers"}`;
+        case "write_confirmed":
+          return `Confirmed ${event.tool || "a write"}`;
+        case "write_refused":
+          return `Refused ${event.tool || "a write"}: ${event.reason || "check failed"}`;
+        default:
+          return Object.entries(event)
+            .filter(([key]) => !["id", "ts", "kind", "prevHash", "hash"].includes(key))
+            .map(([key, value]) => `${key}: ${typeof value === "string" ? value : JSON.stringify(value)}`)
+            .join(" · ");
+      }
+    };
+    const render = () => {
+      const events = engine.audit.events;
+      const blocked = events.filter((event) => event.kind === "dlp_block").length;
+      count.textContent = events.length
+        ? `${blocked ? `${blocked} blocked · ` : ""}${events.length} event${events.length === 1 ? "" : "s"}`
+        : "no boundary events yet";
+      count.classList.toggle("blocked", blocked > 0);
+      const shown = events.slice(-LIMIT);
+      list.replaceChildren(...shown.map((event) => {
+        const item = document.createElement("li");
+        item.classList.toggle("block", event.kind === "dlp_block" || event.kind === "policy_denied");
+        const time = document.createElement("time");
+        time.dateTime = event.ts;
+        time.textContent = new Date(event.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const name = document.createElement("strong");
+        name.textContent = label(event.kind);
+        const detail = document.createElement("span");
+        detail.textContent = describe(event);
+        item.append(time, name, detail);
+        return item;
+      }));
+      if (events.length > LIMIT) {
+        const more = document.createElement("li");
+        const blank = document.createElement("time");
+        const note = document.createElement("span");
+        note.textContent = `${events.length - LIMIT} earlier event${events.length - LIMIT === 1 ? "" : "s"} in the download`;
+        more.append(blank, note);
+        list.append(more);
+      }
+      if (!events.length) {
+        status.textContent = "No boundary event yet. Ask the assistant to contact Harbor Hotel.";
+        status.className = "receipt-status";
+      }
+    };
+    const verify = async () => {
+      const token = ++verifyToken;
+      const result = await engine.audit.verify();
+      if (token !== verifyToken) return;
+      if (!result.ok) {
+        status.textContent = `Tamper detected at ${result.at}: ${result.reason}. Download the log before reloading.`;
+        status.className = "receipt-status bad";
+        return;
+      }
+      status.textContent = result.checked
+        ? `Chain verified: ${result.checked} event${result.checked === 1 ? "" : "s"}, head ${result.head.slice(0, 12)}…`
+        : "Nothing to verify yet.";
+      status.className = "receipt-status ok";
+    };
+    const originalAppend = engine.audit.append.bind(engine.audit);
+    engine.audit.append = async (kind, fields) => {
+      const event = await originalAppend(kind, fields);
+      render();
+      if (details.open) await verify();
+      return event;
+    };
+    verifyButton?.addEventListener("click", verify);
+    downloadButton?.addEventListener("click", () => {
+      const exported = engine.audit.export();
+      const blob = new Blob([`${JSON.stringify(exported, null, 2)}\n`], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `trip-relay-audit-${new Date().toISOString().replaceAll(":", "-").replace(/\..+$/, "")}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      status.textContent = `Exported ${exported.events.length} event${exported.events.length === 1 ? "" : "s"} as JSON.`;
+      status.className = "receipt-status ok";
+    });
+    details.addEventListener("toggle", () => {
+      if (details.open) verify();
+    });
+    render();
   }
 
   /**
