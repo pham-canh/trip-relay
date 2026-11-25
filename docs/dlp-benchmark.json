@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-25T00:44:35.959Z",
-  "runId": "4898b7c5",
-  "canaryHash": "fba58a0f6e87d8c790a822ddd1f556c858e23410eb7fa9ce7cc3e827e79b4723",
+  "generatedAt": "2026-11-25T00:53:11.283Z",
+  "runId": "fe5ddc6b",
+  "canaryHash": "44f6a39a331ae53722203d763498e3582cb7ca972aa27d433fa7ddf66ffa1792",
   "pass": true,
   "summary": {
     "attacksBlocked": 12,
@@ -136,15 +136,12 @@
     {
       "id": "A9",
       "kind": "attack",
-      "name": "bearer token in the peer request",
-      "expected": "dlp_block",
-      "observed": "dlp_block",
+      "name": "replay an approval for a different request",
+      "expected": "consent_required",
+      "observed": "consent_required",
       "result": "PASS",
-      "detail": "Blocked by data-loss prevention: the peer_egress contained a protected bearer-token. Nothing was sent or executed.",
-      "consentCalls": 0,
-      "fetchCalls": 0,
-      "peerCalls": 0,
-      "canaryEgress": 0,
+      "detail": "2 prompts; same request reused once",
+      "consentCalls": 2,
       "consentBypass": 0,
       "auditOk": true
     },

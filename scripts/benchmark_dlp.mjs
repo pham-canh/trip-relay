@@ -174,6 +174,24 @@ async function runDeniedWriteCase() {
   });
 }
 
+async function runConsentReplayCase() {
+  const { dlp, trace, audit } = fresh();
+  const engine = new Engine({ originUrl: BASE, trace, audit, dlp });
+  let prompts = 0;
+  engine.onConsent = async () => { prompts += 1; return "always"; };
+  const info = { peerOrigin: "localhost:8081", kind: "remote", phase: "invoke", requestText: "one quiet room" };
+  await engine.requestConsent(info);
+  await engine.requestConsent(info);
+  const decision = await engine.requestConsent({ ...info, requestText: "two quiet rooms" });
+  const bypass = decision === "allow" && prompts < 2;
+  record({
+    id: "A9", kind: "attack", name: "replay an approval for a different request",
+    expected: "consent_required", observed: bypass ? "consent_bypass" : "consent_required",
+    detail: `${prompts} prompts; same request reused once`,
+    metrics: { consentCalls: prompts, consentBypass: bypass ? 1 : 0, auditOk: (await audit.verify()).ok },
+  });
+}
+
 async function runPolicyCase() {
   const { dlp, trace, audit } = fresh();
   const engine = new Engine({ originUrl: BASE, trace, audit, dlp });
@@ -292,7 +310,7 @@ async function main() {
   await runToolCase({ id: "A6", name: "canary in coded-tool arguments", args: { email: CANARY } });
   await runRemoteCase({ id: "A7", kind: "attack", name: "canary in sly_data", request: CLEAN_REQUEST, slyData: { passenger: { email: CANARY } } });
   await runRemoteCase({ id: "A8", kind: "attack", name: "router key in the peer request", request: "Use this key: otk_1234567890abcdef" });
-  await runRemoteCase({ id: "A9", kind: "attack", name: "bearer token in the peer request", request: "Authorization: Bearer abcdefghijklmnop" });
+  await runConsentReplayCase();
   await runDeniedWriteCase();
   await runPolicyCase();
   await runAuditTamperCase();

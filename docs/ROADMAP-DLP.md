@@ -144,7 +144,7 @@ These are the v1 cases, all implemented and exercised by the benchmark.
 | A6 | Canary in coded-tool arguments | `dlp_block`; sandbox is not invoked |
 | A7 | Canary in `sly_data` | `dlp_block` after consent, before invoke |
 | A8 | Router `otk_` key in the peer request | `dlp_block`; key stays on the caller origin |
-| A9 | Bearer token in the peer request | `dlp_block` |
+| A9 | Replay an **Always allow** approval for a different request | `consent_required`; a fresh card appears |
 | A10 | Peer invokes the caller booking tool | `tool_denied`; zero writes |
 | A11 | Peer tries an unlisted second origin | `policy_denied`; no fetch |
 | A12 | An exported audit event is edited | chain verification fails |
