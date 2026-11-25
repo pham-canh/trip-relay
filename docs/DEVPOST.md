@@ -40,7 +40,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 27 `node:test` checks run the real runtime with a scripted model, including 13 DLP/audit checks; a 27-check Playwright browser pass covers both pages, the manual booking and room-request paths, the Privacy receipt (in-page verify and JSON download), the consent ordering, and the approved cross-site answer. The browser pass is committed as `scripts/browser_check.mjs`: `npm run check:browser` runs the 27 local checks and `npm run check:browser:live` repeats the 12 consent and receipt checks against the hosted pair. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs the unit suite and the benchmark on every push. The visitor-facing receipt reads the same hash-chained log and patches `append()` so a new event appears without a reload. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
+- 27 `node:test` checks run the real runtime with a scripted model, including 13 DLP/audit checks; a 27-check Playwright browser pass covers both pages, the manual flight-booking path, the Privacy receipt (in-page verify and JSON download), the consent ordering, and the approved cross-site answer. The browser pass is committed as `scripts/browser_check.mjs`: `npm run check:browser` runs the 27 local checks and `npm run check:browser:live` repeats the 12 consent and receipt checks against the hosted pair. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs the unit suite and the benchmark on every push. The visitor-facing receipt reads the same hash-chained log and patches `append()` so a new event appears without a reload. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
 
 ### Verification status
 
@@ -149,12 +149,12 @@ Upload the screenshots in this order; each caption is under 140 characters.
 
 ## Update draft (post-submission)
 
-Post this in **Updates** only after the code and docs are pushed. It is a progress log, not a replacement for the project story. The benchmark is implemented and measured; the browser UI and remote audit sink are not.
+Post this in **Updates** only after the code and docs are pushed. It is a progress log, not a replacement for the project story. The benchmark, the receipt UI, and the two-page browser pass are implemented and measured; IndexedDB persistence and the remote audit sink are not.
 
 ```markdown
-## Update: hostile-peer DLP benchmark passes 12/12
+## Update: hostile-peer DLP benchmark passes 12/12, and the privacy receipt is live
 
-The Trip Relay repository now ships a deterministic hostile-peer benchmark. A malicious hotel network tries to obtain the passenger email, bypass consent, and execute a caller tool; every attempt is blocked and recorded.
+The Trip Relay repository now ships a deterministic hostile-peer benchmark and a visitor-facing privacy receipt. A malicious hotel network tries to obtain the passenger email, bypass consent, and execute a caller tool; every attempt is blocked and recorded.
 
 **Results**
 - 12/12 attacks blocked
@@ -164,20 +164,23 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark. A ma
 - 0 PII in raw audit fields
 - 4/4 legitimate controls pass
 - audit hash chain verifies
+- 27/27 local browser checks and 12/12 hosted consent/receipt checks
 
 **What changed**
 - Per-run canary email; DLP at peer egress, coded-tool args, `sly_data`, and peer output.
 - “Always allow” is bound to origin + request hash + kind + phase, with a 5-minute expiry.
 - Caller writes are denied to a non-top peer; unlisted origins fail closed.
 - Hash-chained, redacted audit log with export and verification.
-- A visitor-facing **Privacy receipt** under the assistant: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, and any blocked value.
+- A visitor-facing **Privacy receipt** under the assistant, now deployed: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, and any blocked value.
+- A committed browser pass (`scripts/browser_check.mjs`): 27 local checks and 12 hosted checks. It covers both pages, the manual booking path, the receipt verify/download, zero hotel requests before **Allow**, zero after **Decline**, and the approved cross-site answer.
 - `npm test` now includes 13 DLP/audit checks (27 total).
 
 **Scope**
-This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The submitted video was recorded before this benchmark, so it says “fourteen tests”; the repository and the live pair are current. The remaining browser attack matrix, IndexedDB persistence, remote audit sink, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
+The DLP benchmark is deterministic Node code on the real dispatch boundary, not a browser test; the separate browser pass covers the two pages, the consent ordering, the decline, and the receipt. The audit log is session-only, not a remote WORM store. The submitted video was recorded before this work, so it says “fourteen tests”; the repository and the live pair are current. The remaining sandbox/spoofed-card browser cases, IndexedDB persistence, remote audit sink, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
 
 Run: `npm run benchmark:dlp`
 Report: https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json
+Browser: `npm run check:browser` / `npm run check:browser:live`
 Spec: https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md
 ```
 
