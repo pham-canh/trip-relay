@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Two travel agentic websites with a visible consent boundary, built for the Open Agentic Web Challenge.",
   "scripts": {
-    "test": "node --test tests/caller.test.mjs tests/peer.test.mjs",
+    "test": "node --test tests/caller.test.mjs tests/peer.test.mjs tests/dlp.test.mjs",
+    "benchmark:dlp": "node scripts/benchmark_dlp.mjs",
     "check:origins": "node scripts/check_origins.mjs",
     "build:pages": "node scripts/build_public.mjs",
     "serve:airline": "node scripts/serve.mjs site 8080 127.0.0.1",

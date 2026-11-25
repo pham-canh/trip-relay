@@ -8,13 +8,19 @@
 let SEQ = 0;
 
 export class TraceBus extends EventTarget {
-  constructor() {
+  constructor({ redact } = {}) {
     super();
     this.events = [];
     this.spans = new Map();
+    this.redact = typeof redact === "function" ? redact : null;
+  }
+
+  setRedactor(redact) {
+    this.redact = typeof redact === "function" ? redact : null;
   }
 
   _emit(ev) {
+    if (this.redact) ev = this.redact(ev);
     ev.seq = SEQ++;
     ev.t = performance.now();
     ev.wall = Date.now();

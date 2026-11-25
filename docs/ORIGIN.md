@@ -61,7 +61,7 @@ Browser check:
 
 **Proves:** the browser enforces an origin boundary between the two sites; the hotel's public artifacts are CORS-readable from the airline; the consent gate precedes the first peer request.
 
-**Does not prove:** server isolation or publisher identity. Both sites are public static files and the hotel holds no private data. The private state is the airline's chat/page state and the visitor's key, which stay on the airline origin and are never sent to the hotel. There is no cryptographic attestation and no persistent audit log; see [PROTOCOL.md](../PROTOCOL.md).
+**Does not prove:** server isolation or publisher identity. Both sites are public static files and the hotel holds no private data. The private state is the airline's chat/page state and the visitor's key, which stay on the airline origin and are never sent to the hotel. There is no cryptographic attestation and no remote audit store; the runtime's audit log is a session hash chain, not a server-side WORM log. See [PROTOCOL.md](../PROTOCOL.md) and [ROADMAP-DLP.md](ROADMAP-DLP.md).
 
 **Caveat:** some corporate proxies and VPNs reject trailing-dot hosts. The local pair (`127.0.0.1` vs `localhost`) is the fallback, and a custom domain is the cleaner long-term deployment. The app only needs `PEER_URL` changed and a rebuild.
 

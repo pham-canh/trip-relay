@@ -130,7 +130,7 @@ These are honest boundaries, not hidden claims:
 
 - **No cryptographic attestation.** The demo verifies published names and origins, not signatures or publisher identity.
 - **No server-side policy enforcement.** The consent gate lives in the browser runtime. A production system should mirror the policy at a trusted gateway.
-- **No persistent audit log.** The trace is visible in the page but is not exported to a tamper-evident store. A concrete hostile-peer DLP and audit benchmark plan is in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
+- **No remote audit store.** The runtime keeps a hash-chained, redacted audit log for the session and can export and verify it, but it is not a remote WORM store and the page does not yet expose download/verify buttons. A production system should ship the same events to a trusted server. The measured hostile-peer benchmark and the remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
 - **No real inventory, payment, or booking.** Travel data is generated demo data.
 - **No general-purpose authenticated action API beyond the shipped bridge.** The runtime can call a peer's declared actions through its action bridge; this demo uses that for the hotel's own actions, and writes still require confirmation on the owning origin. A production system would add authorization and audit controls around that bridge.
 
@@ -146,8 +146,11 @@ The repository tests these directly:
 6. A declined write changes no state.
 7. A stale write is refused.
 8. Both sites keep working without a model key for manual use.
+9. A canary email, API key, or bearer token is blocked at peer egress, coded-tool arguments, `sly_data`, and peer output.
+10. **Always allow** is scoped to one origin, phase, and request hash; a different request asks again.
+11. The audit chain verifies, and the raw canary never appears in it.
 
-See `npm test`, the Playwright checks in `docs/DEMO.md`, and the requirement map in `docs/SPEC-MAPPING.md`.
+See `npm test`, `npm run benchmark:dlp`, the Playwright checks in `docs/DEMO.md`, and the requirement map in `docs/SPEC-MAPPING.md`.
 
 ## How this could become a product
 

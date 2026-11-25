@@ -14,6 +14,7 @@ import { actionContext, proposalRefs } from "./actions.js";
 import { parseAgentResponse, agentPresentationContext, normalizePresentation, consolidateIntakePresentations } from "./cruse.js";
 import { applyPendingSteering, runInterruptibleModelCall } from "./turn-control.js";
 import { assertModelForRouter, effectiveModel } from "./model.js";
+import { sha256Hex } from "./audit.js";
 
 let invocationSequence = 0;
 
@@ -32,6 +33,30 @@ export function safeName(s) {
 
 function hostOfUrl(url) {
   try { return new URL(url).host; } catch { return url; }
+}
+
+// Scan one value at a named trust boundary. A block is a refusal, never a
+// partial send: the caller returns before fetch, invoke, render, or execute.
+async function dlpBlock(ctx, value, boundary, fields = {}) {
+  if (!ctx.dlp) return null;
+  const verdict = ctx.dlp.scan(value, { boundary });
+  if (verdict.action !== "block") return null;
+  const requestHash = typeof value === "string" ? await sha256Hex(value) : null;
+  const detail = {
+    origin: ctx.displayOrigin,
+    boundary,
+    rule: verdict.rule,
+    path: verdict.path || null,
+    requestHash,
+    ...fields,
+  };
+  ctx.trace?.note("dlp_block", detail);
+  await ctx.audit?.append("dlp_block", detail);
+  return verdict;
+}
+
+function dlpRefusal(verdict) {
+  return `Blocked by data-loss prevention: the ${verdict.boundary} contained a protected ${verdict.rule}. Nothing was sent or executed.`;
 }
 
 // Consent protects a site boundary, not every service call. Local MCP hosts are
@@ -329,6 +354,8 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
   const { trace } = ctx;
 
   if (entry.kind === "presentation") {
+    const blocked = await dlpBlock(ctx, args.presentation, "presentation");
+    if (blocked) throw new Error(dlpRefusal(blocked));
     if (!ctx.presentationOutput) throw new Error("No presentation output is available for this invocation.");
     const normalized = normalizePresentation(args.presentation, ctx.invocation);
     if (!normalized.presentation || normalized.issues.length) {
@@ -350,6 +377,13 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
       || registered.base !== ctx.baseOrigin || registered.network !== ctx.network.name
       || registered.availability !== "local-only"
       || (registered.effect === "irreversible" && typeof ctx.confirmWebsiteActions !== "function")) {
+      const denial = {
+        origin: ctx.displayOrigin,
+        tool: registered?.name || entry.ref,
+        reason: "website action is not callable by this agent",
+      };
+      ctx.trace?.note("tool_denied", denial);
+      await ctx.audit?.append("tool_denied", denial);
       throw new Error("Website action is not callable by this agent.");
     }
     const plan = ctx.actions.prepare({ kind: "action", action: entry.ref, arguments: args });
@@ -371,6 +405,8 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
     // including secrets like backend_token.) Untrusted peer code never sees more
     // than it is declared to need.
     const permitted = filterSlyData(ctx.slyData, allowedDownstreamSly(entry.spec) || []);
+    const blocked = await dlpBlock(ctx, { args, slyData: permitted }, "coded_tool", { tool: entry.spec.class });
+    if (blocked) return dlpRefusal(blocked);
     const { result, slyData } = await ctx.sandbox.invoke({
       bundleUrl: ctx.codedToolBundleUrl,
       integrity: ctx.codedToolIntegrity,
@@ -395,6 +431,8 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
       // prompts because they do not cross the site's trust boundary.
       const host = hostOfUrl(entry.client.url);
       const requestText = argsToText(args);
+      const blocked = await dlpBlock(ctx, requestText, "mcp_egress", { peerOrigin: host });
+      if (blocked) return dlpRefusal(blocked);
       const decision = await ctx.requestConsent?.({
         kind: "mcp", phase: "call", peerLabel: "Destination service", peerOrigin: host,
         requestText,
@@ -417,7 +455,10 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
   if (entry.kind === "remote") {
     const requestText = argsToText(args);
     const host = hostOfUrl(entry.url);
-    if (requiresThirdPartyApproval(entry.url, ctx.baseOrigin)) {
+    const requiresApproval = requiresThirdPartyApproval(entry.url, ctx.baseOrigin);
+    if (requiresApproval) {
+      const blocked = await dlpBlock(ctx, requestText, "peer_egress", { peerOrigin: host });
+      if (blocked) return dlpRefusal(blocked);
       // The third-party peer has not been fetched yet, so consent genuinely
       // precedes contact. A network published by this same site stays local.
       const est = {
@@ -452,12 +493,16 @@ export async function dispatchToolCall(ctx, entry, args, parentSpan, chain) {
       throw err;
     }
     const downstreamSly = filterSlyData(ctx.slyData, allowedDownstreamSly(ctx.network.getAgentSpec(ctx.frontMan)) || []);
+    const blockedSly = await dlpBlock(ctx, downstreamSly, "peer_sly_data", { peerOrigin: host });
+    if (blockedSly) return dlpRefusal(blockedSly);
     const request = {
       user_message: { type: ChatMessageType.HUMAN, text: requestText },
       sly_data: downstreamSly,
       chat_filter: { chat_filter_type: "MINIMAL" },
     };
     const result = await session.invoke(request, { parentSpan, chain, composition: ctx.composition });
+    const blockedResult = await dlpBlock(ctx, result, "peer_response", { peerOrigin: host });
+    if (blockedResult) return dlpRefusal(blockedResult);
     for (const ref of proposalRefs(result)) ctx.allowedActionRefs?.add(ref);
     return result;
   }

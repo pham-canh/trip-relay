@@ -36,11 +36,11 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 14 `node:test` checks run the real runtime with a scripted model; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. GitHub Actions runs the suite on every push. The demo recording uses a scripted SSE router; the public pair defaults to Otari.
+- 27 `node:test` checks run the real runtime with a scripted model, including 13 DLP/audit checks; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs both on every push. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
 
 ### Verification status
 
-- **Protocol and consent:** 14 `node:test` checks and a 16-check Playwright pass, both with a scripted model. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**.
+- **Protocol and consent:** 27 `node:test` checks and a 16-check Playwright pass, both with a scripted model. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the audit log is session-only.
 - **Hosted boundary:** the same consent flow was run against the public pair. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
 - **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in **AI model settings** and repeat the question. We do not claim a live provider call.
 - **Scope:** demo data only. No real inventory, payment, or reservation. The contribution is the boundary, not the travel inventory.
@@ -59,7 +59,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - A visible, testable cross-origin consent gate with zero peer requests before approval.
 - A two-agent caller network and a separate hotel network, both running in a normal browser tab.
 - Per-origin private-context rules: only the natural-language request crosses the boundary.
-- 14 unit tests, 16 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
+- 27 unit tests, a 16-case hostile-peer DLP benchmark, 16 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
 - The same consent ordering was verified against the hosted GitHub Pages pair, including the trailing-dot second origin; that run also used a scripted endpoint, not a live Otari call.
 - A complete spec map, demo script, screenshots, and a reproducible local setup with no server dependencies.
 
@@ -71,6 +71,7 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 - Record a take against a live Otari key over the same picture; the current entrant-voice cut uses a scripted, reproducible endpoint.
 - Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
+- Extend the DLP benchmark into the browser UI: Playwright cases for the sandbox, a spoofed consent card, and IndexedDB audit download/verify.
 - Extract the consent/policy layer into a small reusable library and add signed publisher identity.
 - Add a second peer with a different trust level to show per-origin policies.
 - Add an optional MCP facade and an A2A card.
@@ -131,7 +132,41 @@ Upload the screenshots in this order; each caption is under 140 characters.
 - **Screenshot:** `docs/screenshots/airline-hero.png`.
 - **Upload a file:** leave blank; the public repository, `PROTOCOL.md`, `docs/ORIGIN.md`, and the transcript are the evidence bundle.
 - **Additional tool URL:** <https://github.com/pham-canh/trip-relay/blob/main/scripts/check_origins.mjs>.
+- **Benchmark:** `npm run benchmark:dlp` runs the deterministic 12-attack/4-control matrix against the real dispatch boundary. Committed report: <https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json>; source: <https://github.com/pham-canh/trip-relay/blob/main/scripts/benchmark_dlp.mjs>; scope: <https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md>.
 - **Additional tool description:** `scripts/check_origins.mjs` is a dependency-free Node.js check for the deployed pair. It verifies that the airline and hotel resolve to different browser origins (the hotel host keeps its deliberate trailing dot), that both manifests are reachable, that the hotel manifest is CORS-readable from the airline, that the airline lists the hotel origin as an allowed peer, that the hotel allows no further peers, and that the hotel network publishes tools. Run it with `npm run check:origins`; the browser-level evidence, including localStorage isolation and the 0/0/11 consent request counts, is in `docs/ORIGIN.md`.
+
+## Update draft (post-submission)
+
+Post this in **Updates** only after the code and docs are pushed. It is a progress log, not a replacement for the project story. The benchmark is implemented and measured; the browser UI and remote audit sink are not.
+
+```markdown
+## Update: hostile-peer DLP benchmark passes 12/12
+
+The Trip Relay repository now ships a deterministic hostile-peer benchmark. A malicious hotel network tries to obtain the passenger email, bypass consent, and execute a caller tool; every attempt is blocked and recorded.
+
+**Results**
+- 12/12 attacks blocked
+- 0 canary egress
+- 0 unauthorized tool executions
+- 0 consent bypasses
+- 0 PII in raw audit fields
+- 4/4 legitimate controls pass
+- audit hash chain verifies
+
+**What changed**
+- Per-run canary email; DLP at peer egress, coded-tool args, `sly_data`, and peer output.
+- “Always allow” is bound to origin + request hash + kind + phase, with a 5-minute expiry.
+- Caller writes are denied to a non-top peer; unlisted origins fail closed.
+- Hash-chained, redacted audit log with export and verification.
+- `npm test` now includes 13 DLP/audit checks (27 total).
+
+**Scope**
+This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The remaining browser matrix, IndexedDB download/verify UI, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
+
+Run: `npm run benchmark:dlp`
+Report: https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json
+Spec: https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md
+```
 
 ## Before submitting
 
@@ -141,11 +176,12 @@ Upload the screenshots in this order; each caption is under 140 characters.
 - [x] Upload `docs/trip-relay-demo-own-voice.mp4` to YouTube as **Public** at <https://youtu.be/lDLhXmqXv6I> (1:46). The English subtitles are burned in, so no English caption track is needed.
 - [ ] Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`; the current thumbnail is a video frame with the developer panel.
 - [x] Confirm the final video has English subtitles burned into the picture and that `docs/VIDEO-TRANSCRIPT.md` is linked in the submission. The language rule allows Vietnamese audio with an English translation.
-- [ ] Submit the Devpost form with the copy above.
+- [x] Submit the Devpost form with the copy above.
 - [x] Add the Otari account email (`crytobot459@gmail.com`) and check the problem/improvement text in `docs/OTARI.md`.
 - [ ] Revoke any Otari key used during development and confirm no key is in the repo or screenshots.
 - [x] Confirm the repository is public and the license is visible.
 - [ ] Upload the repository social preview (`docs/social-preview.png`) and pin the repo if it belongs in the portfolio.
-- [x] Re-run `npm test` after the last code change (14/14 pass).
-- [ ] Push `main` so `PROTOCOL.md`, `scripts/build_public.mjs`, and the demo docs stop 404ing on GitHub.
-- [ ] Open the Devpost form, paste this copy, add the screenshots and video link, and submit.
+- [x] Re-run `npm test` after the last code change (27/27 pass).
+- [x] Run `npm run benchmark:dlp` (12/12 attacks blocked, 4/4 controls pass).
+- [x] Push `main` so `PROTOCOL.md`, `scripts/build_public.mjs`, and the demo docs stop 404ing on GitHub.
+- [x] Keep the Devpost confirmation email; edit the project story if any claim changes, and post the DLP update separately.

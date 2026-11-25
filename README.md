@@ -58,7 +58,7 @@ The manual pages work without a key, so the demo never depends on a provider bei
 
 ### Five-minute review
 
-1. `npm test` — 14 unit checks, no network.
+1. `npm test` — 27 unit checks, no network; then `npm run benchmark:dlp` for the hostile-peer matrix.
 2. Start both servers, open <http://127.0.0.1:8080/>, and book a flight manually.
 3. Read the handoff sequence in [PROTOCOL.md](PROTOCOL.md), then run the cross-site question below.
 4. Inspect the consent card, the trace rail, and the spec map.
@@ -112,12 +112,13 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 - **No key sharing.** The hotel network is fetched as public data and executed in the caller's browser. The key goes only to the configured router.
 - **Two gates for writes.** `book_flight` and `request_room` require a visitor confirmation and a current `expectedVersion`; a stale call is refused with a readable reason.
 - **Demo data only.** State lives in memory, resets on reload, takes no payment, and no request is sent to a real airline or hotel.
-- **Planned adversarial hardening.** A hostile-peer DLP and audit benchmark is specified in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md). It is not part of the submitted demo.
+- **Measured adversarial hardening.** `npm run benchmark:dlp` runs 12 hostile-peer cases and 4 controls against the real dispatch boundary with a per-run canary. The current result is 12/12 attacks blocked, 0 canary egress, 0 unauthorized writes, and 4/4 controls pass ([committed report](docs/dlp-benchmark.json)). The audit log is a session hash chain, not a remote WORM store; the scope and remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
 
 ## Tests
 
 ```bash
 npm test
+npm run benchmark:dlp
 npm run check:origins
 ```
 
@@ -125,12 +126,14 @@ The unit suite runs the real runtime with a scripted model, no network:
 
 - 9 caller tests: network validation, two-agent delegation, manifest/action agreement, read tool, flight write, confirmation gating, decline, approval, stale versions, dialog words, and Otari regional-router selection.
 - 5 peer tests: closed policy, grounded read, room-request confirmation, refusal paths, dialog words.
+- 13 DLP/audit tests: canary normalization, peer/tool/sly_data/response blocks, consent binding, tool denial, closed peer policy, audit redaction and tamper detection.
 
-Fourteen tests in total.
+Twenty-seven tests in total.
 
 | Check | Result | What it covers |
 | --- | --- | --- |
-| Unit suite | 14/14 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection |
+| Unit suite | 27/27 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection, DLP and audit |
+| DLP benchmark | 12/12 attacks, 4/4 controls | per-run canary, encoded/zero-width/base64 egress, peer response, coded-tool args, sly_data, secrets, caller-write denial, closed policy, audit tamper; clean hotel/coded flows, decline, audit redaction |
 | Local browser pass | 16 checks | both pages, manual booking, consent card, zero hotel requests before **Allow**, approved cross-site answer, zero console errors |
 | Hosted browser pass | pass | the same consent flow against the public pair, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, then the hotel answer |
 | Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |

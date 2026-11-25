@@ -1,12 +1,12 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The public pair, the repository, and the entrant-voice video are ready. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: replace the YouTube thumbnail, then submit the Devpost form.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submitted. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: replace the YouTube thumbnail, post the DLP benchmark update, and optionally upload the social preview.
 
 ## 1. Repository status
 
-`main` is pushed with the entrant-voice cut (2026-11-24). The `test` job and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README now says 14 tests with `crytobot459@gmail.com` as the Otari contact.
+`main` is pushed with the entrant-voice cut and the DLP benchmark (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 27 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
 
-The live site is already current: the deployed airline and hotel files match the local `dist-pages` build (verified by hash). `gh-pages` and the hotel repo `pham-canh/pham-canh.github.io` do not need a rebuild unless you change `site/` or `peer/`. The docs and the origin-check script live on `main` only.
+The live site still serves the submitted build. The DLP/audit hardening is on `main`; it changes `site/runtime` and `peer/runtime`, so rebuild and deploy only after a browser pass. `gh-pages` is the airline branch; the hotel is the `main` branch of `pham-canh/pham-canh.github.io`. The docs and the origin-check script live on `main` only.
 
 If a later change needs pushing, `gh` is authenticated on this machine with `repo` and `workflow` scopes:
 
@@ -87,7 +87,9 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**.
 - [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
-- [x] The GitHub README says 14 tests (not 13) and the Otari email is filled in.
+- [x] The GitHub README says 27 tests plus the DLP benchmark, and the Otari email is filled in.
+- [x] `npm test` passes 27/27 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.
 - [x] No API key appears in the repository or the Devpost copy; the recording uses a scripted endpoint.
 - [ ] The social preview is uploaded in **Settings → Social preview** (`docs/social-preview.png`).
-- [ ] The Devpost form is submitted before the deadline; keep the confirmation email.
+- [x] The Devpost form is submitted before the deadline; keep the confirmation email.
+- [ ] Post the DLP benchmark update from `docs/DEVPOST.md` after `main` is pushed.
