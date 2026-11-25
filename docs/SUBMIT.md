@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submitted. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: replace the YouTube thumbnail, post the DLP benchmark update, and optionally upload the social preview.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submitted. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: update the live project story and Built With tags, post the DLP/receipt update, replace the YouTube thumbnail, and optionally upload the social preview.
 
 ## 1. Repository status
 
@@ -103,4 +103,6 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] No API key appears in the repository or the Devpost copy; the recording uses a scripted endpoint.
 - [ ] The social preview is uploaded in **Settings → Social preview** (`docs/social-preview.png`).
 - [x] The Devpost form is submitted before the deadline; keep the confirmation email.
-- [ ] Post the DLP benchmark update from `docs/DEVPOST.md` after `main` is pushed.
+- [ ] Update the live Devpost story: it still says 14 tests and a 16-check pass. Replace that paragraph with the 27-test/27-check text in `docs/DEVPOST.md`, add the Privacy receipt bullet, and add `privacy-receipt.png` to the gallery.
+- [ ] Fix the Devpost **Built With** tags: replace `otira` with Mozilla Otari and split `neuro`/`san` into Neuro SAN; add Playwright and GitHub Actions if missing.
+- [ ] Post the DLP/receipt update from `docs/DEVPOST.md` after `main` is pushed.
