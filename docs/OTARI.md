@@ -38,7 +38,7 @@ Devpost asks for three things when a project uses Otari. Fill in the first befor
 
 ## Verification status
 
-The 27 unit tests, the 16-check browser pass, and the 12-attack/4-control DLP benchmark use a scripted model that speaks the same SSE/tool-call protocol, so they prove the integration boundary, the consent flow, the hostile-peer policy, and the regional-router selection without spending tokens. A live Otari call needs the account email above and an Otari key; after adding the key, use **AI model settings -> Otari (Mozilla)** for a global key or **Otari (Mozilla, EU)** for an EU key, then ask *"Can you ask Harbor Hotel whether it has a quiet room near the airport for two nights?"*.
+The 27 unit tests, the 27-check local browser pass (plus 12 hosted checks), and the 12-attack/4-control DLP benchmark use a scripted model that speaks the same SSE/tool-call protocol, so they prove the integration boundary, the consent flow, the hostile-peer policy, and the regional-router selection without spending tokens. A live Otari call needs the account email above and an Otari key; after adding the key, use **AI model settings -> Otari (Mozilla)** for a global key or **Otari (Mozilla, EU)** for an EU key, then ask *"Can you ask Harbor Hotel whether it has a quiet room near the airport for two nights?"*.
 
 Treat any key shared in a screenshot, chat, or issue as compromised and revoke it. The repository contains no Otari key.
 

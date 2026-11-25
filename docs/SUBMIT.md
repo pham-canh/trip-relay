@@ -4,9 +4,9 @@ Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submi
 
 ## 1. Repository status
 
-`main` is pushed with the entrant-voice cut and the DLP benchmark (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 27 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
+`main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, and the committed browser pass (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 27 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
 
-The live site still serves the submitted build. The DLP/audit hardening is on `main`; it changes `site/runtime` and `peer/runtime`, so rebuild and deploy only after a browser pass. `gh-pages` is the airline branch; the hotel is the `main` branch of `pham-canh/pham-canh.github.io`. The docs and the origin-check script live on `main` only.
+The live pair was redeployed on 2026-11-25 and serves the DLP runtime and the Privacy receipt. The airline is commit `f5a6800` on `gh-pages`; the hotel is commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (27/27 local), and `npm run check:browser:live` (12/12 hosted) pass. The docs, the origin check, and the browser check live on `main` only.
 
 If a later change needs pushing, `gh` is authenticated on this machine with `repo` and `workflow` scopes:
 
@@ -32,7 +32,16 @@ The hotel URL is <https://pham-canh.github.io./> **with a trailing dot**. Do not
 npm run check:origins
 ```
 
-Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable, the airline allows only `https://pham-canh.github.io.`, and the hotel allows no further peers. The browser evidence (two `location.origin` values, isolated `localStorage`, 0 requests before **Allow**, 0 after **Decline**, 11 after **Allow**) is in [`docs/ORIGIN.md`](ORIGIN.md). After a deployment, you can also run the manual **origin-check** workflow in GitHub Actions.
+Expected: distinct origins, both manifests 200, the hotel manifest CORS-readable, the airline allows only `https://pham-canh.github.io.`, and the hotel allows no further peers. The browser evidence (two `location.origin` values, isolated `localStorage`, 0 requests before **Allow**, 0 after **Decline**, 11 after **Allow**, the receipt chain verifies) is in [`docs/ORIGIN.md`](ORIGIN.md). After a deployment, you can also run the manual **origin-check** workflow in GitHub Actions.
+
+Repeat the hosted consent and receipt checks in Chrome:
+
+```bash
+npm install          # once, for playwright-core
+npm run check:browser:live
+```
+
+Expected: 12/12 checks pass. For the local pair, start `npm run serve:airline` and `npm run serve:hotel`, then run `npm run check:browser` (27/27).
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
@@ -63,7 +72,7 @@ Use the sections in [`docs/DEVPOST.md`](DEVPOST.md):
 - **Built with:** HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions.
 - **Try it:** <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>).
 - **Video:** <https://youtu.be/lDLhXmqXv6I>.
-- **Screenshots:** `docs/screenshots/airline-hero.png`, `airline-booking.png`, `consent.png`, `assistant-answer.png`, `hotel-mobile.png`.
+- **Screenshots:** `docs/screenshots/airline-hero.png`, `airline-booking.png`, `consent.png`, `assistant-answer.png`, `privacy-receipt.png`, `hotel-mobile.png`.
 - **Repository:** <https://github.com/pham-canh/trip-relay>.
 - **Otari account email:** `crytobot459@gmail.com`.
 - **Otari problem/improvement:** the text in [`docs/OTARI.md`](OTARI.md).
@@ -83,9 +92,10 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 
 - [x] The final YouTube upload uses the entrant's own voice (not AI-generated), plays without signing in, is 1:46, and has English subtitles burned into the picture.
 - [ ] Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`.
-- [x] Both live origins return HTTP 200.
+- [x] Both live origins return HTTP 200, and both serve `/runtime/dlp.js` plus the Privacy receipt.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
-- [x] The hosted consent flow shows 0 hotel requests before **Allow**.
+- [x] The hosted consent flow shows 0 hotel requests before **Allow**, 0 after **Decline**, and 11 after **Allow**; the receipt chain verifies.
+- [x] `npm run check:browser` passes 27/27 locally and `npm run check:browser:live` passes 12/12 against the deployed pair.
 - [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
 - [x] The GitHub README says 27 tests plus the DLP benchmark, and the Otari email is filled in.
 - [x] `npm test` passes 27/27 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.

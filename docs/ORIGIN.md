@@ -13,7 +13,7 @@ An origin is **scheme + host + port**. `https://pham-canh.github.io/trip-relay/`
 
 ## Evidence
 
-Recorded on 2026-11-24 in Chrome on macOS, against the live pair:
+Recorded on 2026-11-24 in Chrome on macOS, against the live pair; the consent and receipt flow was re-run on 2026-11-25 after the DLP deploy:
 
 | Check | Airline | Hotel |
 | --- | --- | --- |
@@ -28,6 +28,7 @@ The hosted consent flow, in the same browser:
 - **0** requests reach the hotel before **Allow**.
 - **0** requests reach the hotel after **Decline**.
 - **11** requests reach the hotel after **Allow**, followed by the hotel answer.
+- The Privacy receipt records the consent, the peer fetch, and the decline; its hash chain verifies in the page.
 - No console errors.
 
 The hosted run used a scripted OpenAI-compatible endpoint injected for the test. The deployed manifest declares `mock: false`, so the badge correctly flags the scripted peer response as a routing error. With a real Otari key the badge shows the real model. The demo recording uses the local manifest with `mock: true`, where the badge says `MOCK LLM — no real model` throughout. Neither is a live Otari call; see [OTARI.md](OTARI.md).
@@ -50,7 +51,16 @@ npm run serve:hotel
 AIRLINE_URL=http://127.0.0.1:8080/ PEER_URL=http://localhost:8081/ npm run check:origins
 ```
 
-Browser check:
+Browser check, repeatable with a scripted endpoint and no key:
+
+```bash
+npm install
+npm run check:browser:live
+```
+
+Expected: 12/12 checks pass. The same checks run locally with `npm run check:browser` (27/27) after `npm run serve:airline` and `npm run serve:hotel`.
+
+Manual origin check:
 
 1. Open the airline URL and run `location.origin` in DevTools. It is `https://pham-canh.github.io`.
 2. Open the hotel URL and run `location.origin`. It is `https://pham-canh.github.io.`.

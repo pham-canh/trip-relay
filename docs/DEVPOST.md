@@ -12,6 +12,8 @@ Two agentic travel websites, one visible consent boundary.
 
 Agents are starting to use other websites on our behalf, but most demos hide the moment they cross an origin. A prompt-level "the assistant may contact partners" line is not consent: the user cannot see which origin, what request, or what leaves the page. Trip Relay makes that boundary the product instead of an implementation detail, using a flight-booking site and a hotel site that a traveler would actually use together.
 
+The audience is specific: a traveler booking a trip that spans two suppliers, and the small airline or independent hotel that cannot run its own agent server. The booking needs a name and an email; the hotel is a different company. Today that exchange is invisible. Trip Relay turns it into a visible, reviewable handoff, and keeps the receipt on the traveler's side.
+
 ## What it does
 
 Trip Relay is a working pair of agentic websites. The airline and hotel are fictional, the inventory is generated, and no payment or real reservation is made.
@@ -19,6 +21,8 @@ Trip Relay is a working pair of agentic websites. The airline and hotel are fict
 - **Skyline Air** lets a visitor find a flight from Ho Chi Minh City to Da Nang, hold a fare, and book it. Its front agent delegates flight writes to a `fare_agent` specialist, and every write needs a current version and a visitor confirmation.
 - **Harbor Hotel** is a separate origin with its own manifest, network, rooms, rates, policies, airport shuttle, and room-request intake.
 - The airline's assistant can hand a hotel question to the second site. Before any request reaches the hotel origin (`localhost:8081` locally; `pham-canh.github.io.` hosted), the visitor sees a consent card with the exact origin, purpose, and request text. **Decline** cancels the call; the hotel manifest is never fetched. **Allow** loads only the hotel's public network and runs it in the caller's browser with the caller's router. The runtime forwards only the request text, which the consent card shows. It does not forward the chat history, page state, airline passenger record, or API key. A hotel room request is a separate action confirmed on the hotel origin.
+
+- A **Privacy receipt** under the assistant lists every consent decision, peer fetch, blocked value, and denied tool on the page. It verifies the hash chain in the browser and downloads the redacted log as JSON. The log is session-only; it is not a remote WORM store.
 
 The public demo runs at <https://pham-canh.github.io/trip-relay/> with the hotel at <https://pham-canh.github.io./>; the trailing dot is a deliberate second browser origin. **Do not drop the dot** — without it the hotel is on the airline's origin. The browser evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md). The same pages run locally on `127.0.0.1:8080` and `localhost:8081` and work without a model key for the manual flight-booking and room-request paths.
 
@@ -36,12 +40,12 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 27 `node:test` checks run the real runtime with a scripted model, including 13 DLP/audit checks; a 16-check Playwright pass covers both pages, the consent ordering, and the approved cross-site answer. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs both on every push. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
+- 27 `node:test` checks run the real runtime with a scripted model, including 13 DLP/audit checks; a 27-check Playwright browser pass covers both pages, the manual booking and room-request paths, the Privacy receipt (in-page verify and JSON download), the consent ordering, and the approved cross-site answer. The browser pass is committed as `scripts/browser_check.mjs`: `npm run check:browser` runs the 27 local checks and `npm run check:browser:live` repeats the 12 consent and receipt checks against the hosted pair. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs the unit suite and the benchmark on every push. The visitor-facing receipt reads the same hash-chained log and patches `append()` so a new event appears without a reload. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
 
 ### Verification status
 
-- **Protocol and consent:** 27 `node:test` checks and a 16-check Playwright pass, both with a scripted model. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the audit log is session-only.
-- **Hosted boundary:** the same consent flow was run against the public pair. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
+- **Protocol and consent:** 27 `node:test` checks and a 27-check Playwright browser pass, both with a scripted model and both committed in the repository. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**; it also verifies the Privacy receipt chain, downloads the JSON, and checks that the export contains no email or key. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the audit log is session-only.
+- **Hosted boundary:** the deployed pair now serves the DLP runtime and the Privacy receipt. `npm run check:browser:live` repeated the 12 consent and receipt checks against the public pair on 2026-11-25 (12/12): `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**; the receipt chain verifies; no console errors. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
 - **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in **AI model settings** and repeat the question. We do not claim a live provider call.
 - **Scope:** demo data only. No real inventory, payment, or reservation. The contribution is the boundary, not the travel inventory.
 
@@ -59,7 +63,8 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - A visible, testable cross-origin consent gate with zero peer requests before approval.
 - A two-agent caller network and a separate hotel network, both running in a normal browser tab.
 - Per-origin private-context rules: only the natural-language request crosses the boundary.
-- 27 unit tests, a 16-case hostile-peer DLP benchmark, 16 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
+- 27 unit tests, a 16-case hostile-peer DLP benchmark (12 attacks + 4 controls), 27 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
+- A visitor-facing Privacy receipt that verifies the hash chain in the page, exports the redacted JSON, and makes the boundary observable without the developer trace.
 - The same consent ordering was verified against the hosted GitHub Pages pair, including the trailing-dot second origin; that run also used a scripted endpoint, not a live Otari call.
 - A complete spec map, demo script, screenshots, and a reproducible local setup with no server dependencies.
 
@@ -71,7 +76,7 @@ Consent has to live at the transport boundary. A sentence in the system prompt i
 
 - Record a take against a live Otari key over the same picture; the current entrant-voice cut uses a scripted, reproducible endpoint.
 - Replace the trailing-dot peer host with a custom domain or a second static host when one is available; the public build already accepts `AIRLINE_URL` and `PEER_URL`.
-- Extend the DLP benchmark into the browser UI: Playwright cases for the sandbox, a spoofed consent card, and IndexedDB audit download/verify.
+- Add Playwright cases for the sandbox DOM/storage/network attempts, a spoofed consent card, and a browser-level DLP block. The two-page consent, decline, and receipt checks now ship in `scripts/browser_check.mjs`; IndexedDB persistence and a remote append-only sink do not.
 - Extract the consent/policy layer into a small reusable library and add signed publisher identity.
 - Add a second peer with a different trust level to show per-origin policies.
 - Add an optional MCP facade and an A2A card.
@@ -95,7 +100,7 @@ Devpost tags, one per entry:
 
 ## Try it
 
-Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in **AI model settings**; the regional preset fills the matching Otari router.
+Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in **AI model settings**; the regional preset fills the matching Otari router. After a hotel question, open **Privacy receipt** to verify the chain and download the redacted log.
 
 Local:
 
@@ -114,8 +119,9 @@ Upload the screenshots in this order; each caption is under 140 characters.
 1. `docs/screenshots/airline-hero.png` — Skyline Air landing page: book a flight, then ask the hotel — with a visible consent boundary.
 2. `docs/screenshots/consent.png` — The consent card shows the exact hotel origin, purpose, and request before any cross-origin fetch.
 3. `docs/screenshots/assistant-answer.png` — After Allow: the hotel network runs in the browser and returns a room answer; only the request text crossed.
-4. `docs/screenshots/airline-booking.png` — A manual booking: pick a flight, enter the passenger, and confirm; the demo takes no payment.
-5. `docs/screenshots/hotel-mobile.png` — Harbor Hotel on its own origin at a phone width: separate manifest, rooms, and policies.
+4. `docs/screenshots/privacy-receipt.png` — The Privacy receipt lists the consent, the peer fetch, and any blocked value; the hash chain verifies in the page and exports as JSON.
+5. `docs/screenshots/airline-booking.png` — A manual booking: pick a flight, enter the passenger, and confirm; the demo takes no payment.
+6. `docs/screenshots/hotel-mobile.png` — Harbor Hotel on its own origin at a phone width: separate manifest, rooms, and policies.
 
 ## Links
 
@@ -129,7 +135,13 @@ Upload the screenshots in this order; each caption is under 140 characters.
 ## Additional info (judges only)
 
 - **Public open agentic site:** <https://pham-canh.github.io/trip-relay/> (the airline entry point; the hotel is the separate origin at <https://pham-canh.github.io./>).
-- **Screenshot:** `docs/screenshots/airline-hero.png`.
+- **How it maps to the judging criteria:**
+  - **Technological implementation:** a spec-conformant manifest/network/links bundle, a browser runtime that loads and runs the peer's data-only network locally, a consent gate before the first peer fetch, DLP at every egress, and a hash-chained audit log.
+  - **Design:** one coherent travel flow (find a flight, book it, ask the hotel), a consent card that names the origin and exact request, a visitor-facing Privacy receipt, manual paths that work without a key, and a mobile layout.
+  - **Potential impact:** a concrete case for cross-supplier travel: the traveler sees and approves the handoff, while a small airline or independent hotel can join the agentic web without running an agent server or receiving the traveler's key.
+  - **Community contribution:** MIT-licensed `scripts/check_origins.mjs` and `scripts/benchmark_dlp.mjs`, the protocol note, and the spec map; both scripts are standalone Node tools that other two-origin pairs can reuse.
+  - **Quality of the idea:** consent is treated as a product surface and a transport invariant, not a prompt sentence; the demo makes the invisible origin crossing visible and testable.
+- **Screenshot:** `docs/screenshots/airline-hero.png`; privacy receipt: `docs/screenshots/privacy-receipt.png`.
 - **Upload a file:** leave blank; the public repository, `PROTOCOL.md`, `docs/ORIGIN.md`, and the transcript are the evidence bundle.
 - **Additional tool URL:** <https://github.com/pham-canh/trip-relay/blob/main/scripts/check_origins.mjs>.
 - **Benchmark:** `npm run benchmark:dlp` runs the deterministic 12-attack/4-control matrix against the real dispatch boundary. Committed report: <https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json>; source: <https://github.com/pham-canh/trip-relay/blob/main/scripts/benchmark_dlp.mjs>; scope: <https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md>.
@@ -158,10 +170,11 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark. A ma
 - “Always allow” is bound to origin + request hash + kind + phase, with a 5-minute expiry.
 - Caller writes are denied to a non-top peer; unlisted origins fail closed.
 - Hash-chained, redacted audit log with export and verification.
+- A visitor-facing **Privacy receipt** under the assistant: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, and any blocked value.
 - `npm test` now includes 13 DLP/audit checks (27 total).
 
 **Scope**
-This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The submitted video was recorded before this benchmark, so it says “fourteen tests”; the repository is current. The remaining browser matrix, IndexedDB download/verify UI, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
+This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The submitted video was recorded before this benchmark, so it says “fourteen tests”; the repository and the live pair are current. The remaining browser attack matrix, IndexedDB persistence, remote audit sink, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
 
 Run: `npm run benchmark:dlp`
 Report: https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json

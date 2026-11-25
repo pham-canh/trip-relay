@@ -54,30 +54,36 @@ The take ends at 1:45, under the two-minute limit. The last card also carries th
 9. The assistant run has no console errors.
 10. The badge says `⚠ MOCK LLM — no real model` throughout, matching the disclosure.
 
-## Browser checks already run
+## Browser checks
 
-A Playwright pass against Chromium covered:
+The browser pass is committed as `scripts/browser_check.mjs`. It drives Chrome with Playwright and a scripted SSE router, so it needs no model key. Start the local pair, then:
+
+```bash
+npm run check:browser        # 27 checks: pages + Privacy receipt + consent
+npm run check:browser:live   # 12 checks against the deployed pair
+```
+
+The first run needs Chrome and `npm install` (for `playwright-core`). Override the targets with `AIRLINE_URL` and `PEER_URL`, or the browser with `CHROME_PATH`.
+
+The local pass covers:
 
 1. The airline page renders nine flights.
-2. Selecting a flight updates the selection.
-3. Manual booking returns a `SKY-` reference.
-4. Reset clears the booking.
-5. Without a key, the page asks for one and stays usable.
-6. The airline has no console errors.
-7. The hotel page renders as Harbor Hotel.
-8. A manual room request returns an `HBR-` reference.
-9. The hotel has no console errors.
-10. Chat is usable with a saved key.
-11. The consent card names Harbor Hotel and `localhost:8081` locally, or `pham-canh.github.io.` hosted.
-12. Zero hotel requests occur before consent.
-13. The hotel manifest is fetched only after allow.
-14. The cross-site answer has no tool error.
-15. The model is called for the airline, the hotel, and the summary.
-16. The assistant run has no console errors.
+2. Selecting a flight and booking manually returns a `SKY-` reference.
+3. The Privacy receipt starts empty, renders injected consent/fetch/block events, verifies its hash chain, and downloads the JSON.
+4. The downloaded JSON contains no passenger email and no key.
+5. The airline has no console errors.
+6. The hotel page renders as Harbor Hotel with three rooms.
+7. The hotel has no console errors.
+8. The consent card names Harbor Hotel and the hotel host (`localhost:8081` locally, `pham-canh.github.io.` hosted).
+9. Zero hotel requests occur before consent.
+10. The hotel manifest is fetched only after allow, and allow returns the hotel answer.
+11. Decline sends zero hotel requests, shows one consent card, and the assistant says it did not contact the hotel.
+12. The receipt records both the allow and the decline.
+13. Both assistant runs have no console errors.
+
+The hosted pass repeats the consent and receipt checks against the deployed pair: **0** hotel requests before **Allow**, **0** after **Decline**, **11** after **Allow**, the chain verifies, and there are no console errors. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel. `npm run check:origins` repeats the deployment check without a browser. The evidence and the trailing-dot caveat are in [`docs/ORIGIN.md`](ORIGIN.md).
 
 The browser pass uses a scripted SSE router, not a live provider, so it proves the protocol and the boundary without spending tokens. A live Otari run is a separate recording step; do not imply the scripted pass spent real tokens.
-
-The hosted pair was checked separately. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the consent flow produced **0** hotel requests before **Allow**, **0** after **Decline**, and **11** after **Allow**. `npm run check:origins` repeats the deployment check without a key. The evidence and the trailing-dot caveat are in [`docs/ORIGIN.md`](ORIGIN.md). The hosted run also used a scripted endpoint; no live Otari call is claimed.
 
 ## Screenshots
 

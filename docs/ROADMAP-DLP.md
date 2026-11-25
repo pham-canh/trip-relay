@@ -113,8 +113,9 @@ per-peer `max_effect` are still planned.
 - Redaction happens before hashing, so a raw canary cannot enter the chain.
 - `export()` returns a portable JSON document; `verify()` and
   `verifyAuditEvents()` recompute the chain.
-- The log is in memory only. IndexedDB persistence and the page's download and
-  verify buttons are still planned.
+- The page's **Privacy receipt** lists the boundary events, runs `verify()` in
+  the browser, and downloads the redacted JSON.
+- The log is in memory only. IndexedDB persistence is still planned.
 
 ### Benchmark
 
@@ -175,12 +176,14 @@ Otari key; that is not claimed here.
 
 ## Still planned
 
-- **Browser matrix.** A Playwright pass against both real pages and a
-  `fixtures/evil-hotel/` network with a scripted model, covering the sandbox
-  DOM/storage/network attempts, a spoofed consent card, and the actual UI.
-- **Audit persistence and UI.** IndexedDB storage plus **Download audit log**
-  and **Verify chain** buttons, with a visible "session log, not remote
-  attestation" note.
+- **Browser attack matrix.** `scripts/browser_check.mjs` ships the two-page
+  consent, decline, and Privacy-receipt checks. Still planned: a
+  `fixtures/evil-hotel/` network with a scripted model covering the sandbox
+  DOM/storage/network attempts, a spoofed consent card, and a real
+  browser-level DLP block.
+- **Audit persistence.** IndexedDB storage so a reload does not start a new
+  log. The in-page **Verify chain** and **Download JSON** controls and the
+  "session log, not remote attestation" note now ship in the Privacy receipt.
 - **Per-peer capability grant.** A manifest `peer_tools` map with
   `caller_actions`, `max_effect`, and `allow_sly_data`, denied by default.
 - **Publisher identity.** Signed manifests and a pinned publisher key.
@@ -196,9 +199,10 @@ Otari key; that is not claimed here.
 - [x] The legitimate hotel flow and the manual pages still pass.
 - [x] `PROTOCOL.md` states the scoped audit capability and the remote-log
       caveat.
-- [ ] A short demo shows the attack, the block, the consent decision, the
-      denied tool, the audit event, and the PASS table. The terminal table is
-      available today; the browser UI is still planned.
+- [x] The Privacy receipt shows the consent decision, the peer fetch, and any
+      blocked value; it verifies the chain and downloads the redacted JSON.
+- [ ] A browser-level demo of an actual DLP block (not an injected audit event)
+      is still planned.
 
 ## Demo script
 
@@ -206,6 +210,9 @@ Otari key; that is not claimed here.
    passing.
 2. Book a flight manually on the airline origin.
 3. Ask the hotel; show the consent card with the exact origin and request.
-4. Allow; show the hotel answer and the trace.
-5. In a terminal, show a blocked canary request and the redacted audit export.
-6. State the boundary: session audit, deterministic rules, no remote WORM.
+4. Allow; show the hotel answer, the trace, and the **Privacy receipt** with
+   the consent and peer-fetch events.
+5. In the receipt, press **Verify chain** and **Download JSON**; show the
+   redacted export.
+6. In a terminal, show a blocked canary request and the benchmark table.
+7. State the boundary: session audit, deterministic rules, no remote WORM.

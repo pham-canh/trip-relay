@@ -28,7 +28,7 @@ This maps Trip Relay to the Open Agentic Web Challenge MVP Profile 0.2. "Caller"
 | Peer cannot receive or change the caller's key/router | runtime `engine.js` | Peer compile uses `selectPeerRouter(this.userRouter)` and runs locally; no key is sent to the hotel origin. |
 | Protected values are blocked at every egress | runtime `dlp.js`, `runner.js` | Peer request, `sly_data`, coded-tool args, MCP args, presentation, and peer output are scanned; `npm run benchmark:dlp` reports 12/12 attacks blocked with 0 canary egress. |
 | Consent approval is scoped | runtime `engine.js` | **Always allow** is bound to origin + kind + phase + request hash and expires after five minutes; a different request asks again. |
-| Audit is tamper-evident within the session | runtime `audit.js` | Hash-chained events, redaction before hashing, export and verify; `npm run benchmark:dlp` checks tamper detection. Not a remote WORM store. |
+| Audit is tamper-evident within the session | runtime `audit.js`, page **Privacy receipt** | Hash-chained events, redaction before hashing, in-page verify and JSON download; `npm run benchmark:dlp` checks tamper detection. Not a remote WORM store. |
 | Peer policy is closed and explicit | both manifests | Caller allows only the hotel origin (`http://localhost:8081` locally; `https://pham-canh.github.io.` hosted); hotel allows none. A denied origin fails closed. |
 | Observable execution | runtime trace and **Developer** toggle | Router host, tool calls, origins, and receipt status are visible in the UI. |
 
