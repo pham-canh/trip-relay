@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-25T00:42:57.032Z",
-  "runId": "3675ee92",
-  "canaryHash": "06bf562dc11e233ff9325162442d6d6769df3ff275259d205527c143822303bd",
+  "generatedAt": "2026-11-25T00:44:35.959Z",
+  "runId": "4898b7c5",
+  "canaryHash": "fba58a0f6e87d8c790a822ddd1f556c858e23410eb7fa9ce7cc3e827e79b4723",
   "pass": true,
   "summary": {
     "attacksBlocked": 12,

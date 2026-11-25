@@ -108,8 +108,8 @@ per-peer `max_effect` are still planned.
 - Append-only events: `consent_requested`, `consent_allowed`,
   `consent_declined`, `consent_reused`, `dlp_block`, `tool_denied`,
   `peer_fetch`.
-- `hash = sha256(canonicalJSON(event) + prevHash)`, stored as `prevHash` on the
-  next event.
+- `hash = sha256(canonicalJSON(event with prevHash))`; the next event stores
+  that hash as its `prevHash`.
 - Redaction happens before hashing, so a raw canary cannot enter the chain.
 - `export()` returns a portable JSON document; `verify()` and
   `verifyAuditEvents()` recompute the chain.

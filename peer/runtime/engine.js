@@ -167,7 +167,7 @@ export class Engine {
       if (typeof this.onConsent !== "function") return "allow";
       const decision = await this.onConsent(info);
       if (decision === "always") {
-        this.consent.set(key, now + this.consentTtlMs);
+        this.consent.set(key, Date.now() + this.consentTtlMs);
         return "allow";
       }
       return decision || "allow";
