@@ -161,7 +161,7 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark. A ma
 - `npm test` now includes 13 DLP/audit checks (27 total).
 
 **Scope**
-This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The remaining browser matrix, IndexedDB download/verify UI, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
+This is a deterministic Node benchmark on the real dispatch boundary, not a Playwright browser pass. The audit log is session-only, not a remote WORM store. The submitted video was recorded before this benchmark, so it says “fourteen tests”; the repository is current. The remaining browser matrix, IndexedDB download/verify UI, per-peer `peer_tools` grant, and signed publisher identity are listed in the roadmap.
 
 Run: `npm run benchmark:dlp`
 Report: https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json
