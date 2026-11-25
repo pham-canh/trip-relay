@@ -11,6 +11,8 @@ export { mountApp } from "./ui.js";
 export { AgentNetwork, validateNetwork, ChatMessageType } from "./kernel.js";
 export { parseHocon } from "./hocon.js";
 export { ActionRegistry } from "./actions.js";
+export { createDlp } from "./dlp.js";
+export { AuditLog, sha256Hex, verifyAuditEvents } from "./audit.js";
 
 import { Engine } from "./engine.js";
 import { TraceBus } from "./trace.js";

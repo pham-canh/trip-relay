@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Skyline Air — book a flight, with an agent you can audit</title>
   <meta name="description" content="An open agentic web demo: a browser agent books a flight and asks a hotel only after you approve the contact.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="assistant.css">
   <script type="module" src="site.js"></script>
@@ -130,6 +131,27 @@
         </div>
         <div data-ns-slot="settings"></div>
       </div>
+
+      <details id="privacy-receipt" class="receipt">
+        <summary>
+          Privacy receipt
+          <span id="receipt-count" class="receipt-count">no boundary events yet</span>
+        </summary>
+        <p class="receipt-intro">
+          Every consent decision, peer fetch, blocked value, and denied tool on this
+          page is appended to a hash-chained session log. The log is redacted before
+          hashing, so an email address or key never appears in it. It lives in this
+          tab only and is not sent to either site.
+        </p>
+        <div class="receipt-actions">
+          <button type="button" id="receipt-verify" class="button ghost">Verify chain</button>
+          <button type="button" id="receipt-download" class="button ghost">Download JSON</button>
+        </div>
+        <p id="receipt-status" class="receipt-status" role="status">
+          No boundary event yet. Ask the assistant to contact Harbor Hotel.
+        </p>
+        <ol id="receipt-events" class="receipt-events"></ol>
+      </details>
     </section>
 
     <section class="proof" aria-labelledby="proof-heading">

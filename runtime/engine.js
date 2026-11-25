@@ -18,6 +18,8 @@ import { createTurnEventStream } from "./execution-stream.js";
 import { TurnControl } from "./turn-control.js";
 import { ActionRegistry, actionBindings, cloneData } from "./actions.js";
 import { loadActionModule, registerRemoteActions } from "./action-transport.js";
+import { createDlp } from "./dlp.js";
+import { AuditLog, sha256Hex } from "./audit.js";
 import { randomUuid } from "./web-crypto.js";
 
 function normOrigin(url) {
@@ -94,9 +96,14 @@ export function selectPeerRouter(callerRouter) {
 }
 
 export class Engine {
-  constructor({ originUrl, trace, sandboxWorkerUrl, byokKey, routerOverride } = {}) {
+  constructor({ originUrl, trace, sandboxWorkerUrl, byokKey, routerOverride, dlp, audit, canary } = {}) {
     this.originUrl = (originUrl || (typeof location !== "undefined" ? location.origin : "")).replace(/\/$/, "");
     this.trace = trace || new TraceBus();
+    this.dlp = dlp || createDlp({ canary });
+    this.audit = audit || new AuditLog({ redact: (event) => this.dlp.redact(event) });
+    if (typeof this.trace.setRedactor === "function") {
+      this.trace.setRedactor((event) => this.dlp.redact(event));
+    }
     this.sandboxWorkerUrl = sandboxWorkerUrl || "/runtime/sandbox-worker.js";
     this.byokKey = byokKey || "";
     this.routerOverride = routerOverride || "";
@@ -106,7 +113,8 @@ export class Engine {
     this.top = null; // {network, base, bundleUrl, manifest, llm}
     this.agentRunner = null; // set by enableLangChain(); neuro-san-web owns the loop
     this.history = []; // top-level conversation turns ([{role,content}]) across runs
-    this.consent = new Map(); // peerOrigin -> "always" (remembered approvals)
+    this.consent = new Map(); // consent key -> expiry (remembered "always" approvals)
+    this.consentTtlMs = 5 * 60 * 1000;
     this.consentTail = Promise.resolve(); // serialize modal decisions for parallel tools
     this.onConsent = null; // UI hook: async (info) => "allow"|"always"|"decline"
     this.onLinkRequired = null; // UI hook: async ({reference,...}) => peer URL|null
@@ -125,19 +133,57 @@ export class Engine {
     this.actionSubmissions.clear();
   }
 
-  // Ask the user to approve contacting another hosted network. Remembers
-  // "always" per origin; defaults to allow when no UI hook is attached (headless).
+  // Ask the user to approve contacting another hosted network. Defaults to
+  // allow when no UI hook is attached (headless). "Always allow" is scoped to
+  // one exact request at one origin; a different request, network, phase, or an
+  // expired approval asks again.
+  consentKey(info, requestHash) {
+    return [info?.peerOrigin || "", info?.kind || "network", info?.phase || "", requestHash || ""].join("|");
+  }
+
   async requestConsent(info) {
+    const requestHash = info?.requestText ? await sha256Hex(String(info.requestText)) : null;
+    const key = this.consentKey(info, requestHash);
+    await this.audit.append("consent_requested", {
+      origin: hostOf(this.originUrl),
+      peerOrigin: info?.peerOrigin || null,
+      consentKind: info?.kind || "network",
+      phase: info?.phase || null,
+      requestHash,
+    });
+    const now = Date.now();
+    const remembered = this.consent.get(key);
+    if (remembered && remembered > now) {
+      await this.audit.append("consent_reused", {
+        origin: hostOf(this.originUrl),
+        peerOrigin: info?.peerOrigin || null,
+        consentKind: info?.kind || "network",
+        phase: info?.phase || null,
+        requestHash,
+      });
+      return "allow";
+    }
     const decide = async () => {
-      if (this.consent.get(info.peerOrigin) === "always") return "allow";
       if (typeof this.onConsent !== "function") return "allow";
       const decision = await this.onConsent(info);
-      if (decision === "always") { this.consent.set(info.peerOrigin, "always"); return "allow"; }
+      if (decision === "always") {
+        this.consent.set(key, Date.now() + this.consentTtlMs);
+        return "allow";
+      }
       return decision || "allow";
     };
     const pending = this.consentTail.then(decide, decide);
     this.consentTail = pending.then(() => undefined, () => undefined);
-    return pending;
+    const decision = await pending;
+    await this.audit.append(decision === "decline" ? "consent_declined" : "consent_allowed", {
+      origin: hostOf(this.originUrl),
+      peerOrigin: info?.peerOrigin || null,
+      consentKind: info?.kind || "network",
+      phase: info?.phase || null,
+      requestHash,
+      decision,
+    });
+    return decision;
   }
 
   // Load the prebuilt LangChain.js AgentRunner bundle and use it as the loop.
@@ -230,10 +276,18 @@ export class Engine {
 
   // Every hop is constrained by the immediate caller's published manifest. The
   // user still approves each remote call, so a peer cannot silently expand access.
-  _assertAllowedPeer(target, sourceManifest) {
+  async _assertAllowedPeer(target, sourceManifest) {
     const manifest = sourceManifest || this.top?.manifest;
     if (!manifestAllowsPeer(target, manifest, this.runtimeAllowedPeers)) {
       const source = manifest?.networks?.[0]?.name || "calling network";
+      const detail = {
+        origin: hostOf(this.originUrl),
+        peerOrigin: hostOf(target),
+        source,
+        reason: "not in allowed_peers",
+      };
+      this.trace?.note("policy_denied", detail);
+      await this.audit?.append("policy_denied", detail);
       throw new Error(`Policy: ${hostOf(target)} is not in ${source}'s allowed_peers; refusing to contact it.`);
     }
   }
@@ -350,6 +404,8 @@ export class Engine {
       llm,
       sandbox: this.sandbox,
       trace: this.trace,
+      dlp: this.dlp,
+      audit: this.audit,
       slyData,
       composition,
       // Prior conversation turns ([{role,content}]), only for the top front-man.
@@ -401,7 +457,7 @@ export class Engine {
   async resolveRemote(ref, chain, parentSpan, sourceManifest) {
     const target = new URL(ref, `${this.top.base}/`);
     const origin = new URL("./", target).href.replace(/\/$/, "");
-    this._assertAllowedPeer(origin, sourceManifest); // per-hop publish-time policy gate
+    await this._assertAllowedPeer(origin, sourceManifest); // per-hop publish-time policy gate
     const lastSeg = target.pathname.split("/").filter(Boolean).pop();
     this.registry.checkCycle(chain, origin, lastSeg);
 
@@ -431,6 +487,12 @@ export class Engine {
       const { network, bundleUrl, integrity, llm } = await this._compile(base, manifest, entry);
       await registerRemoteActions(this.actions, { base, network: network.name }, manifest);
       this.trace.end(fetchSpan, { network: network.name, fetchedUrls, peerOrigin: hostOf(origin), brand: manifest.brand });
+      await this.audit.append("peer_fetch", {
+        origin: hostOf(this.top.base),
+        peerOrigin: hostOf(origin),
+        network: network.name,
+        urls: fetchedUrls,
+      });
       session = new Session(this, { network, base, bundleUrl, integrity, manifest, llm, fetchedUrls, brand: manifest.brand });
       this.registry.set(origin, lastSeg, session);
       return session;
@@ -444,7 +506,7 @@ export class Engine {
   // MCP client. The browser acts as MCP client to a hosted MCP server.
   async resolveMcp(ref, parentSpan, slyData, sourceManifest) {
     const url = typeof ref === "string" ? ref : ref.url;
-    this._assertAllowedPeer(url, sourceManifest); // same per-hop policy gate as peer networks
+    await this._assertAllowedPeer(url, sourceManifest); // same per-hop policy gate as peer networks
     if (!this._mcpClients) this._mcpClients = new Map();
     let client = this._mcpClients.get(url);
     if (!client) {

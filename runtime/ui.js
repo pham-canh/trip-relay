@@ -879,7 +879,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       (info.requestText ? `<div class="ns-consent-req">“${escapeHtml(info.requestText.slice(0, 140))}”</div>` : "") +
       `<div class="ns-consent-actions">` +
         `<button data-d="allow">Allow</button>` +
-        `<button data-d="always">Always allow</button>` +
+        `<button data-d="always">Always allow this request</button>` +
         `<button data-d="decline" class="ghost">Decline</button>` +
       `</div>`;
     msgs.appendChild(el);

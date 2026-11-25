@@ -310,6 +310,58 @@ h1 {
 #assistant-status { font-size: 0.88rem; font-weight: 600; color: var(--teal-dark); }
 #agent-app { margin-top: 1rem; }
 
+.receipt {
+  margin-top: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  padding: 0.9rem 1rem;
+}
+.receipt summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 700;
+}
+.receipt summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.receipt-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+.receipt-count.blocked { color: var(--danger); border-color: rgba(163, 50, 37, 0.35); background: #fdf1ef; }
+.receipt-intro { max-width: 52rem; font-size: 0.88rem; color: var(--ink-soft); }
+.receipt-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0; }
+.receipt-actions .button { font-size: 0.82rem; padding: 0.45rem 0.8rem; }
+.receipt-status { font-size: 0.84rem; color: var(--ink-soft); margin: 0.4rem 0; }
+.receipt-status.ok { color: var(--teal-dark); font-weight: 600; }
+.receipt-status.bad { color: var(--danger); font-weight: 600; }
+.receipt-events { list-style: none; margin: 0.6rem 0 0; padding: 0; display: grid; gap: 0.35rem; }
+.receipt-events li {
+  display: grid;
+  grid-template-columns: 5.4rem 10rem 1fr;
+  gap: 0.7rem;
+  align-items: baseline;
+  font-size: 0.8rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--line);
+}
+.receipt-events time { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.receipt-events strong { font-weight: 700; }
+.receipt-events span { color: var(--ink-soft); overflow-wrap: anywhere; }
+.receipt-events li.block strong { color: var(--danger); }
+@media (max-width: 620px) {
+  .receipt-events li { grid-template-columns: 4.6rem 1fr; }
+  .receipt-events li span { grid-column: 2; }
+}
+
 .proof { max-width: 78rem; padding-block: clamp(2rem, 5vw, 4rem); border-top: 1px solid var(--line); }
 .proof ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.45rem; max-width: 48rem; }
 .proof code { background: #ece5d7; padding: 0.1rem 0.35rem; border-radius: 5px; font-size: 0.86em; }
