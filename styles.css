@@ -307,6 +307,9 @@ h1 {
 .assistant h2 { margin-top: 0; font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif; font-size: clamp(1.7rem, 3.5vw, 2.5rem); }
 .assistant > p { max-width: 46rem; }
 .assistant-note { font-size: 0.86rem; color: var(--ink-soft); }
+.assistant-demo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; margin: 0.7rem 0; }
+.assistant-demo .button { font-size: 0.82rem; padding: 0.45rem 0.8rem; }
+.assistant-demo .fineprint { margin: 0; }
 #assistant-status { font-size: 0.88rem; font-weight: 600; color: var(--teal-dark); }
 #agent-app { margin-top: 1rem; }
 

@@ -3,6 +3,8 @@
 // The page needs the mount markup from index.html. reviewDetails() reads the
 // page object from app.js to show the visitor what the action will write.
 import { App } from "./app.js";
+import { auditSessionId, clearAudit, loadAudit, saveAudit } from "./runtime/audit-store.js";
+import { saveTabByokSetup } from "./runtime/byok.js";
 
 /**
  * Boots the browser runtime in the page's assistant section.
@@ -40,6 +42,7 @@ export class AssistantMount {
     consent_declined: "Contact declined",
     consent_reused: "Approval reused",
     peer_fetch: "Peer loaded",
+    peer_error: "Peer failed",
     dlp_block: "Data blocked",
     tool_denied: "Tool denied",
     policy_denied: "Origin denied",
@@ -66,6 +69,36 @@ export class AssistantMount {
   };
 
   /**
+   * Wire the page's keyless demo button. The demo applies a tab-only setup that
+   * points the runtime at the deterministic browser mock, then reloads. It calls
+   * one read tool and summarizes, so it can show consent and the receipt without
+   * a provider key or a write.
+   *
+   * :param engine: The booted runtime engine, or null when boot failed.
+   */
+  static wireDemo(engine = null) {
+    const button = document.querySelector("#demo-start");
+    const note = document.querySelector("#demo-note");
+    if (!button) return;
+    const demoOn = !!engine?.mockLLM && engine.top?.llm?.baseUrl === "browser://mock";
+    if (demoOn) {
+      button.textContent = "Exit scripted demo";
+      if (note) note.textContent = "Scripted demo is on. Add your own key in AI model settings to use a real model.";
+      button.addEventListener("click", () => {
+        saveTabByokSetup(null);
+        location.reload();
+      });
+      return;
+    }
+    button.textContent = "Try the scripted demo (no key)";
+    if (note) note.textContent = "Read-only: one page read, a real consent card, and a receipt. No model is called.";
+    button.addEventListener("click", () => {
+      saveTabByokSetup({ key: "", router: "browser://mock", model: "mock-1" });
+      location.reload();
+    });
+  }
+
+  /**
    * Boot the runtime and report the result in the status line.
    *
    * :return: The runtime engine, or null when boot failed.
@@ -85,7 +118,8 @@ export class AssistantMount {
       booted.engine.onActionConfirm = AssistantMount.review;
       AssistantMount.defaultConsent = booted.engine.onConsent;
       booted.engine.onConsent = AssistantMount.consent;
-      AssistantMount.mountReceipt(booted.engine);
+      await AssistantMount.mountReceipt(booted.engine);
+      AssistantMount.wireDemo(booted.engine);
       // Without a key the chat cannot answer yet. This is the same test as the
       // runtime's "API key required" badge in runtime/ui.js.
       const needsKey = !booted.engine.mockLLM
@@ -109,10 +143,13 @@ export class AssistantMount {
    * Replace the runtime's general first chat message with GREETING. "New chat" keeps the
    * first message, so the greeting stays for the whole visit.
    */
-  static greet() {
+  static greet(engine = AssistantMount.engine) {
     const first = document.querySelector("#ns-msgs .ns-msg.bot");
     if (first) {
-      first.textContent = AssistantMount.GREETING;
+      const demo = engine?.mockLLM && engine.top?.llm?.baseUrl === "browser://mock";
+      first.textContent = demo
+        ? "Scripted demo: ask about Harbor Hotel to see the real consent card and privacy receipt. The demo is read-only; use the page's form to book a flight."
+        : AssistantMount.GREETING;
     }
   }
 
@@ -260,18 +297,21 @@ export class AssistantMount {
    *
    * :param engine: The booted runtime engine.
    */
-  static mountReceipt(engine) {
+  static async mountReceipt(engine) {
     const details = document.querySelector("#privacy-receipt");
     const list = document.querySelector("#receipt-events");
     const count = document.querySelector("#receipt-count");
     const status = document.querySelector("#receipt-status");
     const verifyButton = document.querySelector("#receipt-verify");
     const downloadButton = document.querySelector("#receipt-download");
+    const clearButton = document.querySelector("#receipt-clear");
     if (!details || !list || !count || !status || !engine?.audit) {
       return;
     }
     const LIMIT = 12;
+    const sessionId = auditSessionId();
     let verifyToken = 0;
+    let restoreNotice = "";
 
     const label = (kind) => AssistantMount.RECEIPT_LABELS[kind] || kind.replaceAll("_", " ");
     const ruleName = (rule) => AssistantMount.RECEIPT_RULES[rule] || rule || "protected value";
@@ -289,6 +329,9 @@ export class AssistantMount {
           return peer ? `Reused the scoped approval for ${peer}` : "Scoped approval reused";
         case "peer_fetch":
           return [event.network ? `Loaded ${event.network}` : "Loaded peer network", peer].filter(Boolean).join(" from ");
+        case "peer_error":
+          return [event.network ? `Could not load ${event.network}` : "Could not load a peer", peer, event.reason]
+            .filter(Boolean).join(" · ");
         case "dlp_block":
           return `${ruleName(event.rule)} blocked ${boundaryName(event.boundary)}`;
         case "tool_denied":
@@ -336,10 +379,31 @@ export class AssistantMount {
         list.append(more);
       }
       if (!events.length) {
-        status.textContent = "No boundary event yet. Ask the assistant to contact Harbor Hotel.";
-        status.className = "receipt-status";
+        status.textContent = restoreNotice || "No boundary event yet. Ask the assistant to contact Harbor Hotel.";
+        status.className = restoreNotice ? "receipt-status bad" : "receipt-status";
       }
     };
+    const persist = async () => {
+      try {
+        await saveAudit(sessionId, engine.audit.events);
+      } catch {
+        // IndexedDB can be unavailable in private modes. The live receipt still works.
+      }
+    };
+    // Restore this tab's stored chain before new events arrive. A stored chain that
+    // fails verification is never loaded into the live log.
+    try {
+      const stored = await loadAudit(sessionId);
+      if (stored?.length) {
+        const result = await engine.audit.restore(stored);
+        if (!result.ok) {
+          restoreNotice = `Stored receipt failed verification at ${result.at}: ${result.reason}. Started a new chain.`;
+          await clearAudit(sessionId).catch(() => {});
+        }
+      }
+    } catch {
+      // No readable store: start with an empty chain.
+    }
     const verify = async () => {
       const token = ++verifyToken;
       const result = await engine.audit.verify();
@@ -358,10 +422,21 @@ export class AssistantMount {
     engine.audit.append = async (kind, fields) => {
       const event = await originalAppend(kind, fields);
       render();
+      await persist();
       if (details.open) await verify();
       return event;
     };
     verifyButton?.addEventListener("click", verify);
+    clearButton?.addEventListener("click", async () => {
+      if (!window.confirm("Clear the privacy receipt? Download it first if you need the evidence.")) return;
+      engine.audit.clear();
+      restoreNotice = "";
+      verifyToken += 1;
+      await clearAudit(sessionId).catch(() => {});
+      render();
+      status.textContent = "Receipt cleared. New boundary events start a fresh chain.";
+      status.className = "receipt-status ok";
+    });
     downloadButton?.addEventListener("click", () => {
       const exported = engine.audit.export();
       const blob = new Blob([`${JSON.stringify(exported, null, 2)}\n`], { type: "application/json" });

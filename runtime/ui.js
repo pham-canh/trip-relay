@@ -363,7 +363,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       </div>
       ${settingsSlot ? "" : settingsHtml}
       <div class="ns-inputbar" data-turn-active="false">
-        <input id="ns-input" class="ns-input" placeholder="Type a request…" />
+        <input id="ns-input" class="ns-input" aria-label="Message" placeholder="Type a request…" />
         <button id="ns-send" class="ns-send">Send</button>
         <button id="ns-newchat" title="Clear conversation history" style="background:transparent;color:var(--ns-muted,#888);border:1px solid var(--ns-border,#ccc)">New chat</button>
       </div>
@@ -1024,7 +1024,7 @@ export function mountApp(root, { engine, trace, manifest }) {
     let router = routerEl.value.trim();
     const key = keyEl.value.trim();
     const model = normalizeModelName(modelEl.value);
-    if ((key || model) && byokRouter && isMockRouter(router)) {
+    if (byokRouter && isMockRouter(router) && (!isBrowserMock(router) || !!key)) {
       router = byokRouter;
       routerEl.value = router;
     }
@@ -1065,14 +1065,20 @@ export function mountApp(root, { engine, trace, manifest }) {
     }
     catch { return String(url || "").replace(/\/$/, ""); }
   };
+  const isBrowserMock = (url) => String(url || "").trim() === "browser://mock";
   const isMockRouter = (url) => Boolean(
-    url && ((mockUrl && normalizedRouter(url) === normalizedRouter(mockUrl)) || /:8003(\/|$)/.test(url)),
+    url && (url === "browser://mock"
+      || (mockUrl && normalizedRouter(url) === normalizedRouter(mockUrl))
+      || /:8003(\/|$)/.test(url)),
   );
   const refreshHint = () => {
     const hasKey = keyEl.value.trim().length > 0;
     if (hasKey && isMockRouter(routerEl.value.trim())) {
       hintEl.className = "ns-hint warn";
       hintEl.textContent = `⚠ This router is the MOCK (ignores your key). It will be switched to the real proxy ${byokRouter || ""} when you save.`;
+    } else if (routerEl.value.trim() === "browser://mock") {
+      hintEl.className = "ns-hint";
+      hintEl.textContent = "Scripted demo router (no key needed). It calls read tools and summarizes; add a key to use a real model.";
     } else if (isMockRouter(routerEl.value.trim())) {
       hintEl.className = "ns-hint";
       hintEl.textContent = `Mock router (no key needed). To use a real LLM, enter a key — it will route via ${byokRouter || "the proxy"}.`;
@@ -1131,7 +1137,7 @@ export function mountApp(root, { engine, trace, manifest }) {
     // Apply checks the form it is about to save.
     if (!key || key === "demo") return false;
     // With a real key, Apply switches a mock router to the BYOK router.
-    const nextRouter = byokRouter && isMockRouter(router) ? byokRouter : router;
+    const nextRouter = byokRouter && isMockRouter(router) && (!isBrowserMock(router) || !!key) ? byokRouter : router;
     if (isMockRouter(nextRouter)) return false;
     if (model) return isPlaceholderModel(model);
     return !everyAgentHasModel;
@@ -1178,7 +1184,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       return false;
     }
     if (!model) return true;
-    if ((key || model) && byokRouter && isMockRouter(router)) {
+    if (byokRouter && isMockRouter(router) && (!isBrowserMock(router) || !!key)) {
       router = byokRouter;
       routerEl.value = router;
       refreshHint();

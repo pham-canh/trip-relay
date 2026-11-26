@@ -123,6 +123,10 @@
       <p>Find a flight, check what the hotel offers, or ask what this page cannot do.</p>
       <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
       <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
+      <p class="assistant-demo">
+        <button type="button" id="demo-start" class="button ghost">Try the scripted demo (no key)</button>
+        <span id="demo-note" class="fineprint">Read-only: one page read, a real consent card, and a receipt. No model is called.</span>
+      </p>
       <div id="agent-app">
         <div data-ns-slot="header"></div>
         <div class="assistant-panels">
@@ -139,13 +143,14 @@
         </summary>
         <p class="receipt-intro">
           Every consent decision, peer fetch, blocked value, and denied tool on this
-          page is appended to a hash-chained session log. The log is redacted before
-          hashing, so an email address or key never appears in it. It lives in this
-          tab only and is not sent to either site.
+          page is appended to a hash-chained receipt. The log is redacted before
+          hashing, so an email address or key never appears in it. It is kept in this
+          browser tab's database, survives a reload, and is not sent to either site.
         </p>
         <div class="receipt-actions">
           <button type="button" id="receipt-verify" class="button ghost">Verify chain</button>
           <button type="button" id="receipt-download" class="button ghost">Download JSON</button>
+          <button type="button" id="receipt-clear" class="button ghost">Clear receipt</button>
         </div>
         <p id="receipt-status" class="receipt-status" role="status">
           No boundary event yet. Ask the assistant to contact Harbor Hotel.

@@ -43,6 +43,9 @@ function sameRouter(left, right) {
 export async function isPublishedMockRouter(router, fetchImpl = fetch) {
   try {
     const url = new URL(router);
+    // Only a published http(s) origin can be another site's mock. The keyless
+    // browser://mock router is local and has no manifest to fetch.
+    if (!["http:", "https:"].includes(url.protocol)) return false;
     const response = await fetchImpl(`${url.origin}/agent-manifest.json`, { cache: "no-store" });
     if (!response.ok) return false;
     const manifest = await response.json();
@@ -58,6 +61,11 @@ export function selectTopRouter(manifest, routerOverride, byokKey, modelOverride
   const hasRealKey = !!(byokKey && byokKey !== "demo");
   const hasExplicitModel = !!String(modelOverride || "").trim();
   let requested = String(routerOverride || "").replace(/\/$/, "");
+  // A page can offer a keyless scripted demo. It uses the deterministic browser
+  // mock, so it never contacts a provider and cannot be mistaken for a real model.
+  if (requested === "browser://mock") {
+    return { baseUrl: requested, mock: true, upgradedToByok: false };
+  }
   const requestedMock = requested && declared.mock === true && sameRouter(requested, declared.base_url);
 
   if ((hasRealKey || hasExplicitModel) && (!requested || requestedMock)) {
@@ -498,6 +506,12 @@ export class Engine {
       return session;
     } catch (err) {
       this.trace.fail(fetchSpan, err);
+      await this.audit.append("peer_error", {
+        origin: hostOf(this.top.base),
+        peerOrigin: hostOf(origin),
+        network: lastSeg,
+        reason: String(err?.message || err).slice(0, 300),
+      });
       throw err;
     }
   }
