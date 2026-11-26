@@ -104,7 +104,7 @@ Use this only if you want a take that matches the current repository. The upload
 
 | Time | On screen | Narration |
 | --- | --- | --- |
-| 0:00–0:12 | Split screen: airline page and hotel page, then the consent card | "Booking a trip crosses company boundaries. Your assistant can ask a hotel on your behalf, but today you cannot see which site it contacts, what it sends, or whether you agreed." |
+| 0:00–0:12 | Full-screen card: **0 requests before Allow**; then split screen of the airline and hotel pages, then the consent card | "Your assistant can ask a hotel on your behalf. The question is what leaves your browser before you agree. Here, the answer is nothing." |
 | 0:12–0:28 | Skyline Air hero; highlight the two origins in the URL bar | "Trip Relay is two agentic websites on two origins. Skyline Air sells the flight. Harbor Hotel is a separate company with its own agent network. The airline can ask the hotel directly, with no agent server in the middle. That matters for a small airline or an independent hotel that cannot run one." |
 | 0:28–0:48 | Pick a flight, enter a passenger, book it, show the `SKY-` reference | "Start with a normal task. Pick a flight, enter a passenger, and book it. The page owns the write and returns the reference. No model is needed for this path." |
 | 0:48–1:08 | Ask for the hotel; the consent card appears; point to the origin, request, and token estimate | "Now ask about a hotel. Before anything leaves the page, the runtime pauses. The card names the other origin, the exact request, and the estimated cost. This is consent at the transport boundary, not a sentence hidden in a prompt." |
@@ -114,3 +114,15 @@ Use this only if you want a take that matches the current repository. The upload
 | 1:52–2:00 | Closing card with both URLs and the MIT license | "Two websites, one visible boundary. Try the keyless scripted demo, or add your own key. Trip Relay is MIT licensed and live on GitHub Pages." |
 
 The last card should also carry: *“The tests and the scripted demo use a deterministic model, not a live provider. The public pair accepts Otari or any compatible router.”*
+
+### What to borrow from the reference clip
+
+A 99-second Vietnamese SaaS explainer reviewed as a style reference (not a Trip Relay recording) makes five moves worth copying:
+
+- **Lead with one number.** It opens on `26:00` and `$9.30` before showing any product. Trip Relay can open on **0 requests before Allow**.
+- **Give the demo a numbered spine.** Its five steps are repo, service, customer, list, ads. Trip Relay's are **book → ask → allow → verify → prove**.
+- **Put proof next to the claim.** A `4.2★` rating appears beside the review count. Show `0 / 11` requests beside the consent card, and `12/12` blocked attacks beside the benchmark line.
+- **Use contrast pairs.** "No code" against "has a price"; "no fake reviews" against "5★ guests". The receipt's contrast is **before Allow: 0; after Allow: 11**.
+- **End on one action.** Its closing card says "code the next SaaS". End on "try the keyless demo, or add your key for a live call."
+
+Keep the narration conversational and let the on-screen number carry the point; do not read the caption aloud.

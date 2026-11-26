@@ -10,6 +10,7 @@
     "check:origins": "node scripts/check_origins.mjs",
     "check:browser": "node scripts/browser_check.mjs",
     "check:browser:live": "node scripts/browser_check.mjs --live",
+    "check:browser:demo": "node scripts/browser_check.mjs --live --demo",
     "build:pages": "node scripts/build_public.mjs",
     "serve:airline": "node scripts/serve.mjs site 8080 127.0.0.1",
     "serve:hotel": "node scripts/serve.mjs peer 8081 localhost"

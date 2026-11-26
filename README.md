@@ -137,7 +137,7 @@ The unit suite runs the real runtime with a scripted model, no network:
 - 3 receipt-chain tests: restore a stored chain, refuse a tampered store, and clear to a fresh chain.
 - 5 keyless-demo tests: select `browser://mock` without a key, route a hotel question to the peer, refuse a write, summarize hotel facts, and report a blocked or failed tool without retrying.
 
-Thirty-five tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 66 checks, and `npm run check:browser:live` runs 12 against the deployed pair. Both use a scripted endpoint and need Chrome plus `npm install`.
+Thirty-five tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 66 checks. Against the deployed pair, `npm run check:browser:live` runs 12 consent/receipt checks and `npm run check:browser:demo` runs 10 keyless-demo checks. All use a scripted endpoint and need Chrome plus `npm install`.
 
 | Check | Result | What it covers |
 | --- | --- | --- |
@@ -145,6 +145,7 @@ Thirty-five tests in total. The browser pass is committed too; with the local pa
 | DLP benchmark | 12/12 attacks, 4/4 controls | per-run canary, encoded/zero-width/base64 egress, peer response, coded-tool args, sly_data, secrets, caller-write denial, closed policy, audit tamper; clean hotel/coded flows, decline, audit redaction |
 | Local browser pass | 66 checks | 18 page/receipt checks, 12 consent checks, 4 peer-failure checks, 12 hostile-peer DLP checks, 10 mobile/a11y checks, and 10 keyless-demo checks: both pages, manual booking, receipt verify/download/reload/clear, zero hotel requests before **Allow**, approved cross-site answer, blocked outbound email, blocked inbound key, peer 503, phone layout, keyboard consent, and no provider call in the demo |
 | Hosted browser pass | 12 checks | the same consent flow against the deployed pair after the DLP deploy, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, receipt chain verifies, zero console errors |
+| Hosted demo pass | 10 checks | `npm run check:browser:demo`: the deployed keyless demo boots without a key, calls no provider, returns the hotel facts, writes and verifies the receipt, and exits back to the key requirement |
 | Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |
 | Live Otari call | not yet recorded | add a key in **AI model settings** and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |
 
@@ -173,7 +174,7 @@ AIRLINE_URL=https://airline.example/ PEER_URL=https://hotel.example/ npm run bui
 
 The generated directories are gitignored; publish each one at its origin root. The build fails if both URLs share an origin. Keep CORS on the hotel's public files. Use HTTPS except for loopback development. After any URL change, rebuild the published network JSON if you edited the HOCON, run `npm test`, run `npm run check:origins`, and repeat the cross-origin browser check.
 
-The pair is also proposed for the challenge's official [agentic websites list](https://github.com/cognizant-ai-labs/agentic-web/pull/85).
+The pair is listed on the challenge's official [agentic websites list](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) ([PR #85](https://github.com/cognizant-ai-labs/agentic-web/pull/85), merged).
 
 ## Spec mapping
 

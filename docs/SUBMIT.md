@@ -4,11 +4,11 @@ Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submi
 
 ## 1. Repository status
 
-`main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, per-tab receipt persistence, the keyless demo, and the expanded browser pass (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 35 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
+`main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, per-tab receipt persistence, the keyless demo, and the expanded browser pass (2026-11-26). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 35 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
 
-The live pair was redeployed on 2026-11-26 and serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. The airline is commit `92f71cc` on `gh-pages`; the hotel is unchanged at commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (66/66 local), and `npm run check:browser:live` (12/12 hosted) pass. A separate live smoke check of the keyless demo passed: it booted without a key, called no provider, returned the hotel facts, wrote and verified the receipt, restored it after a reload, and cleared it. The docs, the origin check, and the browser check live on `main` only.
+The live pair was redeployed on 2026-11-26 and serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. The airline is commit `92f71cc` on `gh-pages`; the hotel is unchanged at commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (66/66 local), `npm run check:browser:live` (12/12 hosted), and `npm run check:browser:demo` (10/10 hosted) pass. A separate live smoke check also confirmed the receipt restores after a reload and clears cleanly. The docs, the origin check, and the browser check live on `main` only.
 
-If a later change needs pushing, `gh` is authenticated on this machine with `repo` and `workflow` scopes:
+If a later change needs pushing, the existing Git credentials can push `main`:
 
 ```bash
 cd /Users/phamcanh/harness/devpost/trip-relay
@@ -95,10 +95,10 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] Both live origins return HTTP 200, and both serve `/runtime/dlp.js` plus the Privacy receipt.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**, 0 after **Decline**, and 11 after **Allow**; the receipt chain verifies.
-- [x] `npm run check:browser` passes 66/66 locally and `npm run check:browser:live` passes 12/12 against the deployed pair.
+- [x] `npm run check:browser` passes 66/66 locally, `npm run check:browser:live` passes 12/12 against the deployed pair, and `npm run check:browser:demo` passes 10/10 there.
 - [x] The keyless demo boots without a key, calls no provider, and writes the consent and peer fetch to the receipt.
 - [x] The receipt survives a reload, refuses a tampered stored chain, and clears to a fresh chain.
-- [x] Opened PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85) adding Trip Relay to the official agentic websites list.
+- [x] PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85) was merged, adding Trip Relay to the official [`agentic_websites.md`](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) list.
 - [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
 - [x] The GitHub README says 35 tests plus the DLP benchmark, and the Otari email is filled in.
 - [x] `npm test` passes 35/35 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.

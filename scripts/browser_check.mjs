@@ -3,6 +3,7 @@
 //
 //   npm run check:browser        # local pair: 66 checks across six groups
 //   npm run check:browser:live   # hosted pair: 12 consent/receipt checks
+//   npm run check:browser:demo   # hosted keyless demo: 10 checks
 //
 // Start the local pair first:
 //
@@ -24,7 +25,8 @@ import path from "node:path";
 const args = new Set(process.argv.slice(2));
 const live = args.has("--live");
 const pagesOnly = args.has("--pages");
-const consentOnly = args.has("--consent") || (live && !args.has("--pages"));
+const demoOnly = args.has("--demo");
+const consentOnly = !demoOnly && (args.has("--consent") || (live && !args.has("--pages")));
 
 const AIRLINE_URL = process.env.AIRLINE_URL
   || (live ? "https://pham-canh.github.io/trip-relay/" : "http://127.0.0.1:8080/");
@@ -102,17 +104,21 @@ const browser = await chromium.launch(
 );
 
 try {
-  if (!consentOnly) {
-    await runPageChecks();
-  }
-  if (!pagesOnly) {
-    await runConsentChecks();
-  }
-  if (!live && !pagesOnly) {
-    await runFailureChecks();
-    await runHostilePeerChecks();
-    await runMobileChecks();
+  if (demoOnly) {
     await runDemoChecks();
+  } else {
+    if (!consentOnly) {
+      await runPageChecks();
+    }
+    if (!pagesOnly) {
+      await runConsentChecks();
+    }
+    if (!live && !pagesOnly) {
+      await runFailureChecks();
+      await runHostilePeerChecks();
+      await runMobileChecks();
+      await runDemoChecks();
+    }
   }
 } finally {
   await browser.close();
