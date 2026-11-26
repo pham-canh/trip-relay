@@ -86,7 +86,7 @@ The browser pass uses a scripted SSE router, not a live provider, so it proves t
 - `docs/screenshots/airline-booking.png` — a selected flight and manual booking.
 - `docs/screenshots/consent.png` — the consent card before any hotel request.
 - `docs/screenshots/assistant-answer.png` — the approved cross-site answer.
-- `docs/screenshots/privacy-receipt.png` — the receipt with the consent, peer fetch, and blocked value.
+- `docs/screenshots/privacy-receipt.png` — the keyless demo's receipt with the consent, allow, peer load, and verified chain; the same panel records blocked values and peer failures.
 - `docs/screenshots/hotel-mobile.png` — the hotel at a phone width.
 
 ## Publishing

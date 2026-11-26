@@ -122,7 +122,7 @@ Upload the screenshots in this order; each caption is under 140 characters.
 1. `docs/screenshots/airline-hero.png` — Skyline Air landing page: book a flight, then ask the hotel — with a visible consent boundary.
 2. `docs/screenshots/consent.png` — The consent card shows the exact hotel origin, purpose, and request before any cross-origin fetch.
 3. `docs/screenshots/assistant-answer.png` — After Allow: the hotel network runs in the browser and returns a room answer; only the request text crossed.
-4. `docs/screenshots/privacy-receipt.png` — The Privacy receipt lists the consent, the peer fetch, and any blocked value; the hash chain verifies, survives a reload, and exports as JSON.
+4. `docs/screenshots/privacy-receipt.png` — The Privacy receipt from the keyless demo lists the consent, the peer fetch, and any blocked value; the hash chain verifies, survives a reload, and exports as JSON.
 5. `docs/screenshots/airline-booking.png` — A manual booking: pick a flight, enter the passenger, and confirm; the demo takes no payment.
 6. `docs/screenshots/hotel-mobile.png` — Harbor Hotel on its own origin at a phone width: separate manifest, rooms, and policies.
 
