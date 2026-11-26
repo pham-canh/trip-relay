@@ -6,7 +6,7 @@ Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submi
 
 `main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, per-tab receipt persistence, the keyless demo, and the expanded browser pass (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 35 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
 
-The live pair was redeployed on 2026-11-25 and serves the DLP runtime and the Privacy receipt. The airline is commit `f5a6800` on `gh-pages`; the hotel is commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (27/27 local), and `npm run check:browser:live` (12/12 hosted) pass. The docs, the origin check, and the browser check live on `main` only.
+The live pair was redeployed on 2026-11-26 and serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. The airline is commit `92f71cc` on `gh-pages`; the hotel is unchanged at commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (66/66 local), and `npm run check:browser:live` (12/12 hosted) pass. A separate live smoke check of the keyless demo passed: it booted without a key, called no provider, returned the hotel facts, wrote and verified the receipt, restored it after a reload, and cleared it. The docs, the origin check, and the browser check live on `main` only.
 
 If a later change needs pushing, `gh` is authenticated on this machine with `repo` and `workflow` scopes:
 

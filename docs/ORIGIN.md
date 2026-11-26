@@ -13,7 +13,7 @@ An origin is **scheme + host + port**. `https://pham-canh.github.io/trip-relay/`
 
 ## Evidence
 
-Recorded on 2026-11-24 in Chrome on macOS, against the live pair; the consent and receipt flow was re-run on 2026-11-25 after the DLP deploy:
+Recorded on 2026-11-24 in Chrome on macOS, against the live pair; the consent and receipt flow was re-run on 2026-11-25 after the DLP deploy, and the receipt persistence and keyless demo were re-run on 2026-11-26:
 
 | Check | Airline | Hotel |
 | --- | --- | --- |
@@ -29,6 +29,8 @@ The hosted consent flow, in the same browser:
 - **0** requests reach the hotel after **Decline**.
 - **11** requests reach the hotel after **Allow**, followed by the hotel answer.
 - The Privacy receipt records the consent, the peer fetch, and the decline; its hash chain verifies in the page.
+- The keyless demo boots without a key, calls no provider, returns the hotel's published facts, and writes the consent and peer fetch to the receipt.
+- A reload restores the same receipt chain; **Verify chain** still passes; **Clear receipt** starts a fresh one.
 - No console errors.
 
 The hosted run used a scripted OpenAI-compatible endpoint injected for the test. The deployed manifest declares `mock: false`, so the badge correctly flags the scripted peer response as a routing error. With a real Otari key the badge shows the real model. The demo recording uses the local manifest with `mock: true`, where the badge says `MOCK LLM — no real model` throughout. Neither is a live Otari call; see [OTARI.md](OTARI.md).
