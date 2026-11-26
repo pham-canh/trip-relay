@@ -79,7 +79,7 @@ The runtime pauses the tool call and asks the visitor to allow the contact. The 
 - the exact natural-language request, which conveys the purpose,
 - an optional token/cost estimate.
 
-**Allow** permits this contact. **Decline** returns a tool result saying the user declined; the model must continue without the peer. The runtime also offers **Always allow** for the current page session, scoped to that origin. The default is per-contact.
+**Allow** permits this contact. **Decline** returns a tool result saying the user declined; the model must continue without the peer. The runtime also offers **Always allow this request**, scoped to `peerOrigin + kind + phase + sha256(requestText)` with a five-minute expiry. A different origin, request, kind, or phase asks again. The default is per-contact.
 
 No peer request occurs while the card is open. This is the invariant the Playwright pass asserts.
 
@@ -130,7 +130,7 @@ These are honest boundaries, not hidden claims:
 
 - **No cryptographic attestation.** The demo verifies published names and origins, not signatures or publisher identity.
 - **No server-side policy enforcement.** The consent gate lives in the browser runtime. A production system should mirror the policy at a trusted gateway.
-- **No remote audit store.** The runtime keeps a hash-chained, redacted audit log for the session. The page's **Privacy receipt** exposes it: it lists the boundary events, verifies the chain in the browser, and downloads the JSON. It is not a remote WORM store, and a page reload starts a new log. A production system should ship the same events to a trusted server. The measured hostile-peer benchmark and the remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
+- **No remote audit store.** The runtime keeps a hash-chained, redacted audit log per tab. The page's **Privacy receipt** exposes it: it lists the boundary events, verifies the chain in the browser, downloads the JSON, and stores the redacted events in this tab's IndexedDB so a reload restores the same chain. A stored chain that fails verification is refused and never loaded. This is not a remote WORM store: the browser profile can still delete the database, and a production system should ship the same events to a trusted server. The measured hostile-peer benchmark and the remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
 - **No real inventory, payment, or booking.** Travel data is generated demo data.
 - **No general-purpose authenticated action API beyond the shipped bridge.** The runtime can call a peer's declared actions through its action bridge; this demo uses that for the hotel's own actions, and writes still require confirmation on the owning origin. A production system would add authorization and audit controls around that bridge.
 

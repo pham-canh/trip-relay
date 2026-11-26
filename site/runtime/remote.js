@@ -3,18 +3,43 @@
 // locally. This is the "fetch-and-run-locally" cross-origin composition model:
 // there is no agent server — the caller's browser runs the peer's published files.
 
+const FETCH_TIMEOUT_MS = 8000;
+
+function hostOf(url) {
+  try { return new URL(url).host; } catch { return String(url || "the peer"); }
+}
+
+async function request(url, options = {}) {
+  const timeout = typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(FETCH_TIMEOUT_MS) : undefined;
+  try {
+    return await fetch(url, { ...options, signal: options.signal || timeout });
+  } catch (error) {
+    const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
+    const reason = timedOut ? `timed out after ${FETCH_TIMEOUT_MS / 1000}s` : "network or CORS error";
+    throw new Error(`Could not reach ${hostOf(url)} (${reason}). The peer may be offline, or its CORS policy may block this origin.`);
+  }
+}
+
 export async function fetchManifest(originUrl) {
   const base = originUrl.replace(/\/$/, "");
   const url = `${base}/agent-manifest.json`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`manifest fetch ${resp.status} for ${url}`);
-  const manifest = await resp.json();
+  const resp = await request(url, { cache: "no-store" });
+  if (!resp.ok) throw new Error(`The peer at ${hostOf(url)} returned HTTP ${resp.status} for agent-manifest.json.`);
+  let manifest;
+  try {
+    manifest = await resp.json();
+  } catch {
+    throw new Error(`The peer at ${hostOf(url)} did not return valid JSON for agent-manifest.json.`);
+  }
+  if (!manifest || !Array.isArray(manifest.networks)) {
+    throw new Error(`The peer at ${hostOf(url)} published an agent-manifest.json without a networks list.`);
+  }
   return { manifest, base, url };
 }
 
 export async function fetchText(url) {
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`fetch ${resp.status} for ${url}`);
+  const resp = await request(url);
+  if (!resp.ok) throw new Error(`The peer at ${hostOf(url)} returned HTTP ${resp.status} for ${new URL(url).pathname}.`);
   return resp.text();
 }
 

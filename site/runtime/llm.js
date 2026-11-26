@@ -12,11 +12,54 @@ export function isMockResponse(configuredMock, routeKind, model) {
 }
 
 export function browserMockCompletion(messages = [], tools = []) {
-  const called = new Set(messages.filter((m) => m?.role === "tool" && m.name).map((m) => m.name));
+  const toolMessages = messages.filter((m) => m?.role === "tool");
+  const called = new Set(toolMessages.map((m) => m.name).filter(Boolean));
   const available = (tools || []).map((tool) => tool?.function).filter((fn) => fn?.name);
-  const next = available.find((fn) => !called.has(fn.name));
   const lastUser = [...messages].reverse().find((m) => m?.role === "user");
   const request = typeof lastUser?.content === "string" ? lastUser.content : JSON.stringify(lastUser?.content || "");
+  const system = messages.find((m) => m?.role === "system")?.content || "";
+  const siteName = system.match(/You are the assistant on the (.+?) website\./i)?.[1] || "";
+  const isPeer = !!siteName && !/skyline air/i.test(siteName);
+  const isSubagent = /^You help the .+ assistant/mi.test(system);
+  if (isPeer) {
+    // A peer runs without its own website tools, so the demo answers from the
+    // published facts in its prompt. This is the same text the hotel's own page
+    // publishes, not a live read.
+    const facts = system.split("\n").find((line) => /rooms and rates:/i.test(line));
+    const content = facts
+      ? `Harbor Hotel's published facts: ${facts.replace(/^-\s*/, "").trim()}`
+      : "I can share this site's published facts; its own page has the details.";
+    return { content, toolCalls: [], finishReason: "stop", usage: null, model: "neuro-san-mock-browser" };
+  }
+  if (isSubagent) {
+    return {
+      content: "The scripted demo is read-only. Use the page's own form to book a flight.",
+      toolCalls: [],
+      finishReason: "stop",
+      usage: null,
+      model: "neuro-san-mock-browser",
+    };
+  }
+  const wantsHotel = /hotel|room|harbor|stay|shuttle|breakfast/i.test(request);
+  const wantsFlight = /flight|fly|fare|book|seat|airline/i.test(request);
+  const readTool = (name) => /^(?:website_)?(?:get_|list_|read_|search|find|lookup|state|catalog)/i.test(name)
+    || /hotel|harbor|fare_agent/i.test(name);
+  const writeTool = (name) => /(?:^|_)(?:book|request|select|create|delete|update|confirm|pay|reserve)(?:_|$)/i.test(name);
+  const usable = (fn) => !called.has(fn.name) && !writeTool(fn.name);
+  const choose = () => {
+    if (wantsHotel) {
+      const hotel = available.find((fn) => usable(fn) && /hotel|harbor/i.test(fn.name));
+      if (hotel) return hotel;
+    }
+    if (wantsFlight) {
+      const flight = available.find((fn) => usable(fn) && /fare|flight/i.test(fn.name));
+      if (flight) return flight;
+    }
+    return available.find((fn) => usable(fn) && readTool(fn.name)) || null;
+  };
+  // The keyless demo is read-only: it calls one read or peer tool, then summarizes.
+  // It never calls a write tool, so a demo visitor cannot book or request a room.
+  const next = toolMessages.length ? null : choose();
   if (next) {
     const args = {};
     const schema = next.parameters || {};
@@ -36,11 +79,41 @@ export function browserMockCompletion(messages = [], tools = []) {
       model: "neuro-san-mock-browser",
     };
   }
-  const results = messages.filter((m) => m?.role === "tool").map((m) => String(m.content || ""));
-  const content = results.length
-    ? `(mock summary) Based on the tools I consulted: ${results.join(" ").slice(0, 1200)}`
-    : "(mock) I have no grounded tool output to summarize for this request.";
+  const content = toolMessages.length
+    ? mockSummary(toolMessages.map((message) => String(message.content || "")))
+    : "(scripted demo) Ask about a flight or Harbor Hotel. This demo uses fixed tool calls and a deterministic summary, not a live model.";
   return { content, toolCalls: [], finishReason: "stop", usage: null, model: "neuro-san-mock-browser" };
+}
+
+function mockSummary(results) {
+  for (const result of results) {
+    if (/Blocked by data-loss prevention/i.test(result)) {
+      return "The scripted demo blocked a protected value. Open the privacy receipt to see the boundary and the rule. Nothing from that value was sent or shown.";
+    }
+    if (/Error from tool|Could not reach|returned HTTP|did not return valid|timed out/i.test(result)) {
+      return `The scripted demo could not complete that request: ${result.replace(/\s+/g, " ").slice(0, 300)}`;
+    }
+  }
+  for (const result of results) {
+    let parsed = null;
+    try { parsed = JSON.parse(result); } catch { /* plain text */ }
+    if (parsed === null) {
+      if (result.trim()) return result.trim().slice(0, 700);
+      continue;
+    }
+    const value = parsed?.result && typeof parsed.result === "object" ? parsed.result : parsed;
+    const rooms = value?.rooms;
+    if (Array.isArray(rooms) && rooms.length) {
+      return `Harbor Hotel lists ${rooms.map((room) => `${room.name} at $${room.rate} a night`).join(", ")}. Breakfast and the airport shuttle are included. This is a scripted demo; the page has the full details.`;
+    }
+    const flights = value?.flights;
+    if (Array.isArray(flights) && flights.length) {
+      const first = flights[0];
+      return `Skyline Air lists ${flights.length} flights, including ${first.number || first.id} at ${first.depart || "the published time"}. This is a scripted demo; the page has the full schedule.`;
+    }
+    if (typeof value?.text === "string" && value.text.trim()) return value.text.trim().slice(0, 700);
+  }
+  return `The scripted demo read ${results.length} page tool${results.length === 1 ? "" : "s"}. Open the privacy receipt to see the boundary events.`;
 }
 
 //

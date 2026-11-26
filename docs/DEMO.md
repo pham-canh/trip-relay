@@ -12,6 +12,8 @@
 
 The recording proves the protocol and the boundary without spending tokens. It does **not** claim a live Otari call. A live Otari run is a separate take: add an `otk_...` key in **AI model settings** and repeat the same steps.
 
+The recorded take predates the receipt persistence, the keyless demo, and the hostile-peer browser checks. Its narration says “fourteen tests”; the current repository has **35** unit tests and **66** local browser checks. Treat the video's count as historical, not as the current claim. The updated two-minute script at the end of this file is for an optional re-record.
+
 ## Before recording
 
 The public pair is live at <https://pham-canh.github.io/trip-relay/> with the hotel at <https://pham-canh.github.io./>. The local pair gives you a cleaner consent card (`localhost:8081`) and more control.
@@ -59,27 +61,20 @@ The take ends at 1:45, under the two-minute limit. The last card also carries th
 The browser pass is committed as `scripts/browser_check.mjs`. It drives Chrome with Playwright and a scripted SSE router, so it needs no model key. Start the local pair, then:
 
 ```bash
-npm run check:browser        # 27 checks: pages + Privacy receipt + consent
+npm run check:browser        # 66 checks: pages, consent, failures, DLP, mobile, demo
 npm run check:browser:live   # 12 checks against the deployed pair
 ```
 
 The first run needs Chrome and `npm install` (for `playwright-core`). Override the targets with `AIRLINE_URL` and `PEER_URL`, or the browser with `CHROME_PATH`.
 
-The local pass covers:
+The local pass covers six groups:
 
-1. The airline page renders nine flights.
-2. Selecting a flight and booking manually returns a `SKY-` reference.
-3. The Privacy receipt starts empty, renders injected consent/fetch/block events, verifies its hash chain, and downloads the JSON.
-4. The downloaded JSON contains no passenger email and no key.
-5. The airline has no console errors.
-6. The hotel page renders as Harbor Hotel with three rooms.
-7. The hotel has no console errors.
-8. The consent card names Harbor Hotel and the hotel host (`localhost:8081` locally, `pham-canh.github.io.` hosted).
-9. Zero hotel requests occur before consent.
-10. The hotel manifest is fetched only after allow, and allow returns the hotel answer.
-11. Decline sends zero hotel requests, shows one consent card, and the assistant says it did not contact the hotel.
-12. The receipt records both the allow and the decline.
-13. Both assistant runs have no console errors.
+1. **Page and receipt (18 checks).** The airline renders nine flights; a manual booking returns a `SKY-` reference; the receipt starts empty, renders consent/fetch/block events, verifies its chain, downloads JSON with no email or key, restores the same chain after a reload, verifies the restored chain, and clears to an empty receipt. The hotel renders three rooms. Both pages have no console errors.
+2. **Consent (12 checks).** The card names Harbor Hotel and `localhost:8081`; zero hotel requests occur before consent; allow fetches the hotel and returns its answer; decline sends zero requests and shows one card; the receipt records both paths; both chains verify.
+3. **Peer failure (4 checks).** A 503 from the hotel manifest produces an actionable answer, a `peer_error` receipt row with the HTTP status, a chain that still verifies, and no unexpected console errors.
+4. **Hostile peer (12 checks).** A committed `tests/fixtures/evil-hotel/` fixture answers with a fake key. An email in the outbound request is blocked before consent and fetch; the hostile reply's `otk_` key is blocked before rendering; both blocks appear in the receipt; both chains verify; the exported JSON contains no key; there are no console errors.
+5. **Mobile and accessibility (10 checks).** At 390 px the page and receipt have no horizontal overflow; the chat input has an accessible name; visible form controls have labels; the consent card fits, takes focus, and completes with Tab then Enter.
+6. **Keyless demo (10 checks).** **Try the scripted demo (no key)** boots without a key, shows `⚠ MOCK LLM — no real model`, explains the scripted path, calls no provider, returns the hotel's published facts, writes the consent and peer fetch to the receipt, verifies the chain, exits back to the key requirement, and has no console errors.
 
 The hosted pass repeats the consent and receipt checks against the deployed pair: **0** hotel requests before **Allow**, **0** after **Decline**, **11** after **Allow**, the chain verifies, and there are no console errors. `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel. `npm run check:origins` repeats the deployment check without a browser. The evidence and the trailing-dot caveat are in [`docs/ORIGIN.md`](ORIGIN.md).
 
@@ -91,6 +86,7 @@ The browser pass uses a scripted SSE router, not a live provider, so it proves t
 - `docs/screenshots/airline-booking.png` — a selected flight and manual booking.
 - `docs/screenshots/consent.png` — the consent card before any hotel request.
 - `docs/screenshots/assistant-answer.png` — the approved cross-site answer.
+- `docs/screenshots/privacy-receipt.png` — the receipt with the consent, peer fetch, and blocked value.
 - `docs/screenshots/hotel-mobile.png` — the hotel at a phone width.
 
 ## Publishing
@@ -101,3 +97,20 @@ The browser pass uses a scripted SSE router, not a live provider, so it proves t
 4. Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`; the current thumbnail is a developer-panel frame.
 5. The URL is in `docs/DEVPOST.md`; paste it into the Devpost form.
 6. Verify the link in a private browser window before submitting.
+
+## Updated two-minute script (optional re-record)
+
+Use this only if you want a take that matches the current repository. The uploaded video is still valid; its “fourteen tests” line is historical. Narrate this in your own voice, in Vietnamese or English, and burn in English subtitles if the audio is Vietnamese. Do not use a synthetic voice for the entrant's explanation.
+
+| Time | On screen | Narration |
+| --- | --- | --- |
+| 0:00–0:12 | Split screen: airline page and hotel page, then the consent card | "Booking a trip crosses company boundaries. Your assistant can ask a hotel on your behalf, but today you cannot see which site it contacts, what it sends, or whether you agreed." |
+| 0:12–0:28 | Skyline Air hero; highlight the two origins in the URL bar | "Trip Relay is two agentic websites on two origins. Skyline Air sells the flight. Harbor Hotel is a separate company with its own agent network. The airline can ask the hotel directly, with no agent server in the middle." |
+| 0:28–0:48 | Pick a flight, enter a passenger, book it, show the `SKY-` reference | "Start with a normal task. Pick a flight, enter a passenger, and book it. The page owns the write and returns the reference. No model is needed for this path." |
+| 0:48–1:08 | Ask for the hotel; the consent card appears; point to the origin, request, and token estimate | "Now ask about a hotel. Before anything leaves the page, the runtime pauses. The card names the other origin, the exact request, and the estimated cost. This is consent at the transport boundary, not a sentence hidden in a prompt." |
+| 1:08–1:22 | Press **Decline**; show zero hotel requests; ask again and press **Allow**; show the answer | "Decline, and the hotel is never contacted. Ask again and allow. The browser fetches only the hotel's public network and runs it locally. The hotel receives the request, not my chat history, my passenger record, or my key." |
+| 1:22–1:40 | Open **Privacy receipt**; verify, download, reload, show the restored chain, then clear | "Every boundary event goes into a privacy receipt: the consent, the fetch, a blocked value, even a peer failure. I can verify the hash chain, download the redacted log, and reload without losing it. It stays in this tab; it is not a remote audit server." |
+| 1:40–1:52 | Terminal: `npm test`, `npm run benchmark:dlp`, browser-check summary | "The repository ships 35 unit tests, a 16-case hostile-peer DLP benchmark, 66 local browser checks, and 12 hosted checks. The tests use a scripted model; the public pair defaults to Otari, and a judge can add a key for a live call." |
+| 1:52–2:00 | Closing card with both URLs and the MIT license | "Two websites, one visible boundary. Try the keyless scripted demo, or add your own key. Trip Relay is MIT licensed and live on GitHub Pages." |
+
+The last card should also carry: *“The tests and the scripted demo use a deterministic model, not a live provider. The public pair accepts Otari or any compatible router.”*

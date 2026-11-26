@@ -30,7 +30,7 @@ An agent that can use other sites is useful only if the user can tell when it cr
 - **Exact network, no fallback.** `http://localhost:8081/harbor_hotel` must match a published network name. A missing name fails closed instead of running a different network.
 - **Private context by exception.** The runtime forwards the declared request, not the caller's chat history, page state, passenger record (name and email), or API key. The consent card shows the exact text that will cross.
 - **Writes stay owned.** Flight booking and room requests require confirmation and a current version on the owning origin.
-- **The boundary leaves a receipt.** A visitor-facing **Privacy receipt** lists every consent decision, peer fetch, blocked value, and denied tool. It verifies the hash chain in the page and downloads the redacted log as JSON; it is session-only, not a remote WORM store.
+- **The boundary leaves a receipt.** A visitor-facing **Privacy receipt** lists every consent decision, peer fetch, peer failure, blocked value, and denied tool. It verifies the hash chain in the page and downloads the redacted log as JSON. It is stored in this tab's browser database, so it survives a reload, and it is not sent to either site; it is not a remote WORM store.
 - **The boundary is testable.** The browser pass asserts zero hotel requests before **Allow**; the unit suite checks policy, the exact link, and write refusal paths.
 
 The travel flow is the demonstration. The reusable idea is a small policy-and-consent layer that any publisher could put in front of a peer agent network.
@@ -55,11 +55,11 @@ npm run serve:hotel
 
 Open <http://127.0.0.1:8080/>. In **AI model settings**, choose **Otari (Mozilla)** and paste an `otk_...` key, or choose another provider and enter its key and model. Global Otari keys use `https://api.otari.ai/api/v1`; EU keys start with `otk_v1_eu_` and use `https://eu.api.otari.ai/api/v1`. The preset detects the EU prefix and fills the right router. The key is stored in this browser and sent only to the router you choose.
 
-The manual pages work without a key, so the demo never depends on a provider being available. A live model call is the only part that needs Otari or another OpenAI-compatible endpoint.
+The manual pages work without a key, so the demo never depends on a provider being available. For the assistant without a key, press **Try the scripted demo (no key)**. It uses the deterministic `browser://mock` router: one read or peer call, a real consent card, and a real Privacy receipt, with no provider request and no write. A live model call is the only part that needs Otari or another OpenAI-compatible endpoint.
 
 ### Five-minute review
 
-1. `npm test` — 27 unit checks, no network; then `npm run benchmark:dlp` for the hostile-peer matrix.
+1. `npm test` — 35 unit checks, no network; then `npm run benchmark:dlp` for the hostile-peer matrix.
 2. Start both servers, open <http://127.0.0.1:8080/>, and book a flight manually.
 3. Read the handoff sequence in [PROTOCOL.md](PROTOCOL.md), then run the cross-site question below.
 4. Inspect the consent card, the trace rail, the Privacy receipt, and the spec map.
@@ -74,7 +74,7 @@ Try the cross-site path:
 
 ## Privacy receipt
 
-Under the assistant, **Privacy receipt** reads the same hash-chained audit log the runtime writes. It lists the consent request, the decision, the peer fetch, any DLP block, and any denied tool. **Verify chain** recomputes every hash in the page; **Download JSON** exports the redacted log. The log stays in the tab, is never sent to either site, and is not a remote WORM store.
+Under the assistant, **Privacy receipt** reads the same hash-chained audit log the runtime writes. It lists the consent request, the decision, the peer fetch, a peer failure, any DLP block, and any denied tool. **Verify chain** recomputes every hash in the page; **Download JSON** exports the redacted log; **Clear receipt** starts a fresh chain. The log is stored in this tab's IndexedDB and survives a reload. A stored chain that fails verification is refused and never loaded into the live log. It is never sent to either site and is not a remote WORM store.
 
 ![Privacy receipt after an approved hotel handoff](docs/screenshots/privacy-receipt.png)
 
@@ -119,7 +119,7 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 - **No key sharing.** The hotel network is fetched as public data and executed in the caller's browser. The key goes only to the configured router.
 - **Two gates for writes.** `book_flight` and `request_room` require a visitor confirmation and a current `expectedVersion`; a stale call is refused with a readable reason.
 - **Demo data only.** State lives in memory, resets on reload, takes no payment, and no request is sent to a real airline or hotel.
-- **Measured adversarial hardening.** `npm run benchmark:dlp` runs 12 hostile-peer cases and 4 controls against the real dispatch boundary with a per-run canary. The current result is 12/12 attacks blocked, 0 canary egress, 0 unauthorized writes, and 4/4 controls pass ([committed report](docs/dlp-benchmark.json)). The audit log is a session hash chain, not a remote WORM store; the scope and remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
+- **Measured adversarial hardening.** `npm run benchmark:dlp` runs 12 hostile-peer cases and 4 controls against the real dispatch boundary with a per-run canary. The current result is 12/12 attacks blocked, 0 canary egress, 0 unauthorized writes, and 4/4 controls pass ([committed report](docs/dlp-benchmark.json)). The browser pass also drives a hostile peer fixture through the real page: an email in the outbound request is blocked before consent and fetch, and an API key in the inbound reply is blocked before rendering. The audit log is a per-tab hash chain persisted in IndexedDB, not a remote WORM store; the scope and remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
 
 ## Tests
 
@@ -134,14 +134,16 @@ The unit suite runs the real runtime with a scripted model, no network:
 - 9 caller tests: network validation, two-agent delegation, manifest/action agreement, read tool, flight write, confirmation gating, decline, approval, stale versions, dialog words, and Otari regional-router selection.
 - 5 peer tests: closed policy, grounded read, room-request confirmation, refusal paths, dialog words.
 - 13 DLP/audit tests: canary normalization, peer/tool/sly_data/response blocks, consent binding, tool denial, closed peer policy, audit redaction and tamper detection.
+- 3 receipt-chain tests: restore a stored chain, refuse a tampered store, and clear to a fresh chain.
+- 5 keyless-demo tests: select `browser://mock` without a key, route a hotel question to the peer, refuse a write, summarize hotel facts, and report a blocked or failed tool without retrying.
 
-Twenty-seven tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 27 checks, and `npm run check:browser:live` runs 12 against the deployed pair. Both use a scripted endpoint and need Chrome plus `npm install`.
+Thirty-five tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 66 checks, and `npm run check:browser:live` runs 12 against the deployed pair. Both use a scripted endpoint and need Chrome plus `npm install`.
 
 | Check | Result | What it covers |
 | --- | --- | --- |
-| Unit suite | 27/27 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection, DLP and audit |
+| Unit suite | 35/35 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection, DLP, audit restore/tamper/clear, keyless demo |
 | DLP benchmark | 12/12 attacks, 4/4 controls | per-run canary, encoded/zero-width/base64 egress, peer response, coded-tool args, sly_data, secrets, caller-write denial, closed policy, audit tamper; clean hotel/coded flows, decline, audit redaction |
-| Local browser pass | 27 checks | 15 page/receipt checks plus 12 consent checks: both pages, manual booking, receipt verify and JSON download, zero hotel requests before **Allow**, approved cross-site answer, zero console errors |
+| Local browser pass | 66 checks | 18 page/receipt checks, 12 consent checks, 4 peer-failure checks, 12 hostile-peer DLP checks, 10 mobile/a11y checks, and 10 keyless-demo checks: both pages, manual booking, receipt verify/download/reload/clear, zero hotel requests before **Allow**, approved cross-site answer, blocked outbound email, blocked inbound key, peer 503, phone layout, keyboard consent, and no provider call in the demo |
 | Hosted browser pass | 12 checks | the same consent flow against the deployed pair after the DLP deploy, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, receipt chain verifies, zero console errors |
 | Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |
 | Live Otari call | not yet recorded | add a key in **AI model settings** and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |

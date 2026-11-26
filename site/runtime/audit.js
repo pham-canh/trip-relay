@@ -67,6 +67,28 @@ export class AuditLog {
     return event;
   }
 
+  // Replace this log with a previously stored chain, but only after the whole
+  // chain verifies. A tampered store is never loaded into the live log: the
+  // caller gets the failure and can start a fresh chain instead.
+  async restore(events) {
+    const snapshot = Array.isArray(events) ? events.map((event) => ({ ...event })) : [];
+    if (!snapshot.length) {
+      this.events = [];
+      this.prevHash = "";
+      return { ok: true, checked: 0, head: "" };
+    }
+    const result = await verifyAuditEvents(snapshot);
+    if (!result.ok) return result;
+    this.events = snapshot;
+    this.prevHash = result.head;
+    return result;
+  }
+
+  clear() {
+    this.events = [];
+    this.prevHash = "";
+  }
+
   export() {
     return {
       version: 1,

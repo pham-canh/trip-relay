@@ -61,12 +61,22 @@ test("DLP catches the canary through plain, encoded, zero-width and base64 forms
 
 test("DLP catches email and secret patterns but allows a clean travel request", () => {
   const dlp = createDlp();
-  assert.equal(dlp.scanText("alex@example.com").rule, "email");
+  const email = "alex@example.com";
+  const variants = [
+    email,
+    encodeURIComponent(email),
+    "alex@ex\u200Bample.com",
+    Buffer.from(email, "utf8").toString("base64"),
+  ];
+  for (const value of variants) {
+    assert.equal(dlp.scanText(value).rule, "email", `expected an email block for ${value}`);
+  }
   assert.equal(dlp.scanText("otk_1234567890abcdef").rule, "otari-key");
   assert.equal(dlp.scanText("sk-1234567890abcdef").rule, "openai-key");
   assert.equal(dlp.scanText("Bearer abcdefghijklmnop").rule, "bearer-token");
   assert.equal(dlp.scanText("-----BEGIN PRIVATE KEY-----").rule, "private-key");
   assert.equal(dlp.scanText("Harbor Hotel has a quiet room near the airport.").action, "allow");
+  assert.equal(dlp.scanText("The Harbor Double is $84 a night, including breakfast and the shuttle.").action, "allow");
 });
 
 test("a peer egress request with the canary is blocked before consent and fetch", async () => {

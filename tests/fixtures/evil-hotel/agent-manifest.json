@@ -1,0 +1,28 @@
+{
+  "brand": "Harbor Hotel (hostile fixture)",
+  "networks": [
+    {
+      "name": "harbor_hotel",
+      "front_man": "harbor_hotel_assistant",
+      "hocon": "./evil_hotel.network.json",
+      "description": "Hostile peer fixture for browser DLP checks.",
+      "tags": [
+        "test-fixture"
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": []
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true
+  }
+}

@@ -5,10 +5,10 @@ attacks and 4/4 controls on the real dispatch boundary, with a fresh canary and
 a scripted peer. It does not change the submitted demo's travel data or the
 scope of its claims.
 
-The v1 boundary is browser code plus a session audit log. It is not a
-server-side security product, not a trained DLP classifier, and not a remote
-WORM store. The remaining browser, persistence, and publisher-identity work is
-listed under [Still planned](#still-planned).
+The v1 boundary is browser code plus a per-tab audit log persisted in
+IndexedDB. It is not a server-side security product, not a trained DLP
+classifier, and not a remote WORM store. The remaining browser and
+publisher-identity work is listed under [Still planned](#still-planned).
 
 ## Goal
 
@@ -34,8 +34,9 @@ The target chain:
   production deployment should mirror the same policy at a trusted gateway.
 - This is not a production DLP engine. The demo uses deterministic rules and a
   canary, not a trained classifier.
-- The audit log is tamper-evident within a session, not a remote WORM store.
-  A production system should ship events to a server the page cannot rewrite.
+- The audit log is tamper-evident within a tab and across reloads, not a
+  remote WORM store. A production system should ship events to a server the
+  page cannot rewrite.
 - No real inventory, payment, reservation, or email delivery.
 
 ## Threat model
@@ -107,7 +108,7 @@ per-peer `max_effect` are still planned.
 
 - Append-only events: `consent_requested`, `consent_allowed`,
   `consent_declined`, `consent_reused`, `dlp_block`, `tool_denied`,
-  `peer_fetch`.
+  `peer_fetch`, `peer_error`.
 - `hash = sha256(canonicalJSON(event with prevHash))`; the next event stores
   that hash as its `prevHash`.
 - Redaction happens before hashing, so a raw canary cannot enter the chain.
@@ -115,7 +116,11 @@ per-peer `max_effect` are still planned.
   `verifyAuditEvents()` recompute the chain.
 - The page's **Privacy receipt** lists the boundary events, runs `verify()` in
   the browser, and downloads the redacted JSON.
-- The log is in memory only. IndexedDB persistence is still planned.
+- `site/runtime/audit-store.js` stores the redacted events in this tab's
+  IndexedDB under a session id kept in `sessionStorage`. A reload restores the
+  chain; a stored chain that fails verification is refused and the page starts
+  a fresh chain. **Clear receipt** deletes the stored chain. A peer fetch
+  failure appends a redacted `peer_error` event.
 
 ### Benchmark
 
@@ -176,19 +181,16 @@ Otari key; that is not claimed here.
 
 ## Still planned
 
-- **Browser attack matrix.** `scripts/browser_check.mjs` ships the two-page
-  consent, decline, and Privacy-receipt checks. Still planned: a
-  `fixtures/evil-hotel/` network with a scripted model covering the sandbox
-  DOM/storage/network attempts, a spoofed consent card, and a real
-  browser-level DLP block.
-- **Audit persistence.** IndexedDB storage so a reload does not start a new
-  log. The in-page **Verify chain** and **Download JSON** controls and the
-  "session log, not remote attestation" note now ship in the Privacy receipt.
+- **Browser attack matrix.** `scripts/browser_check.mjs` now ships the two-page
+  consent, decline, Privacy-receipt, hostile-peer outbound/inbound DLP, peer
+  failure, mobile/keyboard, and keyless-demo checks against the real page. Still
+  planned: the sandbox DOM/storage/network attempts, a spoofed consent card,
+  and a browser-level test of coded-tool bundles.
 - **Per-peer capability grant.** A manifest `peer_tools` map with
   `caller_actions`, `max_effect`, and `allow_sly_data`, denied by default.
 - **Publisher identity.** Signed manifests and a pinned publisher key.
 - **Remote audit sink.** Ship the same hash-chained events to a trusted server
-  the page cannot rewrite.
+  the page cannot rewrite. The per-tab IndexedDB receipt is local only.
 - **Live-key run.** Repeat the matrix against a live Otari key and record it.
 
 ## Definition of done for v1
@@ -201,8 +203,9 @@ Otari key; that is not claimed here.
       caveat.
 - [x] The Privacy receipt shows the consent decision, the peer fetch, and any
       blocked value; it verifies the chain and downloads the redacted JSON.
-- [ ] A browser-level demo of an actual DLP block (not an injected audit event)
-      is still planned.
+- [x] A browser-level demo of an actual DLP block (not an injected audit event):
+      the hostile-peer fixture blocks an outbound email and an inbound API key
+      through the real runtime, and the receipt verifies.
 
 ## Demo script
 
@@ -213,6 +216,7 @@ Otari key; that is not claimed here.
 4. Allow; show the hotel answer, the trace, and the **Privacy receipt** with
    the consent and peer-fetch events.
 5. In the receipt, press **Verify chain** and **Download JSON**; show the
-   redacted export.
+   redacted export, reload to show the same chain restored, then **Clear receipt**.
 6. In a terminal, show a blocked canary request and the benchmark table.
-7. State the boundary: session audit, deterministic rules, no remote WORM.
+7. State the boundary: per-tab audit persisted in IndexedDB, deterministic
+   rules, no remote WORM.

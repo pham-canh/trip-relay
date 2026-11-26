@@ -4,7 +4,7 @@ Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submi
 
 ## 1. Repository status
 
-`main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, and the committed browser pass (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 27 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
+`main` is pushed with the entrant-voice cut, the DLP benchmark, the Privacy receipt, per-tab receipt persistence, the keyless demo, and the expanded browser pass (2026-11-25). The `test` job, the benchmark step, and the manual `origin-check` workflow are green. `PROTOCOL.md`, `docs/ORIGIN.md`, `docs/trip-relay-demo.mp4`, and `docs/trip-relay-demo-own-voice.mp4` load on GitHub, and the README says 35 tests plus the benchmark, with `crytobot459@gmail.com` as the Otari contact.
 
 The live pair was redeployed on 2026-11-25 and serves the DLP runtime and the Privacy receipt. The airline is commit `f5a6800` on `gh-pages`; the hotel is commit `02c84e7` on the `main` branch of `pham-canh/pham-canh.github.io`. `npm run check:origins`, `npm run check:browser` (27/27 local), and `npm run check:browser:live` (12/12 hosted) pass. The docs, the origin check, and the browser check live on `main` only.
 
@@ -41,7 +41,7 @@ npm install          # once, for playwright-core
 npm run check:browser:live
 ```
 
-Expected: 12/12 checks pass. For the local pair, start `npm run serve:airline` and `npm run serve:hotel`, then run `npm run check:browser` (27/27).
+Expected: 12/12 checks pass. For the local pair, start `npm run serve:airline` and `npm run serve:hotel`, then run `npm run check:browser` (66/66).
 
 If an external reviewer says the two sites share an origin, check the URL: they are probably reading `https://pham-canh.github.io/` without the dot. The trailing dot is the boundary.
 
@@ -95,14 +95,16 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] Both live origins return HTTP 200, and both serve `/runtime/dlp.js` plus the Privacy receipt.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**, 0 after **Decline**, and 11 after **Allow**; the receipt chain verifies.
-- [x] `npm run check:browser` passes 27/27 locally and `npm run check:browser:live` passes 12/12 against the deployed pair.
+- [x] `npm run check:browser` passes 66/66 locally and `npm run check:browser:live` passes 12/12 against the deployed pair.
+- [x] The keyless demo boots without a key, calls no provider, and writes the consent and peer fetch to the receipt.
+- [x] The receipt survives a reload, refuses a tampered stored chain, and clears to a fresh chain.
 - [x] Opened PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85) adding Trip Relay to the official agentic websites list.
 - [x] The repository is public, the MIT license is visible, and `PROTOCOL.md` loads.
-- [x] The GitHub README says 27 tests plus the DLP benchmark, and the Otari email is filled in.
-- [x] `npm test` passes 27/27 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.
+- [x] The GitHub README says 35 tests plus the DLP benchmark, and the Otari email is filled in.
+- [x] `npm test` passes 35/35 and `npm run benchmark:dlp` passes 12/12 attacks and 4/4 controls.
 - [x] No API key appears in the repository or the Devpost copy; the recording uses a scripted endpoint.
 - [ ] The social preview is uploaded in **Settings → Social preview** (`docs/social-preview.png`).
 - [x] The Devpost form is submitted before the deadline; keep the confirmation email.
-- [ ] Update the live Devpost story: it still says 14 tests and a 16-check pass. Replace that paragraph with the 27-test/27-check text in `docs/DEVPOST.md`, add the Privacy receipt bullet, and add `privacy-receipt.png` to the gallery.
+- [ ] Update the live Devpost story: it still says 14 tests and a 16-check pass. Replace that paragraph with the 35-test/66-check text in `docs/DEVPOST.md`, add the Privacy receipt bullet, the per-tab persistence sentence, the keyless-demo sentence, and `privacy-receipt.png` to the gallery.
 - [ ] Fix the Devpost **Built With** tags: replace `otira` with Mozilla Otari and split `neuro`/`san` into Neuro SAN; add Playwright and GitHub Actions if missing.
 - [ ] Post the DLP/receipt update from `docs/DEVPOST.md` after `main` is pushed.
