@@ -167,7 +167,7 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark, a vi
 - 0 PII in raw audit fields
 - 4/4 legitimate controls pass
 - audit hash chain verifies
-- 35/35 unit tests and 66/66 local browser checks; 12/12 hosted consent/receipt checks
+- 35/35 unit tests and 66/66 local browser checks; 12/12 hosted consent/receipt checks and 10/10 hosted demo checks
 
 **What changed**
 - Per-run canary email; DLP at peer egress, coded-tool args, `sly_data`, and peer output.
@@ -175,7 +175,7 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark, a vi
 - Caller writes are denied to a non-top peer; unlisted origins fail closed.
 - Hash-chained, redacted audit log with export and verification.
 - A visitor-facing **Privacy receipt** under the assistant: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, peer failure, and any blocked value. The redacted chain is stored in this tab's IndexedDB, so a reload restores it; a tampered store is refused, and **Clear receipt** starts a new chain.
-- A committed browser pass (`scripts/browser_check.mjs`): 66 local checks and 12 hosted checks. It covers both pages, the manual booking path, the receipt verify/download/reload/clear, zero hotel requests before **Allow**, zero after **Decline**, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo.
+- A committed browser pass (`scripts/browser_check.mjs`): 66 local checks, 12 hosted consent/receipt checks, and 10 hosted demo checks. It covers both pages, the manual booking path, the receipt verify/download/reload/clear, zero hotel requests before **Allow**, zero after **Decline**, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo.
 - `npm test` now includes 13 DLP/audit checks, 3 receipt restore/tamper/clear checks, and 5 keyless-demo checks (35 total).
 
 **Scope**
@@ -183,7 +183,7 @@ The DLP benchmark is deterministic Node code on the real dispatch boundary, not 
 
 Run: `npm run benchmark:dlp`
 Report: https://github.com/pham-canh/trip-relay/blob/main/docs/dlp-benchmark.json
-Browser: `npm run check:browser` / `npm run check:browser:live`
+Browser: `npm run check:browser` / `npm run check:browser:live` / `npm run check:browser:demo`
 Spec: https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md
 ```
 
@@ -201,7 +201,7 @@ Spec: https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md
 - [x] Confirm the repository is public and the license is visible.
 - [ ] Upload the repository social preview (`docs/social-preview.png`) and pin the repo if it belongs in the portfolio.
 - [x] Re-run `npm test` after the last code change (35/35 pass).
-- [x] Re-run `npm run check:browser` after the last code change (66/66 pass) and `npm run check:browser:live` (12/12 pass).
+- [x] Re-run `npm run check:browser` after the last code change (66/66 pass), `npm run check:browser:live` (12/12 pass), and `npm run check:browser:demo` (10/10 pass).
 - [x] Run `npm run benchmark:dlp` (12/12 attacks blocked, 4/4 controls pass).
 - [x] Push `main` so `PROTOCOL.md`, `scripts/build_public.mjs`, and the demo docs stop 404ing on GitHub.
 - [x] Keep the Devpost confirmation email; edit the project story if any claim changes, and post the DLP update separately.
