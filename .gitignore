@@ -3,3 +3,18 @@ node_modules/
 *.log
 test-results/
 playwright-report/
+
+# Fichiers temporaires, skills et captures locales
+.agents/
+.taste-skill/
+*/.taste-skill/
+*/shots/
+*/assets/
+modulify-*.html
+modulify-*.png
+modulify-*.js
+peer-*.png
+site-*.png
+projet.md
+update.md
+
