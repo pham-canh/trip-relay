@@ -78,3 +78,14 @@ The cut is honest and complete, but it is a screen recording of a product, while
 - Add music and normalize the voice.
 
 These edits improve the current cut, but they cannot fix the stale “fourteen tests” narration or the slow first half. A re-record with the 90-second script is the stronger option.
+
+## Draft re-cut with the same voice
+
+[`docs/trip-relay-demo-v2-draft.mp4`](trip-relay-demo-v2-draft.mp4) is a local draft that keeps the entrant's existing audio and fixes four visuals:
+
+- a `0 hotel requests before Allow` callout at the decline;
+- a three-step **Fetch → Check → Run** card in place of the raw JSON overlay;
+- a proof card with `12/12`, `0`, `35`, `66`, and `12/12` in place of the terminal;
+- a closing card with **Try the keyless demo — no key needed** and both URLs.
+
+It still says “fourteen tests” in the narration; the proof card states both the recorded count and the current count. Treat it as a visual upgrade, not the final re-record. The draft is not linked from the submission.
