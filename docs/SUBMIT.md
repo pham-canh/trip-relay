@@ -105,6 +105,6 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 - [x] No API key appears in the repository or the Devpost copy; the recording uses a scripted endpoint.
 - [ ] The social preview is uploaded in **Settings → Social preview** (`docs/social-preview.png`).
 - [x] The Devpost form is submitted before the deadline; keep the confirmation email.
-- [ ] Update the live Devpost story: it still says 14 tests and a 16-check pass. Replace that paragraph with the 35-test/66-check text in `docs/DEVPOST.md`, add the Privacy receipt bullet, the per-tab persistence sentence, the keyless-demo sentence, and `privacy-receipt.png` to the gallery.
-- [ ] Fix the Devpost **Built With** tags: replace `otira` with Mozilla Otari and split `neuro`/`san` into Neuro SAN; add Playwright and GitHub Actions if missing.
-- [ ] Post the DLP/receipt update from `docs/DEVPOST.md` after `main` is pushed.
+- [ ] Update the live Devpost story at <https://devpost.com/software/trip-relay>: it still says 14 tests and a 16-check pass. Follow the field-by-field edit sheet in [`docs/DEVPOST-EDIT.md`](DEVPOST-EDIT.md); add the Privacy receipt and keyless-demo bullets, and refresh the gallery with `privacy-receipt.png`.
+- [ ] Fix the Devpost **Built With** tags with the exact list in [`docs/DEVPOST-EDIT.md`](DEVPOST-EDIT.md): Mozilla Otari, Neuro SAN, Playwright, GitHub Actions, IndexedDB.
+- [ ] Post the DLP/receipt update from `docs/DEVPOST.md` after the story is current.

@@ -1,5 +1,7 @@
 # Devpost submission copy
 
+Live project: <https://devpost.com/software/trip-relay>. To update the submitted story, use the field-by-field edit sheet in [`docs/DEVPOST-EDIT.md`](DEVPOST-EDIT.md).
+
 ## Project name
 
 Trip Relay
