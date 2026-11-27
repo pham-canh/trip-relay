@@ -70,6 +70,22 @@ The cut is honest and complete, but it is a screen recording of a product, while
 | 1:20–1:30 | Simple diagram: hotel manifest → policy → local network; no agent server | “The hotel publishes data, not an agent server. The browser enforces consent and keeps the key on the caller’s side.” |
 | 1:30–1:38 | Closing: keyless demo URL, QR, MIT | “Try the keyless demo, or add your key for a live Otari call. Two sites, one visible boundary.” |
 
+## Vietnamese narration for the 90-second re-record
+
+Read this in the entrant's own voice over the new picture. Keep the English subtitles burned in.
+
+| Time | Vietnamese | English |
+| --- | --- | --- |
+| 0:00–0:08 | Trợ lý của bạn có thể hỏi khách sạn giúp bạn. Câu hỏi là: điều gì rời khỏi trình duyệt trước khi bạn đồng ý? Ở đây, câu trả lời là không gì cả. | Your assistant can ask a hotel for you. The question is what leaves your browser before you agree. Here, the answer is nothing. |
+| 0:08–0:18 | Hai công ty, hai origin. Hãng bay có thể hỏi khách sạn trực tiếp, không cần một agent server ở giữa. | Two companies, two origins. The airline can ask the hotel directly, with no agent server in the middle. |
+| 0:18–0:30 | Bắt đầu bằng việc bình thường: chọn chuyến bay, nhập hành khách, đặt vé. Trang tự giữ trạng thái và trả mã vé. | Start with a normal task: pick a flight, enter a passenger, book it. The page holds the state and returns the reference. |
+| 0:30–0:42 | Giờ hỏi về khách sạn. Trước khi bất cứ thứ gì rời trang, thẻ đồng ý ghi rõ origin, đúng nội dung yêu cầu, và chi phí. | Now ask about a hotel. Before anything leaves the page, the consent card names the origin, the exact request, and the cost. |
+| 0:42–0:52 | Từ chối, khách sạn không hề được liên hệ. Hỏi lại và cho phép, trình duyệt chỉ tải network công khai của khách sạn. | Decline, and the hotel is never contacted. Ask again and allow; the browser fetches only the hotel's public network. |
+| 0:52–1:08 | Mỗi sự kiện ranh giới đi vào một privacy receipt. Xác minh chuỗi hash, tải log đã redact, tải lại trang mà không mất receipt. | Every boundary event goes into a privacy receipt. Verify the hash chain, download the redacted log, reload without losing it. |
+| 1:08–1:20 | Mười hai trên mười hai đòn tấn công bị chặn, không có canary rò rỉ, ba mươi lăm unit test, sáu mươi sáu browser check. | Twelve of twelve attacks blocked, zero canary egress, thirty-five unit tests, sixty-six browser checks. |
+| 1:20–1:30 | Khách sạn công bố dữ liệu, không phải agent server. Trình duyệt thực thi đồng ý và giữ khóa ở phía người gọi. | The hotel publishes data, not an agent server. The browser enforces consent and keeps the key on the caller's side. |
+| 1:30–1:38 | Thử demo không cần khóa, hoặc thêm khóa để gọi Otari thật. Hai site, một ranh giới hữu hình. | Try the keyless demo, or add your key for a live Otari call. Two sites, one visible boundary. |
+
 ## What can be fixed without re-recording
 
 - Replace the raw JSON shot at 1:04 with a designed three-step card.
