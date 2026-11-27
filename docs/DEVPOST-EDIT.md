@@ -4,6 +4,8 @@ Live page: <https://devpost.com/software/trip-relay>
 
 Edit the project story itself. An **Update** is a progress log and does not replace the stale sections below. The source text is [`docs/DEVPOST.md`](DEVPOST.md); copy each named section from there.
 
+Copy the rendered text from the GitHub view, not the raw Markdown: Devpost does not render backticks, so remove them or use Devpost's code formatting.
+
 ## 1. What it does
 
 After the paragraph ending “work without a model key for the manual flight-booking and room-request paths.”, add the two bullets from **What it does** in `docs/DEVPOST.md`:
