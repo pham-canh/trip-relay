@@ -51,6 +51,7 @@ The browser pass uses a scripted SSE router, not a live provider, so it proves t
 ## Screenshots
 
 - `docs/screenshots/airline-hero.png` - the airline's landing page.
+- `docs/screenshots/hotel_hero.png` - Harbor Hotel's landing page.
 - `docs/screenshots/airline-booking.png` - a selected flight and manual booking.
 - `docs/screenshots/consent.png` - the consent card before any hotel request.
 - `docs/screenshots/assistant-answer.png` - the approved cross-site answer.

@@ -6,6 +6,8 @@ Two travel agentic websites, one visible consent boundary.
 
 ![Skyline Air landing page](docs/screenshots/airline-hero.png)
 
+![Harbor Hotel landing page](docs/screenshots/hotel_hero.png)
+
 Trip Relay is an entry for the [Open Agentic Web Challenge](https://cognizant-agenticweb.devpost.com/), built on the MVP Profile 0.2 and Mozilla's [Otari](https://otari.ai/) router. It is a working pair of static sites:
 
 - **Skyline Air** (`127.0.0.1:8080`) is the caller. Its network has a front agent and a `fare_agent` specialist that reads flights, holds a fare, and books it after the visitor confirms.
@@ -39,7 +41,7 @@ npm run serve:airline
 npm run serve:hotel
 ```
 
-Open <http://127.0.0.1:8080/>. In **AI model settings**, choose **Otari (Mozilla)** and paste a `tk-...` key, or choose another provider and enter its key and model. The key is stored in this browser and sent only to the router you choose.
+Open <http://127.0.0.1:8080/>. Click **Ask Skyline** to open the assistant drawer, go to the **Settings** tab, choose **Otari (Mozilla)** and paste a `tk-...` key, or choose another provider and enter its key and model. The key is stored in this browser and sent only to the router you choose.
 
 The manual pages work without a key, so the demo never depends on a provider being available.
 
