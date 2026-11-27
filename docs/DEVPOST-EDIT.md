@@ -70,13 +70,13 @@ This replaces `otira` with **Mozilla Otari**, merges `neuro` + `san` into **Neur
 
 ## 6. Gallery
 
-Upload in this order, with the captions from `docs/DEVPOST.md`:
+The live gallery already has five images: airline hero, booking, consent, assistant answer, and hotel mobile. It is missing the Privacy receipt. Add `docs/screenshots/privacy-receipt.png` (refreshed 2026-11-27) as the fifth image, with the caption from `docs/DEVPOST.md`. The full order is:
 
 1. `docs/screenshots/airline-hero.png`
 2. `docs/screenshots/airline-booking.png`
 3. `docs/screenshots/consent.png`
 4. `docs/screenshots/assistant-answer.png`
-5. `docs/screenshots/privacy-receipt.png` (refreshed 2026-11-27)
+5. `docs/screenshots/privacy-receipt.png`
 6. `docs/screenshots/hotel-mobile.png`
 
 ## 7. After the story is current
