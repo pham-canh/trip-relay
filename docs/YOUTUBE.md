@@ -14,6 +14,7 @@ Two travel agentic websites, one visible consent boundary.
 Skyline Air books a flight. Its assistant can ask Harbor Hotel — a different browser origin — but only after you see the origin, the purpose, and the exact request. Decline and the hotel is never contacted. Allow and the hotel's public network runs in your browser.
 
 Live demo: https://pham-canh.github.io/trip-relay/
+No key? Press "Try the scripted demo" to see the real consent card and Privacy receipt.
 Hotel (deliberate trailing-dot origin): https://pham-canh.github.io./
 Source: https://github.com/pham-canh/trip-relay
 Protocol: https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md
@@ -27,7 +28,7 @@ Chapters:
 1:23 Tests and trace
 1:33 Closing
 
-Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key.
+Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key. The video's "fourteen tests" line is historical: the repository now has 35 unit tests, 66 local browser checks, 12 hosted consent/receipt checks, 10 hosted demo checks, and a 12/12 hostile-peer benchmark.
 
 Language: Vietnamese narration by the entrant, with English captions burned into the picture. English transcript: https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md
 
