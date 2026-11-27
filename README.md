@@ -25,7 +25,7 @@ An agent that can use other sites is useful only if the user can tell when it cr
 - Allowing fetches only the hotel's public artifacts. The hotel runs in the caller's browser with the caller's router. It never receives the chat history, the page state, the passenger's email, or the API key.
 - Irreversible writes stay on their owning page. Flight booking and room requests both have their own confirmation dialog and a stale-version check.
 
-![Consent card before the hotel is contacted](docs/screenshots/consent.png)
+![Consent card before the hotel is contacted](docs/screenshots/assistant-answer.png)
 
 ## Run it locally
 
