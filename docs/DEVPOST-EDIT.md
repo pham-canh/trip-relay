@@ -31,7 +31,7 @@ It covers 35 unit tests, 66 local browser checks, 12 hosted consent/receipt chec
 
 Replace the **Protocol and consent** bullet with the current one in `docs/DEVPOST.md`.
 
-Replace the **Hosted boundary** bullet with the current one. It now records the 2026-11-26 12/12 consent pass and the 10/10 keyless-demo pass.
+Replace the **Hosted boundary** bullet with the current one. It now records the 2026-11-27 12/12 consent pass and the 10/10 keyless-demo pass.
 
 Keep **Live Otari call: not yet recorded** and **Scope** as they are.
 
