@@ -9,7 +9,7 @@ Trip Relay — consent-gated agent handoff | Open Agentic Web Challenge
 ## Description
 
 ```
-Two travel agentic websites, one visible consent boundary.
+Zero hotel requests before you press Allow. Two travel sites, one visible consent boundary.
 
 Skyline Air books a flight. Its assistant can ask Harbor Hotel — a different browser origin — but only after you see the origin, the purpose, and the exact request. Decline and the hotel is never contacted. Allow and the hotel's public network runs in your browser.
 
@@ -48,7 +48,7 @@ The submission upload is complete at <https://youtu.be/lDLhXmqXv6I>. These steps
 1. Open <https://studio.youtube.com/> and sign in with `crytobot459@gmail.com`.
 2. **Create → Upload videos**, then choose `docs/trip-relay-demo-own-voice.mp4` — the entrant-voice cut, not the synthetic timing cut.
 3. Paste the title and description above. Add the tags.
-4. Upload `docs/youtube-thumbnail.png` as the thumbnail if the account allows custom thumbnails.
+4. Upload `docs/youtube-thumbnail.png` as the thumbnail if the account allows custom thumbnails. The refreshed file leads with `0 hotel requests before Allow` and shows the consent card, not the abstract tagline.
 5. Under **Subtitles**, the English text is already burned into the picture, so do **not** upload `docs/trip-relay-demo.srt` as an English track — it would duplicate the burned-in text. Optionally upload `docs/trip-relay-demo-vi.srt` as **Vietnamese**. The English SRT stays in the repo as the translation source.
 6. Audience: **Not made for kids**. Visibility: **Public**.
 7. Wait for HD processing to finish, then copy the watch URL.

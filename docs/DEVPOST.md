@@ -8,7 +8,7 @@ Trip Relay
 
 ## Tagline
 
-Two agentic travel websites, one visible consent boundary.
+Two travel sites, one visible boundary. Zero hotel requests before you press Allow.
 
 ## Inspiration
 
@@ -18,7 +18,7 @@ The audience is specific: a traveler booking a trip that spans two suppliers, an
 
 ## What it does
 
-Trip Relay is a working pair of agentic websites. The airline and hotel are fictional, the inventory is generated, and no payment or real reservation is made.
+**Before you press Allow, the hotel receives zero requests.** Trip Relay is a working pair of agentic websites. The airline and hotel are fictional, the inventory is generated, and no payment or real reservation is made.
 
 - **Skyline Air** lets a visitor find a flight from Ho Chi Minh City to Da Nang, hold a fare, and book it. Its front agent delegates flight writes to a `fare_agent` specialist, and every write needs a current version and a visitor confirmation.
 - **Harbor Hotel** is a separate origin with its own manifest, network, rooms, rates, policies, airport shuttle, and room-request intake.

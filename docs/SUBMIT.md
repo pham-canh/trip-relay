@@ -67,7 +67,7 @@ The mux was done with macOS AVFoundation, and the English subtitles were burned 
 Use the sections in [`docs/DEVPOST.md`](DEVPOST.md):
 
 - **Project name:** Trip Relay
-- **Tagline:** Two agentic travel websites, one visible consent boundary.
+- **Tagline:** Two travel sites, one visible boundary. Zero hotel requests before you press Allow.
 - **Description:** Inspiration, What it does, How we built it, Verification status, Challenges, Accomplishments, What we learned, What's next.
 - **Built with:** HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions.
 - **Try it:** <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>).

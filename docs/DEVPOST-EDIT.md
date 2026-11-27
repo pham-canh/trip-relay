@@ -6,7 +6,19 @@ Edit the project story itself. An **Update** is a progress log and does not repl
 
 Copy the rendered text from the GitHub view, not the raw Markdown: Devpost does not render backticks, so remove them or use Devpost's code formatting.
 
+## 0. Tagline
+
+Replace the tagline with:
+
+> Two travel sites, one visible boundary. Zero hotel requests before you press Allow.
+
+The number is measured: the browser check asserts zero hotel requests before **Allow**.
+
 ## 1. What it does
+
+At the start of **What it does**, add the bold hook line:
+
+> **Before you press Allow, the hotel receives zero requests.**
 
 After the paragraph ending “work without a model key for the manual flight-booking and room-request paths.”, add the two bullets from **What it does** in `docs/DEVPOST.md`:
 
