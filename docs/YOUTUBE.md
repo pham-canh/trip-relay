@@ -3,7 +3,7 @@
 ## Title
 
 ```
-Trip Relay — consent-gated agent handoff | Open Agentic Web Challenge
+Trip Relay — 0 hotel requests before Allow | Open Agentic Web Challenge
 ```
 
 ## Description
