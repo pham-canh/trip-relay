@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/pham-canh/trip-relay/actions/workflows/test.yml/badge.svg)](https://github.com/pham-canh/trip-relay/actions/workflows/test.yml)
 
-Two travel sites, one visible boundary. Zero hotel requests before you press Allow.
+Two agentic travel sites, one visible boundary. Zero hotel requests before you press Allow.
 
 ![Skyline Air landing page](docs/screenshots/airline-hero.png)
 

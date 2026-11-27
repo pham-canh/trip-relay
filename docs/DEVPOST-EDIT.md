@@ -10,7 +10,7 @@ Copy the rendered text from the GitHub view, not the raw Markdown: Devpost does 
 
 Replace the tagline with:
 
-> Two travel sites, one visible boundary. Zero hotel requests before you press Allow.
+> Two agentic travel sites, one visible boundary. Zero hotel requests before you press Allow.
 
 The number is measured: the browser check asserts zero hotel requests before **Allow**.
 

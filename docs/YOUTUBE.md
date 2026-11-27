@@ -9,7 +9,7 @@ Trip Relay — consent-gated agent handoff | Open Agentic Web Challenge
 ## Description
 
 ```
-Zero hotel requests before you press Allow. Two travel sites, one visible consent boundary.
+Zero hotel requests before you press Allow. Two agentic travel sites, one visible consent boundary.
 
 Skyline Air books a flight. Its assistant can ask Harbor Hotel — a different browser origin — but only after you see the origin, the purpose, and the exact request. Decline and the hotel is never contacted. Allow and the hotel's public network runs in your browser.
 
