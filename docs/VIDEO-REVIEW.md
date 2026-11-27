@@ -81,10 +81,11 @@ These edits improve the current cut, but they cannot fix the stale “fourteen t
 
 ## Draft re-cut with the same voice
 
-[`docs/trip-relay-demo-v2-draft.mp4`](trip-relay-demo-v2-draft.mp4) is a local draft that keeps the entrant's existing audio and fixes four visuals:
+[`docs/trip-relay-demo-v2-draft.mp4`](trip-relay-demo-v2-draft.mp4) is a local draft that keeps the entrant's existing audio and fixes five visuals:
 
 - a `0 hotel requests before Allow` callout at the decline;
 - a three-step **Fetch → Check → Run** card in place of the raw JSON overlay;
+- a receipt hero with **Verify chain**, the three boundary events, and the redacted-log note;
 - a proof card with `12/12`, `0`, `35`, `66`, and `12/12` in place of the terminal;
 - a closing card with **Try the keyless demo — no key needed** and both URLs.
 
