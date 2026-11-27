@@ -92,6 +92,7 @@ The tests and the video use a scripted endpoint; they do not claim a live Otari 
 
 - [x] The final YouTube upload uses the entrant's own voice (not AI-generated), plays without signing in, is 1:46, and has English subtitles burned into the picture.
 - [ ] Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`.
+- [ ] Optional: re-record or re-cut with the 90-second plan in [`docs/VIDEO-REVIEW.md`](VIDEO-REVIEW.md); the current 1:46 cut is valid but says “fourteen tests” and shows a raw JSON shot.
 - [x] Both live origins return HTTP 200, and both serve `/runtime/dlp.js` plus the Privacy receipt.
 - [x] `npm run check:origins` passes, and the manual Actions run is green.
 - [x] The hosted consent flow shows 0 hotel requests before **Allow**, 0 after **Decline**, and 11 after **Allow**; the receipt chain verifies.

@@ -100,6 +100,8 @@ The browser pass uses a scripted SSE router, not a live provider, so it proves t
 
 ## Updated two-minute script (optional re-record)
 
+For a shot-by-shot critique of the submitted cut and a tighter 90-second plan, see [`docs/VIDEO-REVIEW.md`](VIDEO-REVIEW.md).
+
 Use this only if you want a take that matches the current repository. The uploaded video is still valid; its “fourteen tests” line is historical. Narrate this in your own voice, in Vietnamese or English, and burn in English subtitles if the audio is Vietnamese. Do not use a synthetic voice for the entrant's explanation.
 
 | Time | On screen | Narration |
