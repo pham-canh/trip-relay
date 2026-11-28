@@ -1,95 +1,196 @@
-/* Assistant layout. Append to the site's stylesheet and set the colors to the site's palette. */
-.assistant { margin-top: 48px; }
+/* Assistant and runtime UI styles for Harbor Hotel (Modulify theme & Slide-over Drawer) */
 
-/* The runtime reads these variables for its chat, settings and agent panels.
-   The chat background below also uses --ns-bg. White text sits on --ns-primary (the
-   visitor's messages, Send, and the chat form and settings buttons) and on --ns-accent
-   (Send while a turn is steered), so give both at least 4.5:1 contrast with white.
-   --ns-accent also underlines the chat header. */
 #agent-app {
-  --ns-font: system-ui, sans-serif;
+  --ns-font: var(--font-app-sans, system-ui, sans-serif);
   --ns-bg: #ffffff;
-  --ns-fg: #1f2328;
-  --ns-primary: #2563eb;
-  --ns-accent: #2563eb;
-  --ns-border: #d0d7de;
-  --ns-panelbg: #ffffff;
-  --ns-msgbg: #f6f8fa;
-  --ns-muted: #59636e;
+  --ns-fg: #0d2721;
+  --ns-primary: #18524c;
+  --ns-accent: #c69449;
+  --ns-border: rgba(13, 39, 33, 0.12);
+  --ns-panelbg: #f9f3e6;
+  --ns-msgbg: #ddf0ea;
+  --ns-muted: rgba(13, 39, 33, 0.65);
+  width: 100%;
+  font-family: var(--ns-font);
 }
 
-.assistant-panels {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 240px;
-  gap: 16px;
-  margin-top: 16px;
+/* Chat container inside drawer */
+#agent-app.ns-composed-app [data-ns-slot="chat"] {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Set the height once the runtime has mounted the chat, so a failed load leaves no
-   empty box. */
-#agent-app.ns-composed-app [data-ns-slot="chat"] { height: 720px; }
-/* The runtime gives the chat no background of its own. Keep --ns-msgbg different from
-   --ns-bg, or bot replies lose their bubble. */
-#agent-app .ns-chat { background: var(--ns-bg); }
+#agent-app.ns-composed-app [data-ns-slot="chat"] > .ns-chat {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
 
-/* Site-wide form rules often stretch the runtime's own controls. Undo them here. */
-#agent-app input[type="checkbox"],
-#agent-app input[type="radio"] { width: auto; }
-#agent-app .ns-header { flex-wrap: wrap; }
-/* Site label rules add margins and bold text, and the inputs inside the labels inherit
-   the weight. */
-#agent-app .ns-settings-body label { margin: 4px 0; font-weight: 400; }
-/* Chat forms label radio groups with a legend, so site legend fonts would reach them. */
-#agent-app .ns-w-label { font-family: inherit; }
-/* Site label rules add margins to chat form fields and make their options bold. */
-#agent-app .ns-widget label { margin: 0; }
-#agent-app .ns-w-radio label,
-#agent-app .ns-w-multi label,
-#agent-app .ns-w-toggle { font-weight: 400; }
-/* The runtime sizes radio and multi-choice options but not the checkbox label. */
-#agent-app .ns-w-toggle { font-size: 13px; }
-/* The runtime spaces its buttons with gap. A site's button margin pushes Send below the input. */
-#agent-app button { margin: 0; }
-/* Chat choices are buttons with a light background. A site's button color can hide their
-   titles. */
-#agent-app .ns-w-choice { color: var(--ns-fg); }
-/* A site's button:hover background also reaches the runtime's plain buttons, behind
-   their dark text. Keep the runtime's own backgrounds. */
-#agent-app .ns-devtoggle:not(.on):hover,
-#agent-app .ns-modal-close:hover { background: transparent; }
-#agent-app .ns-w-choice:disabled:hover { background: #fafbfc; }
-/* The runtime's message rule hides the partner consent card's own background, and its
-   Decline label then has too little contrast. */
-#agent-app .ns-consent { background: #fffbeb; }
-/* While a consent card waits, the status line above it already says "Contacting", though
-   nothing has been sent. Hide it until the visitor answers. */
-#agent-app .ns-msgs:has(.ns-consent-actions) > .ns-turn-status { display: none; }
-/* Long links in a reply would run out of the bubble on a phone. "anywhere" would also
-   let the consent card's buttons shrink and split their labels. */
-#agent-app .ns-msg { overflow-wrap: break-word; }
-/* On a phone the consent card is too narrow for its three buttons in one row, and
-   "Always allow" breaks onto two lines. Keep each label whole and wrap the row. */
-#agent-app .ns-consent-actions { flex-wrap: wrap; }
-#agent-app .ns-consent-actions button { white-space: nowrap; }
+/* Hide raw technical disclosure */
+#agent-app .ns-chat > details {
+  display: none !important;
+}
 
-/* site.js and the runtime add their confirmation dialogs to <body>, outside #agent-app.
-   Site h2 rules reach the heading, and the two buttons touch. A right margin keeps
-   wrapped buttons lined up on the left. */
-body > dialog h2 { margin: 0 0 12px; font: 700 1.25em system-ui, sans-serif; }
-body > dialog button { margin-right: 8px; }
-/* site.js's dialog: the details in two columns, and a plain decline button, so the two
-   choices do not look the same. */
-.assistant-review { max-width: 640px; width: 85%; max-height: 85vh; overflow: auto; border: 1px solid #888; border-radius: 12px; padding: 24px; font: 16px system-ui, sans-serif; }
-.assistant-review dl { display: grid; grid-template-columns: fit-content(40%) 1fr; gap: 4px 16px; margin: 12px 0; }
-.assistant-review dt { font-weight: 600; }
-.assistant-review dd { margin: 0; overflow-wrap: anywhere; }
-.assistant-review details { margin: 12px 0; }
-.assistant-review pre { white-space: pre-wrap; overflow-wrap: anywhere; }
-.assistant-review .assistant-decline { background: transparent; color: inherit; border: 1px solid currentColor; }
+/* Hide default first generic message since intro card is above */
+#agent-app .ns-msgs > .ns-msg.bot:first-child {
+  display: none !important;
+}
 
-@media (max-width: 760px) {
-  .assistant-panels { grid-template-columns: 1fr; }
-  /* On a phone, each detail goes under its label, so an email is not split. */
-  .assistant-review dl { grid-template-columns: 1fr; gap: 0; }
-  .assistant-review dd { margin-bottom: 8px; }
+/* Chat messages scroll area */
+#agent-app .ns-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#agent-app .ns-msg {
+  overflow-wrap: break-word;
+  padding: 11px 15px;
+  line-height: 1.5;
+  font-size: 13.5px;
+  max-width: 88%;
+}
+
+#agent-app .ns-msg.bot {
+  background: #ddf0ea;
+  color: #0d2721;
+  border: 1px solid rgba(24, 82, 76, 0.15);
+  align-self: flex-start;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 1px 3px rgba(13, 39, 33, 0.04);
+}
+
+#agent-app .ns-msg.user {
+  background: var(--ns-primary);
+  color: #f9f3e6;
+  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 2px 6px rgba(24, 82, 76, 0.2);
+}
+
+/* Chat input bar matching user photo */
+#agent-app .ns-inputbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 0 !important;
+  border-top: 1px solid var(--ns-border) !important;
+  background: #ffffff !important;
+}
+
+#agent-app .ns-inputbar input {
+  flex: 1 !important;
+  height: 44px !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--ns-border) !important;
+  border-radius: 9999px !important;
+  background: #ffffff !important;
+  color: var(--ns-fg) !important;
+  font: 14px/1.5 var(--ns-font) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease !important;
+}
+
+#agent-app .ns-inputbar input:focus {
+  outline: none !important;
+  border-color: var(--ns-primary) !important;
+  box-shadow: 0 0 0 2px rgba(24, 82, 76, 0.2) !important;
+}
+
+/* Hide new chat button in dock */
+#agent-app .ns-inputbar .ns-newchat {
+  display: none !important;
+}
+
+/* Circular green submit button with arrow up */
+#agent-app .ns-inputbar button:not(.ns-newchat) {
+  width: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  background: var(--ns-primary) !important;
+  color: transparent !important;
+  border: 0 !important;
+  cursor: pointer !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 150ms ease, transform 150ms ease !important;
+}
+
+#agent-app .ns-inputbar button:not(.ns-newchat)::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23f9f3e6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='19' x2='12' y2='5'%3E%3C/line%3E%3Cpolyline points='5 12 12 5 19 12'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+#agent-app .ns-inputbar button:not(.ns-newchat):hover {
+  background: #0f3531 !important;
+  transform: scale(1.05) !important;
+}
+
+#agent-app .ns-inputbar button:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Consent card in chat */
+#agent-app .ns-msg.ns-consent {
+  background: #f9f3e6;
+  border: 1.5px solid var(--ns-accent);
+  border-radius: 1rem;
+  padding: 14px 16px;
+  max-width: 95%;
+  box-shadow: 0 4px 14px rgba(198, 148, 73, 0.1);
+}
+
+#agent-app .ns-consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#agent-app .ns-consent-actions button {
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#agent-app .ns-consent-actions button:first-child {
+  background: var(--ns-primary);
+  color: #f9f3e6;
+  border: 1px solid var(--ns-primary);
+}
+
+#agent-app .ns-msgs:has(.ns-consent-actions) > .ns-turn-status {
+  display: none;
+}
+
+/* Settings slot inside settings tab */
+#agent-app.ns-composed-app [data-ns-slot="settings"] {
+  border: 1px solid var(--ns-border);
+  border-radius: 1rem;
+  background: var(--ns-panelbg);
+  padding: 16px;
+  font-size: 0.875rem;
 }

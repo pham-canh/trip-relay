@@ -5,3 +5,17 @@ test-results/
 playwright-report/
 dist-pages/
 artifacts/
+
+# Fichiers temporaires, skills et captures locales
+.agents/
+.taste-skill/
+*/.taste-skill/
+*/shots/
+*/assets/
+modulify-*.html
+modulify-*.png
+modulify-*.js
+peer-*.png
+site-*.png
+projet.md
+update.md

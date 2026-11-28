@@ -58,6 +58,35 @@ async function reachable(url) {
   }
 }
 
+// The airline assistant lives in a slide-over drawer. Tests that exercise the
+// chat or receipt open it with ?open, so the runtime mounts into a visible
+// panel. The receipt is a tab inside that drawer.
+const airlineUrl = (() => {
+  const url = new URL(AIRLINE_URL);
+  url.searchParams.set("open", "");
+  return url.href;
+})();
+
+async function openAssistant(page) {
+  if (!(await page.locator("#concierge-drawer").count())) return;
+  const isOpen = await page.evaluate(() =>
+    document.querySelector("#concierge-drawer")?.classList.contains("is-open"));
+  if (isOpen) return;
+  await page.locator("[data-open-concierge]").last().click();
+  await page.waitForTimeout(350);
+}
+
+async function openReceipt(page) {
+  await openAssistant(page);
+  const tab = page.locator("#tab-btn-receipt");
+  if (await tab.count()) {
+    await tab.click();
+  } else {
+    await page.locator("#privacy-receipt summary").click();
+  }
+  await page.waitForTimeout(200);
+}
+
 const sse = (chunks) => `${chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join("")}data: [DONE]\n\n`;
 const text = (content) => sse([
   { model: "test-model", choices: [{ delta: { content }, finish_reason: null }] },
@@ -142,13 +171,10 @@ async function runPageChecks() {
   page.on("pageerror", (error) => errors.push(error.message));
 
   await page.goto(AIRLINE_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("#privacy-receipt", { timeout: 15000 });
+  await page.waitForSelector("#flight-list .flight", { timeout: 15000 });
   check("airline page boots", (await page.title()).includes("Skyline Air"));
   check("nine flights render", await page.locator("#flight-list .flight").count() === 9,
     `${await page.locator("#flight-list .flight").count()} flights`);
-  check("privacy receipt starts empty",
-    (await page.locator("#receipt-count").textContent()).includes("no boundary events"),
-    await page.locator("#receipt-count").textContent());
 
   // Manual booking, the no-key path a judge can use.
   await page.locator("#flight-list .flight").nth(1).click();
@@ -158,6 +184,12 @@ async function runPageChecks() {
   await page.waitForTimeout(200);
   const bookingText = await page.locator("#bookings").textContent();
   check("manual booking returns a reference", /SKY-[A-Z0-9]{4}/.test(bookingText), bookingText.trim());
+
+  await openAssistant(page);
+  await openReceipt(page);
+  check("privacy receipt starts empty",
+    (await page.locator("#receipt-count").textContent()).includes("no boundary events"),
+    await page.locator("#receipt-count").textContent());
 
   // Exercise the receipt UI with boundary events through the exposed engine.
   const appended = await page.evaluate(async () => {
@@ -173,8 +205,6 @@ async function runPageChecks() {
   const countText = await page.locator("#receipt-count").textContent();
   check("receipt count shows the block", countText.includes("1 blocked") && countText.includes("4 events"), countText);
 
-  await page.locator("#privacy-receipt summary").click();
-  await page.waitForTimeout(150);
   const rows = await page.locator("#receipt-events li").allTextContents();
   check("receipt lists the block",
     rows.some((row) => row.includes("Data blocked") && row.includes("email address") && row.includes("before the hotel request")),
@@ -206,7 +236,7 @@ async function runPageChecks() {
   await page.waitForFunction(() => document.querySelector("#receipt-count")?.textContent.includes("4 events"), null, { timeout: 10000 });
   const restoredCount = await page.locator("#receipt-count").textContent();
   check("receipt survives a reload", restoredCount.includes("4 events") && restoredCount.includes("1 blocked"), restoredCount);
-  await page.locator("#privacy-receipt summary").click();
+  await openReceipt(page);
   await page.click("#receipt-verify");
   await page.waitForTimeout(150);
   check("restored chain verifies", (await page.locator("#receipt-status").textContent()).includes("Chain verified: 4 events"),
@@ -224,10 +254,9 @@ async function runPageChecks() {
   hotel.on("console", (message) => { if (message.type() === "error") hotelErrors.push(message.text()); });
   hotel.on("pageerror", (error) => hotelErrors.push(error.message));
   await hotel.goto(PEER_URL, { waitUntil: "networkidle" });
-  check("hotel page boots", (await hotel.locator(".brand strong").textContent()).includes("Harbor Hotel"),
-    await hotel.locator(".brand strong").textContent());
-  check("hotel renders three rooms", await hotel.locator("#rooms .steps li").count() === 3,
-    `${await hotel.locator("#rooms .steps li").count()} rooms`);
+  check("hotel page boots", (await hotel.title()).includes("Harbor Hotel"), await hotel.title());
+  check("hotel renders four rooms", await hotel.locator("#rooms ul.mt-12 > li").count() === 4,
+    `${await hotel.locator("#rooms ul.mt-12 > li").count()} rooms`);
 
   check("airline has no console errors", errors.length === 0, errors.join(" | "));
   check("hotel has no console errors", hotelErrors.length === 0, hotelErrors.join(" | "));
@@ -271,11 +300,12 @@ async function runConsentChecks() {
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("request", (request) => { if (request.url().startsWith(PEER_ORIGIN)) peerRequests.push(request.url()); });
 
-  await page.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await page.goto(airlineUrl, { waitUntil: "networkidle" });
   await page.waitForSelector("#ns-input");
   check("assistant is ready with a test key",
     (await page.locator("#assistant-status").textContent()).includes("connected"),
     await page.locator("#assistant-status").textContent());
+  check("real-key run hides the mock label", !(await page.locator("#drawer-model-badge").isVisible()));
   await page.fill("#ns-input", "Can you ask Harbor Hotel whether it has a quiet room near the airport for two nights?");
   await page.click("#ns-send");
   await page.waitForSelector(".ns-consent", { timeout: 15000 });
@@ -290,8 +320,7 @@ async function runConsentChecks() {
   check("the answer keeps the hotel's facts", answer.includes("$84") || answer.includes("Harbor Double"),
     answer.replace(/\s+/g, " ").trim().slice(-220));
 
-  await page.locator("#privacy-receipt summary").click();
-  await page.waitForTimeout(200);
+  await openReceipt(page);
   const receipt = await page.locator("#receipt-events").textContent();
   check("receipt records the real consent and fetch",
     receipt.includes("Consent asked") && receipt.includes("Contact allowed") && receipt.includes("Peer loaded"),
@@ -309,7 +338,7 @@ async function runConsentChecks() {
   declined.on("console", (message) => { if (message.type() === "error") declinedErrors.push(message.text()); });
   declined.on("pageerror", (error) => declinedErrors.push(error.message));
   declined.on("request", (request) => { if (request.url().startsWith(PEER_ORIGIN)) declinedRequests.push(request.url()); });
-  await declined.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await declined.goto(airlineUrl, { waitUntil: "networkidle" });
   await declined.fill("#ns-input", "Can you ask Harbor Hotel whether it has a quiet room near the airport for two nights?");
   await declined.click("#ns-send");
   await declined.waitForSelector(".ns-consent", { timeout: 15000 });
@@ -321,8 +350,7 @@ async function runConsentChecks() {
     /did not contact/i.test(declinedText) && !declinedText.includes("$84")
       && await declined.locator(".ns-consent").count() === 1,
     declinedText.replace(/\s+/g, " ").trim().slice(-200));
-  await declined.locator("#privacy-receipt summary").click();
-  await declined.waitForTimeout(150);
+  await openReceipt(declined);
   const declinedReceipt = await declined.locator("#receipt-events").textContent();
   check("receipt records the decline",
     declinedReceipt.includes("Contact declined") && !declinedReceipt.includes("Peer loaded"),
@@ -359,7 +387,7 @@ async function runFailureChecks() {
   const errors = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await page.goto(airlineUrl, { waitUntil: "networkidle" });
   await page.fill("#ns-input", "Can you ask Harbor Hotel whether it has a quiet room?");
   await page.click("#ns-send");
   await page.waitForSelector(".ns-consent", { timeout: 15000 });
@@ -369,8 +397,7 @@ async function runFailureChecks() {
   check("failed peer fetch reports a clear error", /could not load/i.test(answer) && /hotel site returned an error/i.test(answer),
     answer.replace(/\s+/g, " ").trim().slice(-220));
 
-  await page.locator("#privacy-receipt summary").click();
-  await page.waitForTimeout(200);
+  await openReceipt(page);
   const receipt = await page.locator("#receipt-events").textContent();
   check("receipt records the peer failure",
     receipt.includes("Peer failed") && receipt.includes("HTTP 503"),
@@ -433,7 +460,7 @@ async function runHostilePeerChecks() {
   outbound.on("console", (message) => { if (message.type() === "error") outboundErrors.push(message.text()); });
   outbound.on("pageerror", (error) => outboundErrors.push(error.message));
   outbound.on("request", (request) => { if (request.url().startsWith(PEER_ORIGIN)) outboundRequests.push(request.url()); });
-  await outbound.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await outbound.goto(airlineUrl, { waitUntil: "networkidle" });
   await outbound.fill("#ns-input", "Ask Harbor Hotel about a quiet room. My email is alex@example.com.");
   await outbound.click("#ns-send");
   await outbound.waitForFunction(() => /did not contact/i.test(document.querySelector("#ns-msgs")?.textContent || ""), null, { timeout: 20000 });
@@ -442,8 +469,7 @@ async function runHostilePeerChecks() {
   const outboundText = await outbound.locator("#ns-msgs .ns-msg.bot").last().textContent();
   check("outbound email is reported, not sent", /did not contact/i.test(outboundText) && !outboundText.includes("alex@example.com"),
     outboundText.replace(/\s+/g, " ").trim().slice(-200));
-  await outbound.locator("#privacy-receipt summary").click();
-  await outbound.waitForTimeout(200);
+  await openReceipt(outbound);
   const outboundReceipt = await outbound.locator("#receipt-events").textContent();
   check("receipt blocks the email before the hotel request",
     outboundReceipt.includes("Data blocked") && outboundReceipt.includes("email address") && outboundReceipt.includes("before the hotel request"),
@@ -462,7 +488,7 @@ async function runHostilePeerChecks() {
   inbound.on("console", (message) => { if (message.type() === "error") inboundErrors.push(message.text()); });
   inbound.on("pageerror", (error) => inboundErrors.push(error.message));
   inbound.on("request", (request) => { if (request.url().startsWith(PEER_ORIGIN)) inboundRequests.push(request.url()); });
-  await inbound.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await inbound.goto(airlineUrl, { waitUntil: "networkidle" });
   await inbound.fill("#ns-input", "Can you ask Harbor Hotel whether it has a quiet room?");
   await inbound.click("#ns-send");
   await inbound.waitForSelector(".ns-consent", { timeout: 15000 });
@@ -472,8 +498,7 @@ async function runHostilePeerChecks() {
   const inboundText = await inbound.locator("#ns-msgs").textContent();
   check("hostile key is not rendered", !inboundText.includes("otk_") && /API key/i.test(inboundText),
     inboundText.replace(/\s+/g, " ").trim().slice(-220));
-  await inbound.locator("#privacy-receipt summary").click();
-  await inbound.waitForTimeout(200);
+  await openReceipt(inbound);
   const inboundReceipt = await inbound.locator("#receipt-events").textContent();
   check("receipt blocks the key in the hotel reply",
     inboundReceipt.includes("Data blocked") && inboundReceipt.includes("API key") && inboundReceipt.includes("in the hotel reply"),
@@ -513,7 +538,7 @@ async function runMobileChecks() {
   const errors = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await page.goto(airlineUrl, { waitUntil: "networkidle" });
   await page.waitForSelector("#ns-input");
   const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check("phone page has no horizontal overflow", await overflow() <= 1, `${await overflow()}px`);
@@ -542,8 +567,7 @@ async function runMobileChecks() {
   await page.waitForFunction(() => /Harbor Double/.test(document.querySelector("#ns-msgs")?.textContent || ""), null, { timeout: 20000 });
   check("keyboard allow completes the consent", true);
 
-  await page.locator("#privacy-receipt summary").click();
-  await page.waitForTimeout(200);
+  await openReceipt(page);
   check("phone receipt has no horizontal overflow", await overflow() <= 1, `${await overflow()}px`);
   await page.click("#receipt-verify");
   await page.waitForTimeout(150);
@@ -567,7 +591,7 @@ async function runDemoChecks() {
   page.on("request", (request) => {
     if (/api\.otari\.ai|eu\.api\.otari\.ai|mock\.local/.test(request.url())) providerRequests.push(request.url());
   });
-  await page.goto(AIRLINE_URL, { waitUntil: "networkidle" });
+  await page.goto(airlineUrl, { waitUntil: "networkidle" });
   await page.waitForSelector("#demo-start");
   check("demo button is visible before a key",
     (await page.locator("#demo-start").textContent()).includes("Try the scripted demo"),
@@ -579,8 +603,10 @@ async function runDemoChecks() {
   await page.waitForFunction(() => document.querySelector("#assistant-status")?.textContent.includes("connected"), null, { timeout: 20000 });
   check("demo boots without a key", (await page.locator("#assistant-status").textContent()).includes("connected"),
     await page.locator("#assistant-status").textContent());
-  check("demo is labelled as a mock", (await page.locator(".ns-llmbadge.mock").textContent()).includes("MOCK LLM"),
-    await page.locator(".ns-llmbadge.mock").textContent());
+  check("demo is labelled as a mock",
+    await page.locator("#drawer-model-badge").isVisible()
+      && (await page.locator("#drawer-model-badge").textContent()).includes("MOCK LLM"),
+    await page.locator("#drawer-model-badge").textContent());
   const greeting = await page.locator("#ns-msgs").textContent();
   check("demo greeting explains the scripted path", greeting.includes("Scripted demo"), greeting.slice(0, 120));
 
@@ -593,8 +619,7 @@ async function runDemoChecks() {
     /Harbor Double/.test(await page.locator("#ns-msgs").textContent()));
   check("demo calls no provider", providerRequests.length === 0, providerRequests.join(" | "));
 
-  await page.locator("#privacy-receipt summary").click();
-  await page.waitForTimeout(200);
+  await openReceipt(page);
   const receipt = await page.locator("#receipt-events").textContent();
   check("demo writes the consent and peer fetch",
     receipt.includes("Consent asked") && receipt.includes("Contact allowed") && receipt.includes("Peer loaded"),
@@ -606,6 +631,7 @@ async function runDemoChecks() {
     await page.locator("#receipt-status").textContent());
   check("demo path has no console errors", errors.length === 0, errors.join(" | "));
 
+  await page.click("#tab-btn-chat");
   await Promise.all([
     page.waitForNavigation({ waitUntil: "load" }),
     page.click("#demo-start"),

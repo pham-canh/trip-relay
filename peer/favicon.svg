@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Harbor Hotel">
-  <rect width="64" height="64" rx="14" fill="#8a4b2a"/>
-  <path d="M14 50 V28 L32 16 L50 28 V50 Z" fill="#f3f7fb"/>
-  <rect x="24" y="34" width="6" height="16" fill="#8a4b2a"/>
-  <rect x="36" y="34" width="6" height="16" fill="#8a4b2a"/>
-  <rect x="28" y="22" width="8" height="7" fill="#f0b429"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#0f5257"/><path d="M10 28h28" fill="none" stroke="#c3d7e5" stroke-width="5" stroke-linecap="round"/><path d="M14 34c5 4 15 4 20 0" fill="none" stroke="#c3d7e5" stroke-width="4" stroke-linecap="round"/><path d="M24 12v10m-6-10v10m12-10v10" stroke="#c3d7e5" stroke-width="3" stroke-linecap="round"/></svg>

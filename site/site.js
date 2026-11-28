@@ -69,6 +69,23 @@ export class AssistantMount {
   };
 
   /**
+   * Show the mock label in the drawer header only when the runtime is using the
+   * deterministic browser router. The label is outside the hidden runtime header,
+   * so a visitor can always tell a scripted demo from a real model.
+   *
+   * :param engine: The booted runtime engine, or null when boot failed.
+   */
+  static markModel(engine = null) {
+    const mock = !!engine?.mockLLM;
+    const badge = document.querySelector("#drawer-model-badge");
+    const note = document.querySelector("#drawer-model-note");
+    if (badge) badge.classList.toggle("hidden", !mock);
+    if (note) note.textContent = mock
+      ? "Scripted demo"
+      : "Runs in your browser · Consent-first";
+  }
+
+  /**
    * Wire the page's keyless demo button. The demo applies a tab-only setup that
    * points the runtime at the deterministic browser mock, then reloads. It calls
    * one read tool and summarizes, so it can show consent and the receipt without
@@ -80,6 +97,7 @@ export class AssistantMount {
     const button = document.querySelector("#demo-start");
     const note = document.querySelector("#demo-note");
     if (!button) return;
+    AssistantMount.markModel(engine);
     const demoOn = !!engine?.mockLLM && engine.top?.llm?.baseUrl === "browser://mock";
     if (demoOn) {
       button.textContent = "Exit scripted demo";
@@ -423,7 +441,7 @@ export class AssistantMount {
       const event = await originalAppend(kind, fields);
       render();
       await persist();
-      if (details.open) await verify();
+      await verify();
       return event;
     };
     verifyButton?.addEventListener("click", verify);
@@ -450,9 +468,6 @@ export class AssistantMount {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       status.textContent = `Exported ${exported.events.length} event${exported.events.length === 1 ? "" : "s"} as JSON.`;
       status.className = "receipt-status ok";
-    });
-    details.addEventListener("toggle", () => {
-      if (details.open) verify();
     });
     render();
   }

@@ -32,6 +32,23 @@ export class AssistantMount {
   };
 
   /**
+   * Show the mock label in the drawer header only when the runtime is using a
+   * deterministic mock router. The runtime header is hidden in the drawer, so
+   * this keeps the visitor-facing label honest.
+   *
+   * :param engine: The booted runtime engine, or null when boot failed.
+   */
+  static markModel(engine = null) {
+    const mock = !!engine?.mockLLM;
+    const badge = document.querySelector("#drawer-model-badge");
+    const note = document.querySelector("#drawer-model-note");
+    if (badge) badge.classList.toggle("hidden", !mock);
+    if (note) note.textContent = mock
+      ? "Scripted demo"
+      : "Runs in your browser · Consent-first";
+  }
+
+  /**
    * Boot the runtime and report the result in the status line.
    *
    * :return: The runtime engine, or null when boot failed.
@@ -51,6 +68,7 @@ export class AssistantMount {
       booted.engine.onActionConfirm = AssistantMount.review;
       AssistantMount.defaultConsent = booted.engine.onConsent;
       booted.engine.onConsent = AssistantMount.consent;
+      AssistantMount.markModel(booted.engine);
       // Without a key the chat cannot answer yet. This is the same test as the
       // runtime's "API key required" badge in runtime/ui.js.
       const needsKey = !booted.engine.mockLLM
