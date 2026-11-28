@@ -94,7 +94,19 @@ The redesign adds a hotel hero image and refreshes the drawer screenshots. Repla
 
 All seven were recaptured from the deployed pair on 2026-11-28. The consent, answer, and receipt shots use the keyless demo and show the real `pham-canh.github.io.` origin plus the visible `MOCK LLM` label.
 
-## 7. After the story is current
+## 7. When Lolo's English video is live
+
+Do the Devpost and YouTube edits in one pass, after the new video is public and plays without signing in:
+
+1. Check the video in a private window: English narration, entrant voice (not AI), the consent card and **0 requests before Allow** are visible, the `⚠ MOCK LLM` badge is visible, and the title is `Trip Relay — 0 hotel requests before Allow | Open Agentic Web Challenge`.
+2. Put the new URL in the Devpost **Demo video** field.
+3. Replace the old “Vietnamese narration” sentence in `docs/DEVPOST.md` and `docs/YOUTUBE.md` with the English-video wording; keep the old 1:46 cut only as a backup.
+4. Update the Devpost story with the sections above: tagline, hook, numbers, Built With, gallery, credits.
+5. Replace the YouTube thumbnail with `docs/youtube-thumbnail.png` and paste the description/tags from `docs/VIDEO-BRIEF-EN.md`.
+6. Re-run `node scripts/check-links.mjs`; no site code changes are expected.
+7. Keep the old video public until the new one is confirmed, then update the submission link.
+
+## 8. After the story is current
 
 1. Post the **Update draft** from `docs/DEVPOST.md`.
 2. Replace the YouTube thumbnail with `docs/youtube-thumbnail.png`.
