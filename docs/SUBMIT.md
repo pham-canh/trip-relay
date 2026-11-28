@@ -1,6 +1,6 @@
 # Submit Trip Relay
 
-Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submitted. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: update the live project story and Built With tags, post the DLP/receipt update, replace the YouTube thumbnail, and optionally upload the social preview.
+Deadline: **11 January 2027, 16:00 UTC** (8:00am PST). The Devpost form is submitted. The submission video is <https://youtu.be/lDLhXmqXv6I> (Public, 1:46, Vietnamese narration, English subtitles burned in). Remaining: update the live project story and Built With tags (including the four new sections: why agents, two signals, BYOK, community contribution), link the judge guide, post the DLP/receipt update, replace the YouTube thumbnail, and optionally upload the social preview.
 
 ## 1. Repository status
 
@@ -68,7 +68,8 @@ Use the sections in [`docs/DEVPOST.md`](DEVPOST.md):
 
 - **Project name:** Trip Relay
 - **Tagline:** Two agentic travel sites, one visible boundary. Zero hotel requests before you press Allow.
-- **Description:** Inspiration, What it does, How we built it, Verification status, Challenges, Accomplishments, What we learned, What's next.
+- **Description:** Inspiration, What it does, Why this needs agents, Two signals to check, Bring your own key, Community contribution, Demo video, How we built it, Verification status, Challenges, Accomplishments, What we learned, What's next.
+- **Judge guide:** <https://github.com/pham-canh/trip-relay/blob/main/docs/JUDGE-GUIDE.md>.
 - **Built with:** HTML, CSS, JavaScript, Node.js 22, Neuro SAN agent networks, Mozilla Otari, Playwright, GitHub Actions.
 - **Try it:** <https://pham-canh.github.io/trip-relay/> (hotel: <https://pham-canh.github.io./>).
 - **Video:** <https://youtu.be/lDLhXmqXv6I>.

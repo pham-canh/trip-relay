@@ -27,6 +27,17 @@ After the paragraph ending “work without a model key for the manual flight-boo
 
 Leave the following “reference implementation” paragraph in place.
 
+## 1b. Add the agent-value, BYOK, and community sections
+
+After the “reference implementation” paragraph, add these four sections from `docs/DEVPOST.md`, in this order:
+
+1. **Why this needs agents, not just a booking site** — the plain airline and hotel sites cannot answer the cross-supplier question; the agent handoff is the product.
+2. **Two signals to check** — `allowed_peers` in the manifest, the hotel network tool, and the consent card.
+3. **Bring your own key** — no shared token, Otari in Settings, the keyless demo for judges who do not want to spend tokens.
+4. **Community contribution** — `check_origins`, `benchmark_dlp`, `browser_check`, `PROTOCOL.md`, `SPEC-MAPPING.md`, `COMMUNITY.md`, PR #85.
+
+Then replace the **How it maps to the judging criteria** block with the current five-criterion version in `docs/DEVPOST.md`, and add the **Judge guide** line that points at `docs/JUDGE-GUIDE.md`.
+
 ## 2. How we built it
 
 Replace the bullet that starts:

@@ -8,6 +8,7 @@ Record a **60–90 second** demo of Trip Relay using the new deployed UI. The vi
 
 - a real person using the site (book a flight, ask the hotel);
 - the problem: two sites on different origins, and an agent handoff that is normally invisible;
+- what the plain sites cannot do: neither the airline nor the hotel can answer the cross-supplier question alone;
 - the solution: a consent card with the exact origin, purpose, and request; **0 hotel requests before Allow**;
 - the value of the agent: delegation, consent, receipt, and DLP;
 - the closing: keyless demo and repo.
@@ -30,12 +31,12 @@ Lolo is listed on the Devpost team as **@Euloge_11**, so his English narration i
 
 | Time | Picture | Narration |
 |---|---|---|
-| 0:00–0:08 | Airline hero, then hotel hero | “Booking a flight and a hotel usually means two websites. Agents can talk to each other, but today those requests often leave without you seeing them.” |
+| 0:00–0:08 | Airline hero, then hotel hero | “Booking a flight and a hotel means two websites. The airline can sell me a flight; the hotel can describe a room. Neither can answer the question I actually have. And when their agents talk, the request usually leaves without me seeing it.” |
 | 0:08–0:18 | Skyline Air: select a flight, enter passenger, book | “This is Skyline Air. I'll pick a flight, enter a demo passenger, and book it. The SKY reference is the confirmation.” |
 | 0:18–0:32 | Open **Ask Skyline**, ask about Harbor Hotel | “Now I'll ask Harbor Hotel about a room. Before anything leaves this page, the consent card shows the exact origin, the purpose, and the request. Until I press Allow, the hotel receives zero requests.” |
 | 0:32–0:42 | **Decline**; ask again; **Allow**; hotel answer | “Decline, and the hotel is never contacted. Ask again and Allow: the browser fetches only the hotel's public network and runs it locally.” |
 | 0:42–0:55 | **Receipt** tab: verify, events, download, reload, clear | “Every boundary event goes into the Privacy receipt. I can verify the hash chain, inspect the events, download the redacted JSON, reload and restore it, then clear it.” |
-| 0:55–1:08 | Diagram, or cut between the two sites | “The hotel publishes data, not an agent server. The caller's browser enforces consent and keeps the key. That's what the agent adds: delegation with a visible boundary, a receipt, and DLP.” |
+| 0:55–1:08 | Diagram, or cut between the two sites | “The hotel publishes data, not an agent server. The caller's browser enforces consent and keeps the key. That's what the agent adds: a question answered across two independent businesses, with a visible boundary, a receipt, and DLP — something the plain booking page cannot do.” |
 | 1:08–1:20 | Closing card with both URLs and repo | “Try the keyless demo at pham-canh.github.io/trip-relay. The hotel is at pham-canh.github.io. Source and protocol are on GitHub. MIT licensed.” |
 
 ## How to record

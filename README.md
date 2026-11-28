@@ -14,6 +14,8 @@ It is a **reference implementation of a consent-gated agent handoff**, demonstra
 
 **Live demo:** <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./> — the trailing dot is part of the host. Browsers treat `pham-canh.github.io` and `pham-canh.github.io.` as different origins, so the same GitHub Pages host can serve both sides of the boundary. **Do not drop the dot:** without it the hotel is on the airline's origin. The browser evidence and the one-command deployment check are in [`docs/ORIGIN.md`](docs/ORIGIN.md). The manual pages work without a key; the cross-site assistant needs a working Otari key in the browser.
 
+**For judges:** [`docs/JUDGE-GUIDE.md`](docs/JUDGE-GUIDE.md) is a one-page path through the demo, the two built-in signals, what is real vs scripted, BYOK, and the community tools.
+
 **Demo video:** [the final entrant-voice cut on YouTube](https://youtu.be/lDLhXmqXv6I) (1:46) — Vietnamese narration by the entrant, with English subtitles burned into the picture and a transcript in [`docs/VIDEO-TRANSCRIPT.md`](docs/VIDEO-TRANSCRIPT.md). The [synthetic timing cut](https://youtu.be/uXQRyKOMyxQ) and [`docs/trip-relay-demo.mp4`](docs/trip-relay-demo.mp4) are demo-only; do not submit them. Both cuts were recorded against the local pair with a scripted OpenAI-compatible endpoint, so the assistant header says `⚠ MOCK LLM — no real model`; the public pair defaults to Otari. The silent cut, the Vietnamese script, and the dubbing steps are in [`docs/DUB-VI.md`](docs/DUB-VI.md).
 
 The two sites are:
@@ -122,6 +124,19 @@ Generated discovery files are committed too: `agent-mcp.json`, `.well-known/nsde
 - **Two gates for writes.** `book_flight` and `request_room` require a visitor confirmation and a current `expectedVersion`; a stale call is refused with a readable reason.
 - **Demo data only.** State lives in memory, resets on reload, takes no payment, and no request is sent to a real airline or hotel.
 - **Measured adversarial hardening.** `npm run benchmark:dlp` runs 12 hostile-peer cases and 4 controls against the real dispatch boundary with a per-run canary. The current result is 12/12 attacks blocked, 0 canary egress, 0 unauthorized writes, and 4/4 controls pass ([committed report](docs/dlp-benchmark.json)). The browser pass also drives a hostile peer fixture through the real page: an email in the outbound request is blocked before consent and fetch, and an API key in the inbound reply is blocked before rendering. The audit log is a per-tab hash chain persisted in IndexedDB, not a remote WORM store; the scope and remaining work are in [`docs/ROADMAP-DLP.md`](docs/ROADMAP-DLP.md).
+
+## Community tools
+
+The boundary ships as reusable tooling, not only as a demo:
+
+- [`scripts/check_origins.mjs`](scripts/check_origins.mjs) — dependency-free check that a two-site pair is on distinct origins, both manifests load, the peer manifest is CORS-readable, and the caller's `allowed_peers` matches. `npm run check:origins`.
+- [`scripts/benchmark_dlp.mjs`](scripts/benchmark_dlp.mjs) — deterministic 12-attack / 4-control matrix against the real dispatch boundary, with a per-run canary. `npm run benchmark:dlp`.
+- [`scripts/browser_check.mjs`](scripts/browser_check.mjs) — 67-check Playwright pass covering consent ordering, receipt verify/download/reload/clear, hostile peer, mobile, keyboard, and the keyless demo. `npm run check:browser`; the hosted variants are `check:browser:live` (13) and `check:browser:demo` (10).
+- [`PROTOCOL.md`](PROTOCOL.md) — the pattern, threat model, failure modes, and limits.
+- [`docs/SPEC-MAPPING.md`](docs/SPEC-MAPPING.md) — requirement-by-requirement map to MVP Profile 0.2.
+- [`docs/COMMUNITY.md`](docs/COMMUNITY.md) — what another team should copy, what to change, and what not to copy.
+
+The pair is listed on the challenge's official [agentic websites list](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) (PR #85, merged).
 
 ## Tests
 

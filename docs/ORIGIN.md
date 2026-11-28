@@ -62,6 +62,16 @@ npm run check:browser:live
 
 Expected: 13/13 checks pass. The same checks run locally with `npm run check:browser` (67/67) after `npm run serve:airline` and `npm run serve:hotel`; the local pass also covers receipt reload/clear, hostile-peer DLP, peer failure, mobile layout, and the keyless demo.
 
+The challenge's own partner check also passes for the hosted pair:
+
+```bash
+node skills/agentify-website/scripts/check_partner.mjs \
+  https://pham-canh.github.io./harbor_hotel \
+  --origin https://pham-canh.github.io
+```
+
+Expected: `OK`. It reads the hotel manifest, network, `links.json`, bridge page, bridge script, and bridge manifest with the airline's `Origin`; all answer 200 with CORS. The reverse check for the airline from the hotel origin also returns `OK`.
+
 Manual origin check:
 
 1. Open the airline URL and run `location.origin` in DevTools. It is `https://pham-canh.github.io`.

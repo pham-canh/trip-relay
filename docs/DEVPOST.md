@@ -31,6 +31,36 @@ The public demo runs at <https://pham-canh.github.io/trip-relay/> with the hotel
 
 Trip Relay is a **reference implementation of a consent-gated agent handoff**, not a travel-booking product. Travel is the demonstration domain; the data is generated and the pages take no payment or real reservation. The reusable contribution is the boundary: a peer network is public data, the browser pauses before the first peer fetch, the exact network is resolved with no fallback, and the peer receives the declared request rather than the caller's private context. The pattern, threat model, failure modes, and limitations are documented in [`PROTOCOL.md`](https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md).
 
+## Why this needs agents, not just a booking site
+
+The plain Skyline Air site can sell a flight. The plain Harbor Hotel site can describe a room. Neither can answer the question a traveler actually has — “I land at 10:40; is there a quiet room near the airport, and can I bring the booking with me?” — because the answer spans two independent businesses. A link or a redirect loses the request; a hidden API call gives the traveler no say.
+
+Trip Relay makes the handoff the product: the airline's assistant can ask the hotel's assistant, but the traveler sees the exact origin, purpose, and request before any byte crosses, and gets a receipt afterward. That is the agentic value: delegation across a boundary the traveler can see and control, not a chat box bolted onto a booking page. It also matches the open-agentic-web goal in the challenge's own framing: an independent hotel publishes its own representation, keeps its private operations private, and does not need a platform's permission to be reachable.
+
+## Two signals to check
+
+The challenge points judges at two built-in signals:
+
+1. **The JSON that lists the connected network.** `site/agent-manifest.json` → `allowed_peers` names exactly `https://pham-canh.github.io.`, and `site/skyline_air.network.json` lists the hotel's `harbor_hotel` network as a tool. The hotel's manifest lists no further peers.
+2. **The consent card.** Ask a hotel question on the airline page. The card appears before the first cross-origin fetch and shows the hotel origin, the purpose, and the exact request. The browser check asserts **0** hotel requests before **Allow** and **0** after **Decline**.
+
+## Bring your own key
+
+Trip Relay ships no provider token and does not pay for a visitor's inference. To use a real model, add your own Otari key in the assistant drawer's **Settings** tab; it stays in browser storage and is sent only to the selected router. Both manifests publish Otari as the default, with global and EU presets. No key? The keyless scripted demo shows the real consent card and receipt against a deterministic `browser://mock` router; it contacts no provider and is labeled `⚠ MOCK LLM` throughout. That keeps the demo reproducible for judging and matches the challenge's bring-your-own-key model: the visitor chooses the model and controls the cost.
+
+## Community contribution
+
+Trip Relay ships the boundary as reusable tooling, not only as a demo:
+
+- [`scripts/check_origins.mjs`](https://github.com/pham-canh/trip-relay/blob/main/scripts/check_origins.mjs) — dependency-free check that a two-site pair is on distinct origins, both manifests load, the peer manifest is CORS-readable, and the caller's `allowed_peers` matches. Reusable by any two-origin submission.
+- [`scripts/benchmark_dlp.mjs`](https://github.com/pham-canh/trip-relay/blob/main/scripts/benchmark_dlp.mjs) — deterministic 12-attack / 4-control matrix against the real dispatch boundary, with a per-run canary. Reusable as a template for hostile-peer testing.
+- [`scripts/browser_check.mjs`](https://github.com/pham-canh/trip-relay/blob/main/scripts/browser_check.mjs) — 67-check Playwright pass covering consent ordering, receipt verify/download/reload/clear, hostile peer, mobile, keyboard, and the keyless demo. The 13-check hosted and 10-check demo variants run against the live pair.
+- [`PROTOCOL.md`](https://github.com/pham-canh/trip-relay/blob/main/PROTOCOL.md) — the pattern, threat model, failure modes, and limits.
+- [`docs/SPEC-MAPPING.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/SPEC-MAPPING.md) — requirement-by-requirement map to MVP Profile 0.2.
+- [`docs/COMMUNITY.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/COMMUNITY.md) — what another team should copy, what to change, and what not to copy.
+
+The pair is also listed on the challenge's official [agentic websites list](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) (PR #85, merged). MIT licensed; the vendored runtime keeps Apache 2.0.
+
 ## Demo video
 
 <https://youtu.be/lDLhXmqXv6I>
@@ -50,6 +80,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 
 - **Protocol and consent:** 35 `node:test` checks and a 67-check Playwright browser pass, both with a scripted model and both committed in the repository. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**; it also verifies the Privacy receipt chain, downloads the JSON, reloads and verifies the restored chain, clears it, and checks that the export contains no email or key. A hostile-peer fixture proves a real outbound email block and a real inbound key block in the page, and a 503 fixture proves an actionable peer failure with a `peer_error` receipt. The keyless demo boots without a key, calls no provider, and writes the real consent and peer fetch to the receipt. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the receipt is per-tab and local, not a remote WORM store.
 - **Hosted boundary:** the deployed pair now serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. `npm run check:browser:live` repeated the 13 consent and receipt checks against the public pair on 2026-11-28 (13/13): `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**; the receipt chain verifies; no console errors. `npm run check:browser:demo` repeated the 10 keyless-demo checks against the public pair (10/10): no provider request, the real consent card and hotel facts, a verified receipt, and a clean exit. A separate reload/clear smoke check also passed. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
+- **Official partner check:** the challenge's own `check_partner.mjs` returned `OK` for the hosted pair in both directions on 2026-11-28. It read the manifest, network, `links.json`, bridge page, bridge script, and bridge manifest with a caller `Origin`; all answered 200 with CORS; the hotel shares no actions with the caller; the airline's `allowed_peers` matches the hotel origin. Run it from a clone of [`cognizant-ai-labs/agentic-web`](https://github.com/cognizant-ai-labs/agentic-web): `node skills/agentify-website/scripts/check_partner.mjs https://pham-canh.github.io./harbor_hotel --origin https://pham-canh.github.io`.
 - **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in the assistant drawer's **Settings** tab and repeat the question. We do not claim a live provider call.
 - **Scope:** demo data only. No real inventory, payment, or reservation. The contribution is the boundary, not the travel inventory.
 
@@ -71,6 +102,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - A visitor-facing Privacy receipt that verifies the hash chain in the page, exports the redacted JSON, persists the redacted chain in the tab so a reload restores it, and makes the boundary observable without the developer trace.
 - A keyless scripted demo that shows the real consent card and receipt without a provider key, and never calls a write tool.
 - The same consent ordering was verified against the hosted GitHub Pages pair, including the trailing-dot second origin; that run also used a scripted endpoint, not a live Otari call.
+- The challenge's own `check_partner.mjs` passes in both directions against the hosted pair, and the reusable boundary checks ship as three standalone scripts (`check_origins`, `benchmark_dlp`, `browser_check`).
 - A complete spec map, demo script, screenshots, and a reproducible local setup with no server dependencies.
 
 ## What we learned
@@ -142,12 +174,13 @@ Upload the screenshots in this order; each caption is under 140 characters.
 ## Additional info (judges only)
 
 - **Public open agentic site:** <https://pham-canh.github.io/trip-relay/> (the airline entry point; the hotel is the separate origin at <https://pham-canh.github.io./>).
-- **How it maps to the judging criteria:**
-  - **Technological implementation:** a spec-conformant manifest/network/links bundle, a browser runtime that loads and runs the peer's data-only network locally, a consent gate before the first peer fetch, DLP at every egress, and a hash-chained audit log.
+- **How it maps to the judging criteria:** the office-hour Q&A lists five Stage Two criteria: technological implementation, design, potential impact, community contribution, and quality of the idea.
+  - **Technological implementation:** a spec-conformant manifest/network/links bundle, a browser runtime that loads and runs the peer's data-only network locally, a consent gate before the first peer fetch, DLP at every egress, and a hash-chained audit log. The challenge's own `check_partner.mjs` passes for both hosted directions.
   - **Design:** one coherent travel flow (find a flight, book it, ask the hotel), a consent card that names the origin and exact request, a visitor-facing Privacy receipt, manual paths that work without a key, and a mobile layout.
   - **Potential impact:** a concrete case for cross-supplier travel: the traveler sees and approves the handoff, while a small airline or independent hotel can join the agentic web without running an agent server or receiving the traveler's key.
-  - **Community contribution:** MIT-licensed `scripts/check_origins.mjs`, `scripts/benchmark_dlp.mjs`, and `scripts/browser_check.mjs`, the protocol note, and the spec map; the scripts are standalone Node tools that other two-origin pairs can reuse. PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85) added the pair to the challenge's official [`agentic_websites.md`](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) list and was merged.
+  - **Community contribution:** MIT-licensed `scripts/check_origins.mjs`, `scripts/benchmark_dlp.mjs`, and `scripts/browser_check.mjs`, the protocol note, and the spec map; the scripts are standalone Node tools that other two-origin pairs can reuse. The pair is on the challenge's official [`agentic_websites.md`](https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/agentic_websites.md) list (PR [#85](https://github.com/cognizant-ai-labs/agentic-web/pull/85), merged).
   - **Quality of the idea:** consent is treated as a product surface and a transport invariant, not a prompt sentence; the demo makes the invisible origin crossing visible and testable.
+- **Judge guide:** [`docs/JUDGE-GUIDE.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/JUDGE-GUIDE.md) is a one-page path through the demo, the two built-in signals, what is real vs scripted, BYOK, and the community tools.
 - **Screenshot:** `docs/screenshots/airline-hero.png`; privacy receipt: `docs/screenshots/privacy-receipt.png`.
 - **Upload a file:** leave blank; the public repository, `PROTOCOL.md`, `docs/ORIGIN.md`, and the transcript are the evidence bundle.
 - **Additional tool URL:** <https://github.com/pham-canh/trip-relay/blob/main/scripts/check_origins.mjs>.

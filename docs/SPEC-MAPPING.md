@@ -65,6 +65,20 @@ This maps Trip Relay to the Open Agentic Web Challenge MVP Profile 0.2. "Caller"
 | Private context absent at the peer unless explicitly allowed | Hotel receives only `request`. |
 | Fail closed on invalid network, cycle, budget, denied origin | Runtime validation and `max_steps: 12`; `allowed_peers` enforcement; tests cover invalid calls and the closed policy. |
 
+## Official tooling check
+
+On 2026-11-28, the challenge's own [`check_partner.mjs`](https://github.com/cognizant-ai-labs/agentic-web/blob/main/skills/agentify-website/scripts/check_partner.mjs) returned `OK` for the hosted pair in both directions. It read the manifest, network, `links.json`, bridge page, bridge script, and bridge manifest with a caller `Origin`; every file answered 200 with CORS; the hotel shares no actions with the caller; the airline's `allowed_peers` matches the hotel origin.
+
+```bash
+node skills/agentify-website/scripts/check_partner.mjs \
+  https://pham-canh.github.io./harbor_hotel \
+  --origin https://pham-canh.github.io
+
+node skills/agentify-website/scripts/check_partner.mjs \
+  https://pham-canh.github.io/trip-relay/skyline_air \
+  --origin https://pham-canh.github.io.
+```
+
 ## Not implemented
 
 These are optional in the MVP and intentionally out of scope for this demo:
