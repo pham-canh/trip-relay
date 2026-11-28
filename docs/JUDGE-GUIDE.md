@@ -24,7 +24,7 @@ Trip Relay makes the handoff the product: the airline's assistant can ask the ho
 
 ## The two signals the challenge mentions
 
-1. **The JSON that lists the connected network.** `site/agent-manifest.json` → `allowed_peers` names exactly `https://pham-canh.github.io.`. `site/skyline_air.network.json` lists the hotel's `harbor_hotel` network as a tool. The hotel's manifest lists no further peers.
+1. **The JSON that lists the connected network.** `site/agent-manifest.json` → `allowed_peers` names exactly `https://pham-canh.github.io.`. `site/skyline_air.network.json` lists the hotel's `harbor_hotel` network as a tool. The hotel's manifest lists no further peers. `links.json` is intentionally empty for this partner: the spec's linking guide says not to use a link slot for a partner, because an unbound slot would ask the visitor for a URL and allow that origin for the whole page.
 2. **The consent card.** It appears before the first cross-origin fetch, not after. The browser check asserts **0** hotel requests before **Allow** and **0** after **Decline**.
 
 ## What is real, and what is scripted

@@ -15,7 +15,7 @@ Trip Relay is a reference implementation, not a library. This page is the shorte
 
 - **Origins.** Use two real origins. Locally, `127.0.0.1` and `localhost` are different origins; two ports on one hostname are not. On a static host, a second hostname or a trailing-dot host works, but a custom domain is cleaner.
 - **`allowed_peers`.** Put the peer origin in the caller's `agent-manifest.json`; put no peers in the peer's manifest unless it really calls another site.
-- **Network URL.** Point the caller's partner tool at the peer's exact published network, such as `https://peer.example/harbor_hotel`. Do not fall back to a different network when the name is missing.
+- **Network URL.** Point the caller's partner tool at the peer's exact published network, such as `https://peer.example/harbor_hotel`. Do not fall back to a different network when the name is missing. Do **not** use a `link_slots` entry for a partner: the spec's linking guide warns that an unbound slot makes the chat ask the visitor for a URL and allows that origin for the whole page. Leave `links.json` empty for a direct partner; the connection is declared in `tools` and `allowed_peers`.
 - **`link_labels`.** Give the consent card a human label for that URL.
 - **CORS.** The peer's public artifacts need `Access-Control-Allow-Origin` for the caller. GitHub Pages sends `*`; a custom server must do the same.
 - **Build-time rewrite.** If the same source runs locally and hosted, rewrite the local URLs at build time, as `scripts/build_public.mjs` does, and fail the build when both sites resolve to one origin.

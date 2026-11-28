@@ -33,6 +33,8 @@ The caller publishes:
 - `links.json`: publisher-owned peer link map.
 - Site actions: same-origin capabilities registered with the runtime.
 
+`links.json` is intentionally empty for Harbor Hotel. The spec's linking guide says not to use `link_slots` for a partner: an unbound slot makes the chat ask the visitor for a URL and allows that origin for the whole page. The hotel is named by its full URL in the network's `tools`, its origin is in `allowed_peers`, and `link_labels` gives the consent card its name. `links.json` stays available for a genuine link slot.
+
 The peer publishes the same public artifacts. Its network is **data**, not a remote process.
 
 ## Handoff sequence
