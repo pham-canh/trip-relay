@@ -1,184 +1,1004 @@
 <!doctype html>
+<!--
+  Skyline Air — Trip Relay flight booking with a consent-first assistant.
+  Replication of https://trip-relay.modulify.website/
+  All test IDs, data-ns-slot mounts, and business logic are strictly preserved.
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Skyline Air — book a flight, with an agent you can audit</title>
-  <meta name="description" content="An open agentic web demo: a browser agent books a flight and asks a hotel only after you approve the contact.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Skyline Air</title>
+  <meta name="description" content="Skyline Air's trip assistant searches fares and holds seats, then pauses and asks before it contacts Harbor Hotel. A fictional airline built for Trip Relay.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Skyline Air">
+  <meta property="og:description" content="Skyline Air's trip assistant searches fares and holds seats, then pauses and asks before it contacts Harbor Hotel. A fictional airline built for Trip Relay.">
+  <meta property="og:image" content="share.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="color-scheme" content="light">
+
+  
+  <style>
+    :root {
+      --font-app-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+      --font-app-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --font-app-heading: 'Sora', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+      --radius: 0.75rem;
+    }
+  </style>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="modulify.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="assistant.css">
+
   <script type="module" src="site.js"></script>
 </head>
-<body>
-  <a class="skip" href="#main">Skip to content</a>
+<body class="min-h-full flex flex-col font-sans bg-skyline-mist text-skyline-ink antialiased">
 
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">S</span>
-      <span>
-        <strong>Skyline Air</strong>
-        <small>Open agentic web demo</small>
-      </span>
+  <!-- Top Announcement Banner -->
+  <div class="bg-skyline-ink text-[12.5px] text-white/80">
+    <div class="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center">
+      <svg viewBox="0 0 64 64" class="shrink-0 hidden size-4 sm:block" aria-hidden="true" focusable="false">
+        <rect width="64" height="64" rx="15" fill="#161a24"></rect>
+        <circle cx="15" cy="32" r="6" fill="#6f97ff"></circle>
+        <circle cx="49" cy="32" r="6" fill="#4fa39a"></circle>
+        <path d="M21 32 H26 M38 32 H43" stroke="#e8ecf5" stroke-width="3" stroke-linecap="round"></path>
+        <rect x="30" y="17" width="4" height="30" rx="2" fill="#f2c14e"></rect>
+      </svg>
+      <p>Fictional airline. Generated fares. No payment and no real booking. Part of <a class="font-semibold text-white underline underline-offset-2 hover:text-skyline-coral" href="#boundary">Trip Relay</a>.</p>
     </div>
-    <nav aria-label="Primary">
-      <a href="#flights">Flights</a>
-      <a href="#partner">Hotel</a>
-      <a href="#assistant">Assistant</a>
-    </nav>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-30 border-b border-skyline-ink/10 bg-white/85 backdrop-blur-md">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <a aria-label="Skyline Air home" class="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-skyline-blue" href="#top">
+        <span class="inline-flex items-center gap-2.5">
+          <span class="flex size-9 items-center justify-center rounded-xl bg-skyline-navy text-white">
+            <svg viewBox="0 0 64 64" class="size-7" aria-hidden="true" focusable="false">
+              <circle cx="46" cy="34" r="6" fill="#ee7b5c"></circle>
+              <path d="M11 44 L38 18 H49 L24 44 Z" fill="currentColor"></path>
+              <path d="M11 51 H53" stroke="currentColor" stroke-opacity="0.55" stroke-width="3.5" stroke-linecap="round"></path>
+            </svg>
+          </span>
+          <span class="font-heading text-lg font-semibold tracking-tight text-skyline-ink">Skyline Air</span>
+        </span>
+      </a>
+
+      <nav aria-label="Main" class="hidden items-center gap-1 lg:flex">
+        <a href="#flights" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">Flights</a>
+        <a href="#destinations" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">Destinations</a>
+        <a href="#assistant" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">Trip assistant</a>
+        <a href="#boundary" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">The boundary</a>
+        <a href="#faq" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">Questions</a>
+        <a href="agent-manifest.json" class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">Protocol</a>
+        <a href="https://pham-canh.github.io./" data-peer-link class="rounded-lg px-3 py-2 text-sm font-medium text-skyline-ink/75 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue inline-flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Harbor Hotel
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button type="button" data-open-concierge class="hidden items-center gap-2 rounded-full bg-skyline-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-skyline-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue sm:inline-flex">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg>
+          Ask Skyline
+        </button>
+        <button id="mobile-toggle" type="button" aria-expanded="false" aria-controls="skyline-menu" aria-label="Open menu" class="flex size-10 items-center justify-center rounded-lg text-skyline-ink transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue lg:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="skyline-menu" class="border-t border-skyline-ink/10 bg-white lg:hidden hidden">
+      <nav aria-label="Mobile" class="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6">
+        <a href="#flights" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">Flights</a>
+        <a href="#destinations" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">Destinations</a>
+        <a href="#assistant" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">Trip assistant</a>
+        <a href="#boundary" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">The boundary</a>
+        <a href="#faq" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">Questions</a>
+        <a href="agent-manifest.json" class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue">Protocol</a>
+        <a href="https://pham-canh.github.io./" data-peer-link class="rounded-lg px-3 py-3 text-base font-medium text-skyline-ink hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue inline-flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Harbor Hotel
+        </a>
+        <button type="button" data-open-concierge class="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-skyline-blue px-4 py-3 text-base font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg>
+          Ask Skyline
+        </button>
+      </nav>
+    </div>
   </header>
 
-  <main id="main">
-    <section class="hero">
-      <p class="eyebrow">Open Agentic Web Challenge · Mozilla Otari</p>
-      <h1>Book a flight.<br>Then ask the hotel — with consent.</h1>
-      <p class="lede">
-        This page runs its own agent in your browser. It can hold a fare, book it,
-        and ask a second site for hotel details. Before it contacts anyone else,
-        it shows you the origin, the purpose, and the exact request.
-      </p>
-      <div class="hero-actions">
-        <a class="button primary" href="#flights">See flights</a>
-        <a class="button ghost" href="#assistant">Ask the assistant</a>
+  <main class="flex-1">
+    <!-- Hero Section -->
+    <section id="top" aria-labelledby="hero-title" class="relative isolate overflow-hidden bg-skyline-ink">
+      <div class="absolute inset-0 -z-10">
+        <img alt="" decoding="async" class="object-cover object-[50%_42%] w-full h-full" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;" src="images/hero.webp">
+        <div class="absolute inset-0 bg-gradient-to-r from-skyline-ink via-skyline-ink/75 to-skyline-ink/5"></div>
+        <div class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-skyline-ink/85 to-transparent"></div>
       </div>
-      <p class="fineprint">
-        Demo data only. No real tickets are issued and no payment is taken. Your model
-        key stays in this browser and goes to the router you choose.
-      </p>
-    </section>
-
-    <section class="how" aria-labelledby="how-heading">
-      <h2 id="how-heading">Three steps, one auditable trail</h2>
-      <ol class="steps">
-        <li>
-          <span class="step-number">1</span>
-          <h3>Pick a real flight</h3>
-          <p>The page owns the schedule. The agent reads the same state you see.</p>
-        </li>
-        <li>
-          <span class="step-number">2</span>
-          <h3>Confirm the booking</h3>
-          <p>The browser asks before the write. The receipt is bound to the flight.</p>
-        </li>
-        <li>
-          <span class="step-number">3</span>
-          <h3>Approve the hand-off</h3>
-          <p>The hotel is a separate origin. Its agent loads only after you allow it.</p>
-        </li>
-      </ol>
-    </section>
-
-    <section id="flights" class="booking-section" aria-labelledby="flights-heading">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Schedule</p>
-          <h2 id="flights-heading">Flights to Da Nang</h2>
+      <div class="mx-auto max-w-7xl px-4 pb-40 pt-16 sm:px-6 sm:pt-20 lg:px-8 lg:pb-48 lg:pt-28">
+        <div class="max-w-2xl">
+          <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[12.5px] font-medium text-white/85 backdrop-blur">
+            <span class="size-1.5 rounded-full bg-skyline-coral" aria-hidden="true"></span>
+            Skyline Air, a trip assistant with a consent boundary
+          </p>
+          <h1 id="hero-title" class="mt-6 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Book the flight.<br>
+            <span class="text-skyline-coral">Approve</span> the hotel handoff.
+          </h1>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/80">
+            Our assistant searches fares and holds seats on this page. When you want a room in Port Meridian, it pauses and shows you exactly what it would send to Harbor Hotel, before a single request leaves your browser.
+          </p>
+          <div class="mt-9 flex flex-wrap gap-3">
+            <a href="#flights" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-semibold text-skyline-ink shadow-sm transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">See this week's fares</a>
+            <a href="#boundary" class="inline-flex items-center gap-2 rounded-full border border-white/35 px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+              Watch the hotel handoff
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+          <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/75">
+            <li class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-skyline-coral" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path></svg>
+              Runs in your browser
+            </li>
+            <li class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-skyline-coral" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+              Nothing sent before you approve
+            </li>
+            <li class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-skyline-coral" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M14 8H8"></path><path d="M16 12H8"></path><path d="M13 16H8"></path></svg>
+              A receipt you can verify
+            </li>
+          </ul>
         </div>
-        <p class="muted" id="schedule-note">Next three days · nonstop · one passenger</p>
       </div>
-      <div id="flight-list" class="flight-list" aria-live="polite"></div>
-      <p id="flight-empty" class="empty" hidden>No flights left. Reset the demo below.</p>
+    </section>
 
-      <form id="booking-form" class="booking" autocomplete="off">
-        <fieldset>
-          <legend>Book the selected flight</legend>
-          <p class="selection" id="selection">No flight selected yet.</p>
-          <label for="passenger-name">Passenger name</label>
-          <input id="passenger-name" name="passengerName" type="text" maxlength="80" placeholder="Alex Nguyen" required>
-          <label for="passenger-email">Email for the ticket</label>
-          <input id="passenger-email" name="email" type="email" maxlength="120" placeholder="alex@example.com" required>
-          <button class="button primary" type="submit" id="book-button" disabled>Book this flight</button>
-          <p class="form-note">The site asks you to confirm. This demo stores nothing on a server and takes no payment.</p>
-        </fieldset>
+    <!-- Search Form Overlay -->
+    <div class="relative z-10 mx-auto -mt-28 max-w-7xl px-4 sm:px-6 lg:-mt-32 lg:px-8">
+      <form aria-label="Search flights" class="rounded-3xl bg-white p-4 shadow-[0_30px_80px_-30px_rgba(14,26,51,0.55)] ring-1 ring-skyline-ink/5 sm:p-6" onsubmit="event.preventDefault(); document.querySelector('#flights').scrollIntoView({behavior: 'smooth'});">
+        <div role="radiogroup" aria-label="Trip type" class="mb-4 inline-flex rounded-full bg-skyline-mist p-1">
+          <button type="button" role="radio" aria-checked="true" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue bg-white text-skyline-ink shadow-sm">Round trip</button>
+          <button type="button" role="radio" aria-checked="false" class="rounded-full px-4 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue text-skyline-ink/60 hover:text-skyline-ink">One way</button>
+        </div>
+        <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_1fr_1fr_0.7fr_auto] lg:items-end">
+          <div>
+            <label for="search-from" class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">From</label>
+            <select id="search-from" class="h-12 w-full rounded-xl border border-skyline-ink/15 bg-white px-3 text-[15px] font-medium text-skyline-ink transition-colors hover:border-skyline-ink/30 focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-skyline-blue/25">
+              <option value="ALM" selected="">Aldermoor (ALM) / SGN</option>
+              <option value="PMR">Port Meridian (PMR) / DAD</option>
+              <option value="VSS">Vessa (VSS)</option>
+              <option value="KBY">Kestrel Bay (KBY)</option>
+              <option value="SLM">Saltmere (SLM)</option>
+            </select>
+          </div>
+          <button type="button" aria-label="Swap origin and destination" class="hidden size-12 items-center justify-center self-end rounded-xl border border-skyline-ink/15 text-skyline-ink/70 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue lg:flex">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg>
+          </button>
+          <div>
+            <label for="search-to" class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">To</label>
+            <select id="search-to" class="h-12 w-full rounded-xl border border-skyline-ink/15 bg-white px-3 text-[15px] font-medium text-skyline-ink transition-colors hover:border-skyline-ink/30 focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-skyline-blue/25">
+              <option value="ALM">Aldermoor (ALM)</option>
+              <option value="PMR" selected="">Port Meridian (PMR) · partner hotel</option>
+              <option value="VSS">Vessa (VSS)</option>
+              <option value="KBY">Kestrel Bay (KBY)</option>
+              <option value="SLM">Saltmere (SLM)</option>
+            </select>
+          </div>
+          <div>
+            <label for="search-depart" class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">Depart</label>
+            <input id="search-depart" type="date" class="h-12 w-full rounded-xl border border-skyline-ink/15 bg-white px-3 text-[15px] font-medium text-skyline-ink transition-colors hover:border-skyline-ink/30 focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-skyline-blue/25" value="2026-11-28">
+          </div>
+          <div>
+            <label for="search-return" class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">Return</label>
+            <input id="search-return" type="date" class="h-12 w-full rounded-xl border border-skyline-ink/15 bg-white px-3 text-[15px] font-medium text-skyline-ink transition-colors hover:border-skyline-ink/30 focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-skyline-blue/25" value="2026-12-01">
+          </div>
+          <div>
+            <label for="search-travelers" class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">Travelers</label>
+            <select id="search-travelers" class="h-12 w-full rounded-xl border border-skyline-ink/15 bg-white px-3 text-[15px] font-medium text-skyline-ink transition-colors hover:border-skyline-ink/30 focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-skyline-blue/25">
+              <option value="1">1</option>
+              <option value="2" selected="">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <button type="submit" class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-skyline-blue px-6 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-skyline-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue md:col-span-2 lg:col-span-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            Search
+          </button>
+        </div>
       </form>
+    </div>
 
-      <div id="bookings" class="bookings" aria-live="polite"></div>
-      <button class="link-button" type="button" id="reset-demo">Reset demo data</button>
-    </section>
-
-    <section id="partner" class="partner" aria-labelledby="partner-heading">
-      <div>
-        <p class="eyebrow">Second origin</p>
-        <h2 id="partner-heading">Harbor Hotel</h2>
-        <p>
-          A separate agentic website. The airline assistant can ask it what rooms it
-          offers, how the airport shuttle works, and when check-in starts. It cannot
-          see this chat, the passenger's email, or the booking code.
-        </p>
-        <p class="consent-copy">
-          The first contact opens a consent card with the hotel's origin and the exact
-          request. Decline it, and nothing is fetched.
-        </p>
-        <a class="button ghost" href="https://pham-canh.github.io./" data-peer-link>Open the hotel site</a>
-      </div>
-      <dl class="facts">
-        <div><dt>Hand-off</dt><dd>user-approved, per origin</dd></div>
-        <div><dt>Private context</dt><dd>denied by default</dd></div>
-        <div><dt>Router</dt><dd>Otari, your key</dd></div>
-      </dl>
-    </section>
-
-    <section id="assistant" class="assistant" aria-labelledby="assistant-heading">
-      <h2 id="assistant-heading">Ask Skyline Air</h2>
-      <p>Find a flight, check what the hotel offers, or ask what this page cannot do.</p>
-      <p class="assistant-note">Your messages and this page's data go to the LLM provider you choose in the settings below. You confirm anything that cannot be undone before it happens.</p>
-      <p id="assistant-status" role="status">Connecting the assistant… If this message stays, the assistant could not load. You can still use the page directly.</p>
-      <p class="assistant-demo">
-        <button type="button" id="demo-start" class="button ghost">Try the scripted demo (no key)</button>
-        <span id="demo-note" class="fineprint">Read-only: one page read, a real consent card, and a receipt. No model is called.</span>
-      </p>
-      <div id="agent-app">
-        <div data-ns-slot="header"></div>
-        <div class="assistant-panels">
-          <div data-ns-slot="chat"></div>
-          <div data-ns-slot="agents"></div>
+    <!-- Fares & Booking Section -->
+    <section id="flights" aria-labelledby="flights-title" class="scroll-mt-20 bg-skyline-mist pb-24 pt-14 sm:pt-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-[12px] font-semibold uppercase tracking-[0.18em] text-skyline-blue">Generated fares, per traveler</p>
+            <h2 id="flights-title" class="mt-2 font-heading text-3xl font-semibold tracking-tight text-skyline-ink sm:text-4xl">Available flights</h2>
+          </div>
+          <p class="max-w-md text-sm leading-relaxed text-skyline-ink/65">Hold a fare here or ask the assistant to do it. Both use the same page actions, so what you see is what it sees.</p>
         </div>
-        <div data-ns-slot="settings"></div>
-      </div>
 
-      <details id="privacy-receipt" class="receipt">
-        <summary>
-          Privacy receipt
-          <span id="receipt-count" class="receipt-count">no boundary events yet</span>
-        </summary>
-        <p class="receipt-intro">
-          Every consent decision, peer fetch, blocked value, and denied tool on this
-          page is appended to a hash-chained receipt. The log is redacted before
-          hashing, so an email address or key never appears in it. It is kept in this
-          browser tab's database, survives a reload, and is not sent to either site.
-        </p>
-        <div class="receipt-actions">
-          <button type="button" id="receipt-verify" class="button ghost">Verify chain</button>
-          <button type="button" id="receipt-download" class="button ghost">Download JSON</button>
-          <button type="button" id="receipt-clear" class="button ghost">Clear receipt</button>
+        <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_380px]">
+          <!-- Flight List -->
+          <div>
+            <div id="flight-list" class="flight-list space-y-3" aria-live="polite">
+              <!-- Flight buttons injected by app.js -->
+            </div>
+            <p id="flight-empty" class="empty hidden mt-4 text-sm text-skyline-ink/60" hidden>No flights left. Reset the demo data below.</p>
+            <div class="mt-4">
+              <button class="inline-flex items-center gap-2 rounded-full border border-skyline-ink/15 bg-white px-4 py-2 text-xs font-semibold text-skyline-ink transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-skyline-blue" type="button" id="reset-demo">Reset demo data</button>
+            </div>
+          </div>
+
+          <!-- Sticky Sidebar / Your Trip -->
+          <div class="lg:sticky lg:top-24 lg:self-start">
+            <div class="rounded-3xl border border-skyline-ink/10 bg-white p-5 shadow-sm sm:p-6">
+              <h3 class="font-heading text-lg font-semibold text-skyline-ink">Your trip</h3>
+              <p class="selection mt-2 text-sm text-skyline-ink/75" id="selection">Select a flight to continue.</p>
+
+              <form id="booking-form" class="mt-5 space-y-3" autocomplete="off">
+                <fieldset class="space-y-3">
+                  <legend class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-skyline-ink/55">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Passenger, private to this page
+                  </legend>
+                  <div>
+                    <label for="passenger-name" class="sr-only">Passenger name</label>
+                    <input id="passenger-name" name="passengerName" type="text" maxlength="80" placeholder="Alex Nguyen" value="Alex Nguyen" autocomplete="name" required class="h-11 w-full rounded-xl border border-skyline-ink/15 px-3 text-sm text-skyline-ink focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-skyline-blue/25">
+                  </div>
+                  <div>
+                    <label for="passenger-email" class="sr-only">Passenger email</label>
+                    <input id="passenger-email" name="email" type="email" maxlength="120" placeholder="alex@example.com" value="alex@example.com" autocomplete="email" required class="h-11 w-full rounded-xl border border-skyline-ink/15 px-3 text-sm text-skyline-ink focus-visible:border-skyline-blue focus-visible:outline-2 focus-visible:outline-skyline-blue/25">
+                  </div>
+                  <p class="text-[12px] leading-snug text-skyline-ink/55">A fictional passenger is filled in for the demo. The assistant never sees these details and no partner ever receives them.</p>
+                </fieldset>
+                <button class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-skyline-blue px-5 py-3 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-skyline-navy disabled:cursor-not-allowed disabled:bg-skyline-ink/20 disabled:text-skyline-ink/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue" type="submit" id="book-button" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                  Book trip (demo)
+                </button>
+                <p class="mt-2 text-center text-[12px] text-skyline-ink/55">Hold a departure flight first.</p>
+              </form>
+
+              <!-- Bookings list -->
+              <div id="bookings" class="bookings mt-5 space-y-2" aria-live="polite"></div>
+            </div>
+          </div>
         </div>
-        <p id="receipt-status" class="receipt-status" role="status">
-          No boundary event yet. Ask the assistant to contact Harbor Hotel.
-        </p>
-        <ol id="receipt-events" class="receipt-events"></ol>
-      </details>
+      </div>
     </section>
 
-    <section class="proof" aria-labelledby="proof-heading">
-      <h2 id="proof-heading">What to inspect</h2>
-      <ul>
-        <li><code>agent-manifest.json</code> names the network, the front agent, and the router.</li>
-        <li><code>skyline_air.network.json</code> is the resolved, data-only network.</li>
-        <li><code>links.json</code> points at the hotel's published network.</li>
-        <li>The network's <code>allowed_peers</code> lists exactly one origin.</li>
-      </ul>
-      <p class="fineprint">
-        Built for the Open Agentic Web Challenge. Spec:
-        <a href="https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md">MVP Profile 0.2</a>.
-        Router:
-        <a href="https://github.com/mozilla-ai/otari">Mozilla Otari</a>.
-      </p>
+    <!-- Trip Assistant Section -->
+    <section id="assistant" aria-labelledby="assistant-title" class="scroll-mt-20 bg-white py-24">
+      <div class="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:items-start lg:px-8">
+        <div>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.18em] text-skyline-blue">The trip assistant</p>
+          <h2 id="assistant-title" class="mt-3 font-heading text-3xl font-semibold tracking-tight text-skyline-ink sm:text-4xl">An assistant that asks before it shares</h2>
+          <p class="mt-5 text-lg leading-relaxed text-skyline-ink/70">It is an agent network published as plain JSON and run by your own browser: a front agent that plans the trip and a fare agent that works this page. Harbor Hotel's concierge joins only after you say yes.</p>
+          
+          <ul class="mt-8 space-y-6">
+            <li class="flex gap-4">
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-skyline-blue-soft text-skyline-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              </span>
+              <span>
+                <span class="block font-heading text-base font-semibold text-skyline-ink">Works the page, not your account</span>
+                <span class="mt-1 block text-[15px] leading-relaxed text-skyline-ink/65">Four site actions, each marked read, write or irreversible in code. The model cannot change the marks, and it never sees the passenger.</span>
+              </span>
+            </li>
+            <li class="flex gap-4">
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-skyline-blue-soft text-skyline-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"></path><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"></path><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path></svg>
+              </span>
+              <span>
+                <span class="block font-heading text-base font-semibold text-skyline-ink">Waits for you on anything final</span>
+                <span class="mt-1 block text-[15px] leading-relaxed text-skyline-ink/65">Booking is irreversible, so the runtime shows the action and its arguments and waits. A proposal made on stale data is refused.</span>
+              </span>
+            </li>
+            <li class="flex gap-4">
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-skyline-blue-soft text-skyline-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"></circle><path d="m10.2 6.3-3.9 3.9"></path><circle cx="4.5" cy="12" r="2.5"></circle><path d="M7 12h10"></path><circle cx="19.5" cy="12" r="2.5"></circle><path d="m13.8 17.7 3.9-3.9"></path><circle cx="12" cy="19.5" r="2.5"></circle></svg>
+              </span>
+              <span>
+                <span class="block font-heading text-base font-semibold text-skyline-ink">Asks before it talks to anyone else</span>
+                <span class="mt-1 block text-[15px] leading-relaxed text-skyline-ink/65">Harbor Hotel is the only partner the airline may call. Every contact needs your approval, and only the request text crosses.</span>
+              </span>
+            </li>
+          </ul>
+
+          <div class="mt-10 flex flex-wrap gap-3">
+            <button type="button" class="prompt-chip inline-flex items-center gap-2 rounded-full bg-skyline-blue px-6 py-3 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-skyline-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue" data-prompt-fill="Show me the available flights and hold the first one">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg>
+              Hold a fare with the assistant
+            </button>
+            <button type="button" class="prompt-chip inline-flex items-center gap-2 rounded-full border border-skyline-ink/15 px-6 py-3 text-[15px] font-semibold text-skyline-ink transition-colors hover:bg-skyline-mist focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue" data-prompt-fill="Ask Harbor Hotel for a room and give them my email alex@example.com">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-boundary-deep" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+              Try to send an email address
+            </button>
+          </div>
+        </div>
+
+        <!-- Assistant Drawer Card trigger -->
+        <div class="relative">
+          <div aria-hidden="true" class="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-br from-skyline-blue-soft via-white to-skyline-coral/15"></div>
+          <div class="rounded-3xl border border-skyline-ink/10 bg-white p-7 shadow-xl">
+            <div class="flex items-center justify-between pb-4 border-b border-skyline-ink/10">
+              <div class="flex items-center gap-3">
+                <span class="flex size-10 items-center justify-center rounded-full bg-skyline-navy text-white">
+                  <svg viewBox="0 0 64 64" class="size-7" aria-hidden="true" focusable="false">
+                    <circle cx="46" cy="34" r="6" fill="#ee7b5c"></circle>
+                    <path d="M11 44 L38 18 H49 L24 44 Z" fill="currentColor"></path>
+                    <path d="M11 51 H53" stroke="currentColor" stroke-opacity="0.55" stroke-width="3.5" stroke-linecap="round"></path>
+                  </svg>
+                </span>
+                <div>
+                  <h3 class="font-heading text-lg font-semibold text-skyline-ink leading-tight">Skyline Air assistant</h3>
+                  <p class="text-[12px] text-skyline-ink/60">Runs locally in your browser</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-600/20">
+                <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Ready
+              </span>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-skyline-mist p-5 border border-skyline-ink/10">
+              <p class="font-heading text-lg font-medium text-skyline-ink">“Ask me to hold a fare, or ask Harbor Hotel about rooms and shuttle times.”</p>
+              <p class="mt-3 text-[13.5px] text-skyline-ink/65 leading-relaxed">The assistant slides in from the right of the screen whenever you click <strong>Ask Skyline</strong>, ready to search fares or coordinate with Harbor Hotel after you approve.</p>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-1.5" role="group" aria-label="Quick questions">
+              <button type="button" class="prompt-chip text-[12px] font-medium px-2.5 py-1 rounded-full border border-skyline-ink/15 bg-skyline-mist hover:bg-skyline-blue-soft hover:text-skyline-blue transition-colors" data-prompt-fill="Show me morning flights from Aldermoor to Port Meridian">✈️ Morning flights</button>
+              <button type="button" class="prompt-chip text-[12px] font-medium px-2.5 py-1 rounded-full border border-skyline-ink/15 bg-skyline-mist hover:bg-skyline-blue-soft hover:text-skyline-blue transition-colors" data-prompt-fill="What rooms and rates does Harbor Hotel offer?">🏨 Harbor Hotel rooms</button>
+              <button type="button" class="prompt-chip text-[12px] font-medium px-2.5 py-1 rounded-full border border-skyline-ink/15 bg-skyline-mist hover:bg-skyline-blue-soft hover:text-skyline-blue transition-colors" data-prompt-fill="What time is the airport shuttle at Harbor Hotel?">🚐 Shuttle schedule</button>
+              <button type="button" class="prompt-chip text-[12px] font-medium px-2.5 py-1 rounded-full border border-skyline-ink/15 bg-skyline-mist hover:bg-skyline-blue-soft hover:text-skyline-blue transition-colors" data-prompt-fill="How does the consent boundary protect my private data?">🔒 Consent boundary</button>
+            </div>
+
+            <div class="mt-6">
+              <button type="button" data-open-concierge class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-skyline-blue px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm transition-all hover:bg-skyline-navy hover:shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg>
+                Open the assistant
+              </button>
+            </div>
+          </div>
+          <p class="mt-4 text-center text-sm text-skyline-ink/60">What you see before anything reaches the hotel.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consent Boundary Section -->
+    <section id="boundary" aria-labelledby="boundary-title" class="scroll-mt-20 overflow-hidden bg-skyline-ink py-24 text-white">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+          <p class="font-mono text-[12px] font-medium uppercase tracking-[0.18em] text-boundary">Trip Relay</p>
+          <h2 id="boundary-title" class="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">One visible consent boundary</h2>
+          <p class="mt-5 text-lg leading-relaxed text-white/70">The airline is the caller. The hotel is a separate site with its own published agent. Between them, your browser stops before the first request to the hotel and waits for you.</p>
+        </div>
+
+        <div class="mt-14 grid gap-6 lg:grid-cols-[1fr_minmax(0,22rem)_1fr]">
+          <!-- Card 1: Skyline Air -->
+          <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/55">Skyline Air, the caller</p>
+            <h3 class="mt-2 flex items-center gap-2 font-heading text-xl font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 text-skyline-coral" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Stays here, always
+            </h3>
+            <ul class="mt-5 space-y-3">
+              <li class="flex items-center gap-3 text-[15px] text-white/80"><span class="size-1.5 shrink-0 rounded-full bg-skyline-coral" aria-hidden="true"></span>Your chat and its history</li>
+              <li class="flex items-center gap-3 text-[15px] text-white/80"><span class="size-1.5 shrink-0 rounded-full bg-skyline-coral" aria-hidden="true"></span>Passenger name and email</li>
+              <li class="flex items-center gap-3 text-[15px] text-white/80"><span class="size-1.5 shrink-0 rounded-full bg-skyline-coral" aria-hidden="true"></span>The booking reference</li>
+              <li class="flex items-center gap-3 text-[15px] text-white/80"><span class="size-1.5 shrink-0 rounded-full bg-skyline-coral" aria-hidden="true"></span>Page state and cookies</li>
+              <li class="flex items-center gap-3 text-[15px] text-white/80"><span class="size-1.5 shrink-0 rounded-full bg-skyline-coral" aria-hidden="true"></span>Your router key</li>
+            </ul>
+          </div>
+
+          <!-- Card 2: The Boundary -->
+          <div class="relative rounded-3xl bg-boundary-panel p-6 ring-1 ring-boundary/40">
+            <div aria-hidden="true" class="boundary-hatch absolute inset-x-0 top-0 h-2 rounded-t-3xl"></div>
+            <p class="font-mono text-[12px] uppercase tracking-[0.16em] text-boundary">The boundary</p>
+            <ol class="mt-5 space-y-5">
+              <li class="flex gap-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-boundary/15 text-boundary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                </span>
+                <span>
+                  <span class="block text-[15px] font-semibold">1. Policy</span>
+                  <span class="mt-0.5 block text-[13.5px] leading-snug text-white/65">Closed list. Harbor Hotel is the only site the airline may call.</span>
+                </span>
+              </li>
+              <li class="flex gap-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-boundary/15 text-boundary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><circle cx="12" cy="12" r="1"></circle><path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"></path></svg>
+                </span>
+                <span>
+                  <span class="block text-[15px] font-semibold">2. Outbound check</span>
+                  <span class="mt-0.5 block text-[13.5px] leading-snug text-white/65">Personal data, keys and encoded copies of them are stopped here.</span>
+                </span>
+              </li>
+              <li class="flex gap-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-boundary/15 text-boundary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"></path><path d="M14 13.12c0 2.38 0 6.38-1 8.88"></path><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"></path><path d="M2 12a10 10 0 0 1 18-6"></path><path d="M2 16h.01"></path><path d="M21.8 16c.2-2 .131-5.354 0-6"></path><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"></path><path d="M8.65 22c.21-.66.45-1.32.57-2"></path><path d="M9 6.8a6 6 0 0 1 9 5.2v2"></path></svg>
+                </span>
+                <span>
+                  <span class="block text-[15px] font-semibold">3. Consent card</span>
+                  <span class="mt-0.5 block text-[13.5px] leading-snug text-white/65">Who, where, why, and the exact text. You decide.</span>
+                </span>
+              </li>
+              <li class="flex gap-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-boundary/15 text-boundary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M4.268 21a2 2 0 0 0 1.727 1H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3"></path><path d="m9 18-1.5-1.5"></path><circle cx="5" cy="14" r="3"></circle></svg>
+                </span>
+                <span>
+                  <span class="block text-[15px] font-semibold">4. Public files only</span>
+                  <span class="mt-0.5 block text-[13.5px] leading-snug text-white/65">Manifest, network, links. No cookies, no referrer.</span>
+                </span>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Card 3: Harbor Hotel -->
+          <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/55">Harbor Hotel, the peer</p>
+            <h3 class="mt-2 font-heading text-xl font-semibold">After you allow it</h3>
+            <dl class="mt-5 space-y-4 text-[15px]">
+              <div>
+                <dt class="text-white/55">Crosses</dt>
+                <dd class="mt-0.5 text-white/85">The request text you approved. Nothing else.</dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Runs</dt>
+                <dd class="mt-0.5 text-white/85">In this tab, on your router, with your limits.</dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Comes back</dt>
+                <dd class="mt-0.5 text-white/85">An answer, treated as untrusted text.</dd>
+              </div>
+              <div>
+                <dt class="text-white/55">Never crosses</dt>
+                <dd class="mt-0.5 text-white/85">Writes. A room request happens on the hotel's own page.</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Live requests banner -->
+        <div class="mt-8 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-5">
+            <p class="font-mono text-5xl font-semibold tabular-nums text-boundary" aria-live="polite">0</p>
+            <p class="max-w-sm text-sm leading-relaxed text-white/70">
+              <span class="block font-semibold text-white">Requests from this page to Harbor Hotel</span>
+              Counted live by your browser's own resource timing, not by our code. Ask for a room and watch it stay at zero until you allow it.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" class="prompt-chip inline-flex items-center gap-2 rounded-full bg-boundary px-5 py-2.5 text-sm font-semibold text-boundary-ink transition-[filter] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boundary" data-prompt-fill="Ask Harbor Hotel for a room and which shuttle to take">
+              Try the handoff
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </button>
+            <a class="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="https://pham-canh.github.io./" data-peer-link>Visit Harbor Hotel</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section id="destinations" aria-labelledby="destinations-title" class="scroll-mt-20 bg-skyline-mist py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-[12px] font-semibold uppercase tracking-[0.18em] text-skyline-blue">Destinations</p>
+            <h2 id="destinations-title" class="mt-3 font-heading text-3xl font-semibold tracking-tight text-skyline-ink sm:text-4xl">Where Skyline Air flies</h2>
+          </div>
+          <p class="max-w-md text-sm leading-relaxed text-skyline-ink/65">Five fictional cities from our Aldermoor hub. The timetables and fares are generated; the views are borrowed.</p>
+        </div>
+
+        <ul class="mt-10 grid gap-6 md:grid-cols-3">
+          <!-- Port Meridian -->
+          <li class="group relative flex flex-col overflow-hidden rounded-3xl bg-skyline-ink shadow-lg">
+            <div class="relative aspect-[4/5] w-full">
+              <img alt="Port Meridian, Meridian Coast" loading="lazy" decoding="async" class="object-cover transition-transform duration-700 group-hover:scale-105 w-full h-full" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;" src="images/port-meridian.webp">
+              <div class="absolute inset-0 bg-gradient-to-t from-skyline-ink via-skyline-ink/35 to-transparent"></div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 p-6 text-white">
+              <p class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-boundary px-3 py-1 text-[12px] font-semibold text-boundary-ink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"></path><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"></path><path d="M12 4v6"></path><path d="M2 18h20"></path></svg>
+                Partner hotel: Harbor Hotel
+              </p>
+              <h3 class="font-heading text-2xl font-semibold">Port Meridian</h3>
+              <p class="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-white/60">Meridian Coast · PMR</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/80">White houses stacked over an old harbour. Harbor Hotel sits on the quay, eighteen minutes from the airport.</p>
+              <div class="mt-5 flex items-center justify-between gap-3">
+                <span class="inline-flex items-center gap-1.5 text-[13px] text-white/70">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  2h 05m from Aldermoor
+                </span>
+                <a href="#flights" class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-skyline-ink transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                  Flights
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <!-- Vessa -->
+          <li class="group relative flex flex-col overflow-hidden rounded-3xl bg-skyline-ink shadow-lg">
+            <div class="relative aspect-[4/5] w-full">
+              <img alt="Vessa, High Lakes" loading="lazy" decoding="async" class="object-cover transition-transform duration-700 group-hover:scale-105 w-full h-full" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;" src="images/vessa.webp">
+              <div class="absolute inset-0 bg-gradient-to-t from-skyline-ink via-skyline-ink/35 to-transparent"></div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 p-6 text-white">
+              <h3 class="font-heading text-2xl font-semibold">Vessa</h3>
+              <p class="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-white/60">High Lakes · VSS</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/80">Glacier lakes so still they hold the whole mountain. Ski lifts in winter, ferries in summer.</p>
+              <div class="mt-5 flex items-center justify-between gap-3">
+                <span class="inline-flex items-center gap-1.5 text-[13px] text-white/70">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  1h 20m from Aldermoor
+                </span>
+                <a href="#flights" class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-skyline-ink transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                  Flights
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <!-- Kestrel Bay -->
+          <li class="group relative flex flex-col overflow-hidden rounded-3xl bg-skyline-ink shadow-lg">
+            <div class="relative aspect-[4/5] w-full">
+              <img alt="Kestrel Bay, South Shore" loading="lazy" decoding="async" class="object-cover transition-transform duration-700 group-hover:scale-105 w-full h-full" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;" src="images/kestrel-bay.webp">
+              <div class="absolute inset-0 bg-gradient-to-t from-skyline-ink via-skyline-ink/35 to-transparent"></div>
+            </div>
+            <div class="absolute inset-x-0 bottom-0 p-6 text-white">
+              <h3 class="font-heading text-2xl font-semibold">Kestrel Bay</h3>
+              <p class="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-white/60">South Shore · KBY</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/80">Green water over pale sand, and a shallow bay you can wade across at low tide.</p>
+              <div class="mt-5 flex items-center justify-between gap-3">
+                <span class="inline-flex items-center gap-1.5 text-[13px] text-white/70">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  3h 10m from Aldermoor
+                </span>
+                <a href="#flights" class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-skyline-ink transition-colors hover:bg-skyline-blue-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                  Flights
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+          <li class="flex items-start justify-between gap-4 rounded-2xl border border-skyline-ink/10 bg-white p-5">
+            <div>
+              <h3 class="font-heading text-lg font-semibold text-skyline-ink">Aldermoor<span class="ml-2 text-xs font-semibold tracking-[0.14em] text-skyline-ink/45">ALM</span></h3>
+              <p class="mt-1 text-sm leading-relaxed text-skyline-ink/65">Skyline Air's home hub, with canals, a covered market and a terminal you can cross in six minutes.</p>
+            </div>
+            <a href="#flights" aria-label="Search flights to Aldermoor" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-skyline-blue-soft text-skyline-navy transition-colors hover:bg-skyline-blue hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </li>
+          <li class="flex items-start justify-between gap-4 rounded-2xl border border-skyline-ink/10 bg-white p-5">
+            <div>
+              <h3 class="font-heading text-lg font-semibold text-skyline-ink">Saltmere<span class="ml-2 text-xs font-semibold tracking-[0.14em] text-skyline-ink/45">SLM</span></h3>
+              <p class="mt-1 text-sm leading-relaxed text-skyline-ink/65">Pink evaporation pools, flamingos in spring, and the longest sunsets on the network.</p>
+            </div>
+            <a href="#flights" aria-label="Search flights to Saltmere" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-skyline-blue-soft text-skyline-navy transition-colors hover:bg-skyline-blue hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Questions / FAQ Section -->
+    <section id="faq" aria-labelledby="faq-title" class="scroll-mt-20 bg-white py-24">
+      <div class="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+        <div>
+          <p class="text-[12px] font-semibold uppercase tracking-[0.18em] text-skyline-blue">Questions</p>
+          <h2 id="faq-title" class="mt-3 font-heading text-3xl font-semibold tracking-tight text-skyline-ink sm:text-4xl">Before you let it talk to a hotel</h2>
+          <p class="mt-5 text-lg leading-relaxed text-skyline-ink/65">Short answers here. The full pattern, threat model and limitations are in the protocol notes.</p>
+        </div>
+
+        <div class="divide-y divide-skyline-ink/10 border-y border-skyline-ink/10">
+          <details class="group py-1">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-left font-heading text-[17px] font-semibold text-skyline-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue [&::-webkit-details-marker]:hidden">
+              Is Skyline Air a real airline?
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-skyline-blue transition-transform group-open:rotate-45" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            </summary>
+            <div class="pb-5 pr-8 text-[15px] leading-relaxed text-skyline-ink/70">
+              No. Skyline Air and Harbor Hotel are fictional, every flight and room is generated, and no payment or reservation is ever made. They exist to show one thing well: an agent that asks before it hands anything to another site.
+            </div>
+          </details>
+
+          <details class="group py-1">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-left font-heading text-[17px] font-semibold text-skyline-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue [&::-webkit-details-marker]:hidden">
+              What exactly does Harbor Hotel receive?
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-skyline-blue transition-transform group-open:rotate-45" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            </summary>
+            <div class="pb-5 pr-8 text-[15px] leading-relaxed text-skyline-ink/70">
+              Only the request text you saw on the consent card and approved. Not your chat, not the passenger details, not the booking reference, not your router key. The hotel network then runs in your browser and its answer comes back as untrusted text.
+            </div>
+          </details>
+
+          <details class="group py-1">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-left font-heading text-[17px] font-semibold text-skyline-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue [&::-webkit-details-marker]:hidden">
+              Do I need an API key?
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-skyline-blue transition-transform group-open:rotate-45" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            </summary>
+            <div class="pb-5 pr-8 text-[15px] leading-relaxed text-skyline-ink/70">
+              No. The assistant starts on a scripted demo model that runs in your tab with no network calls, and goes through the same consent gate as a real model. To try a real model, add an Otari key (or any OpenAI-compatible router) under Settings in the assistant.
+            </div>
+          </details>
+
+          <details class="group py-1">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-left font-heading text-[17px] font-semibold text-skyline-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue [&::-webkit-details-marker]:hidden">
+              What happens if the assistant tries to share my email?
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-skyline-blue transition-transform group-open:rotate-45" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            </summary>
+            <div class="pb-5 pr-8 text-[15px] leading-relaxed text-skyline-ink/70">
+              The runtime checks the outgoing request before the consent card is even shown. Email addresses, phone numbers, card numbers, keys, the booking reference and encoded copies of them are stopped there, and the block is written to the receipt.
+            </div>
+          </details>
+
+          <details class="group py-1">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-left font-heading text-[17px] font-semibold text-skyline-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue [&::-webkit-details-marker]:hidden">
+              Are the two sites really separate?
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-skyline-blue transition-transform group-open:rotate-45" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            </summary>
+            <div class="pb-5 pr-8 text-[15px] leading-relaxed text-skyline-ink/70">
+              The two sites run as independent origins: Skyline Air here, Harbor Hotel on its own host. The browser enforces true cross-origin sandboxing.
+            </div>
+          </details>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Skyline Air is a demo for the Open Agentic Web Challenge. Not a real airline.</p>
-    <p><a href="https://github.com/pham-canh/trip-relay">Source</a> · MIT</p>
+  <!-- Footer -->
+  <footer class="bg-skyline-ink text-white">
+    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div class="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
+        <div>
+          <span class="inline-flex items-center gap-2.5">
+            <span class="flex size-9 items-center justify-center rounded-xl bg-white text-skyline-navy">
+              <svg viewBox="0 0 64 64" class="size-7" aria-hidden="true" focusable="false">
+                <circle cx="46" cy="34" r="6" fill="#ee7b5c"></circle>
+                <path d="M11 44 L38 18 H49 L24 44 Z" fill="currentColor"></path>
+                <path d="M11 51 H53" stroke="currentColor" stroke-opacity="0.55" stroke-width="3.5" stroke-linecap="round"></path>
+              </svg>
+            </span>
+            <span class="font-heading text-lg font-semibold tracking-tight text-white">Skyline Air</span>
+          </span>
+          <p class="mt-5 max-w-sm text-sm leading-relaxed text-white/65">
+            Skyline Air is a fictional airline built for Trip Relay, an entry for the Open Agentic Web Challenge on MVP Profile 0.2 with Mozilla's Otari router. Generated inventory. No payment, no real reservation.
+          </p>
+          <a class="mt-6 inline-flex items-center gap-2.5 rounded-xl border border-white/15 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="#boundary">
+            <svg viewBox="0 0 64 64" class="shrink-0 size-6" aria-hidden="true" focusable="false">
+              <rect width="64" height="64" rx="15" fill="#161a24"></rect>
+              <circle cx="15" cy="32" r="6" fill="#6f97ff"></circle>
+              <circle cx="49" cy="32" r="6" fill="#4fa39a"></circle>
+              <path d="M21 32 H26 M38 32 H43" stroke="#e8ecf5" stroke-width="3" stroke-linecap="round"></path>
+              <rect x="30" y="17" width="4" height="30" rx="2" fill="#f2c14e"></rect>
+            </svg>
+            How Trip Relay works
+          </a>
+        </div>
+
+        <div class="grid gap-10 sm:grid-cols-3">
+          <div>
+            <h3 class="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/45">Fly</h3>
+            <ul class="mt-4 space-y-3 text-sm text-white/70">
+              <li><a href="#flights" class="hover:text-white transition-colors">Search flights</a></li>
+              <li><a href="#destinations" class="hover:text-white transition-colors">Destinations</a></li>
+              <li><a href="#assistant" class="hover:text-white transition-colors">Trip assistant</a></li>
+              <li><a href="#faq" class="hover:text-white transition-colors">Questions</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/45">Trust</h3>
+            <ul class="mt-4 space-y-3 text-sm text-white/70">
+              <li><a href="#boundary" class="hover:text-white transition-colors">The consent boundary</a></li>
+              <li><a href="https://pham-canh.github.io./" data-peer-link class="hover:text-white transition-colors">Harbor Hotel (Peer)</a></li>
+              <li><a href="agent-manifest.json" class="hover:text-white transition-colors">Manifest</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/45">For agents</h3>
+            <ul class="mt-4 space-y-3 font-mono text-sm text-white/70">
+              <li><a href="agent-manifest.json" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">agent-manifest.json</a></li>
+              <li><a href="skyline_air.network.json" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">skyline_air.network.json</a></li>
+              <li><a href="links.json" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">links.json</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-[13px] text-white/50 sm:flex-row sm:items-center sm:justify-between">
+        <p>Skyline Air is fictional. Fares and timetables are generated for this demo.</p>
+        <a href="https://pham-canh.github.io./" data-peer-link class="inline-flex items-center gap-1 font-semibold text-white/75 transition-colors hover:text-white">
+          Visit our partner, Harbor Hotel
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+        </a>
+      </div>
+    </div>
   </footer>
+
+  <!-- Floating Assistant Dock Button -->
+  <div class="relay-dock">
+    <button type="button" data-open-concierge aria-label="Open AI Assistant" class="fixed bottom-4 right-4 z-40 flex items-center gap-2.5 rounded-full bg-skyline-blue py-2 pl-2 pr-4 text-white shadow-[0_16px_40px_-12px_rgba(0,0,0,0.45)] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-skyline-blue sm:bottom-6 sm:right-6">
+      <span class="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/15">
+        <svg viewBox="0 0 64 64" class="size-7" aria-hidden="true" focusable="false">
+          <circle cx="46" cy="34" r="6" fill="#ee7b5c"></circle>
+          <path d="M11 44 L38 18 H49 L24 44 Z" fill="currentColor"></path>
+          <path d="M11 51 H53" stroke="currentColor" stroke-opacity="0.55" stroke-width="3.5" stroke-linecap="round"></path>
+        </svg>
+      </span>
+      <span class="text-sm font-semibold">Ask Skyline</span>
+    </button>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- Assistant Slide-over Drawer (Modulify replica) -->
+  <!-- ============================================================== -->
+  <div id="concierge-backdrop" aria-hidden="true"></div>
+
+  <aside id="concierge-drawer" aria-labelledby="drawer-assistant-title" role="dialog" aria-modal="true">
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between border-b border-skyline-ink/10 px-5 py-4 bg-white">
+      <div class="flex items-center gap-3">
+        <span class="flex size-10 items-center justify-center rounded-full bg-skyline-navy text-white shrink-0">
+          <svg viewBox="0 0 64 64" class="size-7" aria-hidden="true" focusable="false">
+            <circle cx="46" cy="34" r="6" fill="#ee7b5c"></circle>
+            <path d="M11 44 L38 18 H49 L24 44 Z" fill="currentColor"></path>
+            <path d="M11 51 H53" stroke="currentColor" stroke-opacity="0.55" stroke-width="3.5" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <div class="min-w-0">
+          <h2 id="drawer-assistant-title" class="font-heading text-[17px] font-semibold text-skyline-ink leading-tight truncate">Skyline Air assistant</h2>
+          <div class="flex items-center gap-1.5">
+            <p id="drawer-model-note" class="text-[12px] text-skyline-ink/60 truncate">Runs in your browser · Consent-first</p>
+            <span id="drawer-model-badge" class="hidden shrink-0 rounded-full border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">⚠ MOCK LLM</span>
+          </div>
+        </div>
+      </div>
+      <button id="close-drawer-btn" type="button" aria-label="Close assistant" class="flex size-9 items-center justify-center rounded-full text-skyline-ink/60 transition-colors hover:bg-skyline-blue-soft hover:text-skyline-ink focus-visible:outline-2 focus-visible:outline-skyline-blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+    </div>
+
+    <!-- Drawer Tab Navigation -->
+    <div class="flex items-center gap-1.5 border-b border-skyline-ink/10 bg-white px-4 py-2">
+      <button id="tab-btn-chat" type="button" class="drawer-tab-btn flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors bg-skyline-blue-soft text-skyline-blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Chat
+      </button>
+      <button id="tab-btn-receipt" type="button" class="drawer-tab-btn flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors text-skyline-ink/65 hover:bg-skyline-blue-soft hover:text-skyline-ink">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Receipt
+      </button>
+      <button id="tab-btn-settings" type="button" class="drawer-tab-btn flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors text-skyline-ink/65 hover:bg-skyline-blue-soft hover:text-skyline-ink">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        Settings
+      </button>
+    </div>
+
+    <!-- Agent App Mount Root inside Drawer -->
+    <div id="agent-app" class="flex flex-1 flex-col min-h-0 overflow-hidden">
+      <!-- Hidden technical slots -->
+      <div data-ns-slot="header" class="hidden"></div>
+      <div data-ns-slot="agents" class="hidden"></div>
+
+      <!-- Panel 1: Chat -->
+      <div id="panel-chat" class="drawer-panel flex flex-1 flex-col min-h-0 overflow-hidden">
+        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+          <!-- Greeting Card -->
+          <div class="rounded-2xl border border-skyline-blue/15 bg-skyline-blue-soft/60 p-4 text-[13px] leading-relaxed text-skyline-ink shadow-sm">
+            <p class="font-semibold text-skyline-ink">Good to see you. I'm the Skyline Air assistant.</p>
+            <p class="mt-1.5 text-skyline-ink/80">I search flights and hold fares right on this page. When you're ready to book or want to check rooms at Harbor Hotel, I'll pause and ask you first.</p>
+            <p class="mt-1.5 text-skyline-ink/80">Your passenger details and booking reference stay private here and never cross to the hotel.</p>
+          </div>
+
+          <!-- Keyless scripted demo -->
+          <div class="rounded-2xl border border-skyline-ink/10 bg-white p-4 text-[13px] leading-relaxed text-skyline-ink shadow-sm">
+            <p class="font-semibold text-skyline-ink">No provider key?</p>
+            <p class="mt-1 text-skyline-ink/75">Run the real consent card and receipt with the deterministic mock router. It is read-only and never calls a provider.</p>
+            <button type="button" id="demo-start" class="mt-3 inline-flex items-center justify-center rounded-full bg-skyline-blue px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-skyline-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-skyline-blue">Try the scripted demo (no key)</button>
+            <p id="demo-note" class="mt-2 text-[11.5px] text-skyline-ink/55">Read-only: one page read, a real consent card, and a receipt. No model is called.</p>
+          </div>
+
+          <!-- Try Suggestions -->
+          <div>
+            <p class="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-skyline-ink/50 mb-2">Try</p>
+            <div class="space-y-1.5">
+              <button type="button" class="drawer-prompt-btn w-full text-left rounded-xl border border-skyline-ink/10 bg-white px-3.5 py-2.5 text-[13px] text-skyline-ink/85 hover:border-skyline-blue/40 hover:bg-skyline-mist transition-colors shadow-sm" data-prompt="Show me the available flights and hold the first one">
+                Show me the available flights and hold the first one
+              </button>
+              <button type="button" class="drawer-prompt-btn w-full text-left rounded-xl border border-skyline-ink/10 bg-white px-3.5 py-2.5 text-[13px] text-skyline-ink/85 hover:border-skyline-blue/40 hover:bg-skyline-mist transition-colors shadow-sm" data-prompt="Ask Harbor Hotel which rooms are free from 2026-12-11 to 2026-12-14">
+                Ask Harbor Hotel which rooms are free from 2026-12-11 to 2026-12-14
+              </button>
+              <button type="button" class="drawer-prompt-btn w-full text-left rounded-xl border border-skyline-ink/10 bg-white px-3.5 py-2.5 text-[13px] text-skyline-ink/85 hover:border-skyline-blue/40 hover:bg-skyline-mist transition-colors shadow-sm" data-prompt="Ask Harbor Hotel for a room and give them my email alex@example.com">
+                Ask Harbor Hotel for a room and give them my email alex@example.com
+              </button>
+              <button type="button" class="drawer-prompt-btn w-full text-left rounded-xl border border-skyline-ink/10 bg-white px-3.5 py-2.5 text-[13px] text-skyline-ink/85 hover:border-skyline-blue/40 hover:bg-skyline-mist transition-colors shadow-sm" data-prompt="What time is the airport shuttle at Harbor Hotel?">
+                What time is the airport shuttle at Harbor Hotel?
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Slot (messages and input bar) -->
+          <div data-ns-slot="chat" class="mt-2 flex flex-col flex-1 min-h-[300px]"></div>
+        </div>
+
+        <!-- Status line -->
+        <div class="px-4 py-1.5 border-t border-skyline-ink/5 bg-skyline-mist/70">
+          <p id="assistant-status" role="status" class="text-xs text-skyline-ink/60 truncate">Connecting assistant…</p>
+        </div>
+
+        <!-- Subtext Footnote -->
+        <div class="px-4 py-2 border-t border-skyline-ink/5 bg-white text-center">
+          <p class="text-[11.5px] text-skyline-ink/50">Passenger details stay on Skyline Air. Only approved requests reach Harbor Hotel</p>
+        </div>
+      </div>
+
+      <!-- Panel 2: Receipt -->
+      <div id="panel-receipt" class="drawer-panel hidden flex flex-1 flex-col min-h-0 overflow-y-auto p-5 space-y-4">
+        <div class="rounded-2xl border border-skyline-ink/10 bg-white p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-heading text-lg font-semibold text-skyline-ink">Privacy receipt</h3>
+            <span id="receipt-count" class="receipt-count">no boundary events yet</span>
+          </div>
+          <p class="mt-1 text-sm text-skyline-ink/65">Every consent decision, peer fetch, blocked value, and denied tool is appended to a hash-chained log. It is redacted, kept in this tab, and never sent to either site.</p>
+          <div id="privacy-receipt" class="receipt mt-3">
+            <div class="receipt-actions">
+              <button type="button" id="receipt-verify" class="button ghost">Verify chain</button>
+              <button type="button" id="receipt-download" class="button ghost">Download JSON</button>
+              <button type="button" id="receipt-clear" class="button ghost">Clear receipt</button>
+            </div>
+            <p id="receipt-status" class="receipt-status" role="status">No boundary event yet. Ask the assistant to contact Harbor Hotel.</p>
+            <ol id="receipt-events" class="receipt-events"></ol>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-skyline-ink/10 bg-white p-4">
+          <h3 class="font-heading text-lg font-semibold text-skyline-ink">Your Flight Bookings</h3>
+          <p class="mt-1 text-sm text-skyline-ink/65">Any confirmed demo bookings made on this visit appear here as verifiable receipts.</p>
+          <div id="drawer-receipts-mirror" class="space-y-2 mt-3">
+            <p class="text-sm italic text-skyline-ink/50">No bookings recorded yet. Hold a flight on the page or ask the assistant.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Settings -->
+      <div id="panel-settings" class="drawer-panel hidden flex flex-1 flex-col min-h-0 overflow-y-auto p-5">
+        <h3 class="font-heading text-lg font-semibold text-skyline-ink mb-1">AI Provider & Settings</h3>
+        <p class="text-sm text-skyline-ink/65 mb-4">Choose your AI provider (Google AI Studio, Groq, OpenAI, Anthropic, or Mozilla Otari) or use the local demo model.</p>
+        <div data-ns-slot="settings" class="space-y-4"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Client-side Controller: Drawer, Tabs, Prompts, Mobile Menu -->
+  <script type="module">
+    const drawer = document.querySelector('#concierge-drawer');
+    const backdrop = document.querySelector('#concierge-backdrop');
+    const closeBtn = document.querySelector('#close-drawer-btn');
+
+    function openConcierge() {
+      if (drawer && backdrop) {
+        drawer.classList.add('is-open');
+        backdrop.classList.add('is-open');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+          document.querySelector('#ns-input')?.focus();
+        }, 300);
+      }
+    }
+
+    if (new URLSearchParams(window.location.search).has('open')) {
+      setTimeout(openConcierge, 150);
+    }
+
+    function closeConcierge() {
+      if (drawer && backdrop) {
+        drawer.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    document.querySelectorAll('[data-open-concierge]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openConcierge();
+      });
+    });
+
+    closeBtn?.addEventListener('click', closeConcierge);
+    backdrop?.addEventListener('click', closeConcierge);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer?.classList.contains('is-open')) {
+        closeConcierge();
+      }
+    });
+
+    // Quick prompt chips & TRY suggestions open drawer and fill chat input
+    document.querySelectorAll('.drawer-prompt-btn, [data-prompt-fill]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.dataset.prompt || btn.dataset.promptFill;
+        openConcierge();
+        const input = document.querySelector('#ns-input');
+        if (input && prompt) {
+          input.value = prompt;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.focus();
+        }
+      });
+    });
+
+    // Mobile menu toggle
+    const toggle = document.querySelector('#mobile-toggle');
+    const menu = document.querySelector('#skyline-menu');
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => {
+        const isHidden = menu.classList.toggle('hidden');
+        toggle.setAttribute('aria-expanded', String(!isHidden));
+      });
+    }
+
+    // Drawer Tabs (Chat, Receipt, Settings)
+    const tabChat = document.querySelector('#tab-btn-chat');
+    const tabReceipt = document.querySelector('#tab-btn-receipt');
+    const tabSettings = document.querySelector('#tab-btn-settings');
+    const panelChat = document.querySelector('#panel-chat');
+    const panelReceipt = document.querySelector('#panel-receipt');
+    const panelSettings = document.querySelector('#panel-settings');
+
+    function switchTab(activeBtn, activePanel) {
+      [tabChat, tabReceipt, tabSettings].forEach(btn => {
+        if (btn === activeBtn) {
+          btn.classList.add('bg-skyline-blue-soft', 'text-skyline-blue', 'font-semibold');
+          btn.classList.remove('text-skyline-ink/65');
+        } else if (btn) {
+          btn.classList.remove('bg-skyline-blue-soft', 'text-skyline-blue', 'font-semibold');
+          btn.classList.add('text-skyline-ink/65');
+        }
+      });
+      [panelChat, panelReceipt, panelSettings].forEach(panel => {
+        if (panel === activePanel) {
+          panel.classList.remove('hidden');
+        } else if (panel) {
+          panel.classList.add('hidden');
+        }
+      });
+      if (activeBtn === tabReceipt) {
+        updateDrawerReceipts();
+      }
+    }
+
+    tabChat?.addEventListener('click', () => switchTab(tabChat, panelChat));
+    tabReceipt?.addEventListener('click', () => switchTab(tabReceipt, panelReceipt));
+    tabSettings?.addEventListener('click', () => switchTab(tabSettings, panelSettings));
+
+    function updateDrawerReceipts() {
+      const source = document.querySelector('#bookings');
+      const target = document.querySelector('#drawer-receipts-mirror');
+      if (source && target) {
+        if (source.children.length === 0) {
+          target.innerHTML = '<p class="text-sm italic text-skyline-ink/50">No bookings recorded yet. Hold a flight on the page or ask the assistant.</p>';
+        } else {
+          target.innerHTML = '';
+          Array.from(source.children).forEach(child => {
+            target.appendChild(child.cloneNode(true));
+          });
+        }
+      }
+    }
+  </script>
 </body>
 </html>
