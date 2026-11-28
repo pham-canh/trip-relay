@@ -92,6 +92,8 @@ The redesign adds a hotel hero image and refreshes the drawer screenshots. Repla
 6. `docs/screenshots/privacy-receipt.png`
 7. `docs/screenshots/hotel-mobile.png`
 
+All seven were recaptured from the deployed pair on 2026-11-28. The consent, answer, and receipt shots use the keyless demo and show the real `pham-canh.github.io.` origin plus the visible `MOCK LLM` label.
+
 ## 7. After the story is current
 
 1. Post the **Update draft** from `docs/DEVPOST.md`.

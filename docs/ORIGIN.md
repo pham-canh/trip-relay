@@ -13,7 +13,7 @@ An origin is **scheme + host + port**. `https://pham-canh.github.io/trip-relay/`
 
 ## Evidence
 
-Recorded on 2026-11-24 in Chrome on macOS, against the live pair; the consent and receipt flow was re-run on 2026-11-25 after the DLP deploy, and the receipt persistence and keyless demo were re-run on 2026-11-26 and again on 2026-11-27:
+Recorded on 2026-11-24 in Chrome on macOS, against the live pair; the consent and receipt flow was re-run on 2026-11-25 after the DLP deploy, and the receipt persistence and keyless demo were re-run on 2026-11-26 and 2026-11-27; the redesigned pair was checked on 2026-11-28:
 
 | Check | Airline | Hotel |
 | --- | --- | --- |
