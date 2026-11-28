@@ -24,7 +24,7 @@ The audience is specific: a traveler booking a trip that spans two suppliers, an
 - **Harbor Hotel** is a separate origin with its own manifest, network, rooms, rates, policies, airport shuttle, and room-request intake.
 - The airline's assistant can hand a hotel question to the second site. Before any request reaches the hotel origin (`localhost:8081` locally; `pham-canh.github.io.` hosted), the visitor sees a consent card with the exact origin, purpose, and request text. **Decline** cancels the call; the hotel manifest is never fetched. **Allow** loads only the hotel's public network and runs it in the caller's browser with the caller's router. The runtime forwards only the request text, which the consent card shows. It does not forward the chat history, page state, airline passenger record, or API key. A hotel room request is a separate action confirmed on the hotel origin.
 
-- A **Privacy receipt** under the assistant lists every consent decision, peer fetch, peer failure, blocked value, and denied tool on the page. It verifies the hash chain in the browser and downloads the redacted log as JSON. The redacted chain is stored in this tab's IndexedDB and survives a reload; a tampered stored chain is refused, and **Clear receipt** starts a fresh chain. It is not a remote WORM store.
+- A **Privacy receipt** in the assistant drawer's **Receipt** tab lists every consent decision, peer fetch, peer failure, blocked value, and denied tool on the page. It verifies the hash chain in the browser and downloads the redacted log as JSON. The redacted chain is stored in this tab's IndexedDB and survives a reload; a tampered stored chain is refused, and **Clear receipt** starts a fresh chain. It is not a remote WORM store.
 - A **keyless scripted demo** lets a judge see the real consent card and receipt without an Otari key. It uses the deterministic `browser://mock` router, makes one read or peer call, never calls a write tool, and contacts no provider.
 
 The public demo runs at <https://pham-canh.github.io/trip-relay/> with the hotel at <https://pham-canh.github.io./>; the trailing dot is a deliberate second browser origin. **Do not drop the dot** — without it the hotel is on the airline's origin. The browser evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md). The same pages run locally on `127.0.0.1:8080` and `localhost:8081` and work without a model key for the manual flight-booking and room-request paths. The assistant also has a keyless **Try the scripted demo (no key)** path that shows the consent card and receipt without contacting a provider.
@@ -43,13 +43,14 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - The airline network has a front agent plus a `fare_agent`; the hotel is a separate network reached through the exact `http://localhost:8081/harbor_hotel` link locally and `https://pham-canh.github.io./harbor_hotel` in the hosted pair.
 - Consent is enforced by the runtime before the first peer fetch, not by the prompt. The browser test asserts zero requests to the hotel origin before **Allow**.
 - Mozilla Otari is the default router in both manifests; the settings panel adds global and EU Otari presets with `alibaba/qwen-3.5-35b-a3b`. Keys stay in browser storage and go only to the selected router.
-- 35 `node:test` checks run the real runtime with a scripted model: 13 DLP/audit checks, 3 receipt restore/tamper/clear checks, and 5 keyless-demo checks, plus the caller and peer suites. A 66-check Playwright browser pass covers both pages, the manual flight-booking path, the Privacy receipt (in-page verify, JSON download, reload restore, clear), the consent ordering, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo. The browser pass is committed as `scripts/browser_check.mjs`: `npm run check:browser` runs the 66 local checks, `npm run check:browser:live` repeats the 12 consent and receipt checks against the hosted pair, and `npm run check:browser:demo` runs 10 keyless-demo checks against the hosted pair. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs the unit suite and the benchmark on every push. The visitor-facing receipt reads the same hash-chained log, patches `append()` so a new event appears without a reload, and persists the redacted chain in this tab's IndexedDB. A peer fetch failure writes a redacted `peer_error` event. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
+- The Skyline Air and Harbor Hotel interface, the assistant drawer, and the design QA pass are by Lolo (Euloge).
+- 35 `node:test` checks run the real runtime with a scripted model: 13 DLP/audit checks, 3 receipt restore/tamper/clear checks, and 5 keyless-demo checks, plus the caller and peer suites. A 67-check Playwright browser pass covers both pages, the manual flight-booking path, the Privacy receipt (in-page verify, JSON download, reload restore, clear), the consent ordering, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo. The browser pass is committed as `scripts/browser_check.mjs`: `npm run check:browser` runs the 67 local checks, `npm run check:browser:live` repeats the 13 consent and receipt checks against the hosted pair, and `npm run check:browser:demo` runs 10 keyless-demo checks against the hosted pair. The separate `npm run benchmark:dlp` matrix runs 12 attacks and 4 controls. GitHub Actions runs the unit suite and the benchmark on every push. The visitor-facing receipt reads the same hash-chained log, patches `append()` so a new event appears without a reload, and persists the redacted chain in this tab's IndexedDB. A peer fetch failure writes a redacted `peer_error` event. The demo recording uses a scripted SSE router; the public pair defaults to Otari. The video says "fourteen tests" because it was recorded before the benchmark; the repository is current.
 
 ### Verification status
 
-- **Protocol and consent:** 35 `node:test` checks and a 66-check Playwright browser pass, both with a scripted model and both committed in the repository. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**; it also verifies the Privacy receipt chain, downloads the JSON, reloads and verifies the restored chain, clears it, and checks that the export contains no email or key. A hostile-peer fixture proves a real outbound email block and a real inbound key block in the page, and a 503 fixture proves an actionable peer failure with a `peer_error` receipt. The keyless demo boots without a key, calls no provider, and writes the real consent and peer fetch to the receipt. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the receipt is per-tab and local, not a remote WORM store.
-- **Hosted boundary:** the deployed pair now serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. `npm run check:browser:live` repeated the 12 consent and receipt checks against the public pair on 2026-11-27 (12/12): `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**; the receipt chain verifies; no console errors. `npm run check:browser:demo` repeated the 10 keyless-demo checks against the public pair (10/10): no provider request, the real consent card and hotel facts, a verified receipt, and a clean exit. A separate reload/clear smoke check also passed. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
-- **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in **AI model settings** and repeat the question. We do not claim a live provider call.
+- **Protocol and consent:** 35 `node:test` checks and a 67-check Playwright browser pass, both with a scripted model and both committed in the repository. The browser pass asserts zero hotel requests before **Allow**, zero after **Decline**, and the hotel answer after **Allow**; it also verifies the Privacy receipt chain, downloads the JSON, reloads and verifies the restored chain, clears it, and checks that the export contains no email or key. A hostile-peer fixture proves a real outbound email block and a real inbound key block in the page, and a 503 fixture proves an actionable peer failure with a `peer_error` receipt. The keyless demo boots without a key, calls no provider, and writes the real consent and peer fetch to the receipt. A separate deterministic DLP benchmark runs 12 hostile-peer attacks and 4 controls against the real dispatch boundary: 12/12 blocked, 0 canary egress, 0 unauthorized writes, 4/4 controls pass, audit chain verifies. It is a Node-level benchmark, not a browser pass; the receipt is per-tab and local, not a remote WORM store.
+- **Hosted boundary:** the deployed pair now serves the DLP runtime, the Privacy receipt with per-tab persistence, and the keyless demo. `npm run check:browser:live` repeated the 13 consent and receipt checks against the public pair on 2026-11-28 (13/13): `location.origin` is `https://pham-canh.github.io` on the airline and `https://pham-canh.github.io.` on the hotel; `localStorage` is isolated; the hotel manifest is CORS-readable; **0** requests before **Allow**, **0** after **Decline**, **11** after **Allow**; the receipt chain verifies; no console errors. `npm run check:browser:demo` repeated the 10 keyless-demo checks against the public pair (10/10): no provider request, the real consent card and hotel facts, a verified receipt, and a clean exit. A separate reload/clear smoke check also passed. `npm run check:origins` reproduces the deployment check. The full evidence is in [`docs/ORIGIN.md`](https://github.com/pham-canh/trip-relay/blob/main/docs/ORIGIN.md).
+- **Live Otari call:** not yet recorded. The tests and the demo video use a scripted OpenAI-compatible endpoint; the public manifests default to Otari. A judge can add a key in the assistant drawer's **Settings** tab and repeat the question. We do not claim a live provider call.
 - **Scope:** demo data only. No real inventory, payment, or reservation. The contribution is the boundary, not the travel inventory.
 
 ## Challenges we ran into
@@ -66,7 +67,7 @@ The 1:46 cut shows a manual booking, the consent card, a decline with zero hotel
 - A visible, testable cross-origin consent gate with zero peer requests before approval.
 - A two-agent caller network and a separate hotel network, both running in a normal browser tab.
 - Per-origin private-context rules: only the natural-language request crosses the boundary.
-- 35 unit tests, a 16-case hostile-peer DLP benchmark (12 attacks + 4 controls), 66 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
+- 35 unit tests, a 16-case hostile-peer DLP benchmark (12 attacks + 4 controls), 67 browser checks, and GitHub Actions on every push; the model is a scripted test double, not a live provider.
 - A visitor-facing Privacy receipt that verifies the hash chain in the page, exports the redacted JSON, persists the redacted chain in the tab so a reload restores it, and makes the boundary observable without the developer trace.
 - A keyless scripted demo that shows the real consent card and receipt without a provider key, and never calls a write tool.
 - The same consent ordering was verified against the hosted GitHub Pages pair, including the trailing-dot second origin; that run also used a scripted endpoint, not a live Otari call.
@@ -105,7 +106,7 @@ Devpost tags, one per entry:
 
 ## Try it
 
-Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in **AI model settings**; the regional preset fills the matching Otari router. After a hotel question, open **Privacy receipt** to verify the chain and download the redacted log.
+Public demo: <https://pham-canh.github.io/trip-relay/>. The hotel is at <https://pham-canh.github.io./>. The manual booking paths work without a key. For the cross-site answer, add a global `otk_...` key or an EU `otk_v1_eu_...` key in the assistant drawer's **Settings** tab; the regional preset fills the matching Otari router. After a hotel question, open the **Receipt** tab to verify the chain and download the redacted log.
 
 Local:
 
@@ -115,18 +116,19 @@ npm run serve:airline   # terminal 1
 npm run serve:hotel     # terminal 2
 ```
 
-Open <http://127.0.0.1:8080/>. Without a key, press **Try the scripted demo (no key)** to see the consent card and receipt; the demo is read-only and calls no provider.
+Open <http://127.0.0.1:8080/>. Without a key, open **Ask Skyline** and press **Try the scripted demo (no key)** to see the consent card and receipt; the demo is read-only and calls no provider.
 
 ## Project media captions
 
 Upload the screenshots in this order; each caption is under 140 characters.
 
 1. `docs/screenshots/airline-hero.png` — Skyline Air landing page: book a flight, then ask the hotel — with a visible consent boundary.
-2. `docs/screenshots/airline-booking.png` — A manual booking: pick a flight, enter the passenger, and confirm; the demo takes no payment.
-3. `docs/screenshots/consent.png` — The consent card shows the exact hotel origin, purpose, and request before any cross-origin fetch.
-4. `docs/screenshots/assistant-answer.png` — After Allow: the hotel network runs in the browser and returns a room answer; only the request text crossed.
-5. `docs/screenshots/privacy-receipt.png` — The Privacy receipt from the keyless demo lists the consent, the peer fetch, and any blocked value; the hash chain verifies, survives a reload, and exports as JSON.
-6. `docs/screenshots/hotel-mobile.png` — Harbor Hotel on its own origin at a phone width: separate manifest, rooms, and policies.
+2. `docs/screenshots/hotel_hero.png` — Harbor Hotel on its own origin: a separate site, manifest, rooms, rates, and concierge.
+3. `docs/screenshots/airline-booking.png` — A manual booking: pick a flight, enter the passenger, and confirm; the demo takes no payment.
+4. `docs/screenshots/consent.png` — The consent card shows the exact hotel origin, purpose, and request before any cross-origin fetch.
+5. `docs/screenshots/assistant-answer.png` — After Allow: the hotel network runs in the browser and returns a room answer; only the request text crossed.
+6. `docs/screenshots/privacy-receipt.png` — The Receipt tab from the keyless demo lists the consent, the peer fetch, and any blocked value; the hash chain verifies, survives a reload, and exports as JSON.
+7. `docs/screenshots/hotel-mobile.png` — Harbor Hotel at a phone width, with its own manifest, rooms, and policies.
 
 ## Links
 
@@ -169,15 +171,15 @@ The Trip Relay repository now ships a deterministic hostile-peer benchmark, a vi
 - 0 PII in raw audit fields
 - 4/4 legitimate controls pass
 - audit hash chain verifies
-- 35/35 unit tests and 66/66 local browser checks; 12/12 hosted consent/receipt checks and 10/10 hosted demo checks
+- 35/35 unit tests and 67/67 local browser checks; 13/13 hosted consent/receipt checks and 10/10 hosted demo checks
 
 **What changed**
 - Per-run canary email; DLP at peer egress, coded-tool args, `sly_data`, and peer output.
 - “Always allow” is bound to origin + request hash + kind + phase, with a 5-minute expiry.
 - Caller writes are denied to a non-top peer; unlisted origins fail closed.
 - Hash-chained, redacted audit log with export and verification.
-- A visitor-facing **Privacy receipt** under the assistant: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, peer failure, and any blocked value. The redacted chain is stored in this tab's IndexedDB, so a reload restores it; a tampered store is refused, and **Clear receipt** starts a new chain.
-- A committed browser pass (`scripts/browser_check.mjs`): 66 local checks, 12 hosted consent/receipt checks, and 10 hosted demo checks. It covers both pages, the manual booking path, the receipt verify/download/reload/clear, zero hotel requests before **Allow**, zero after **Decline**, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo.
+- A visitor-facing **Privacy receipt** in the assistant drawer's **Receipt** tab: verify the chain in the page, download the redacted JSON, and see the consent, peer fetch, peer failure, and any blocked value. The redacted chain is stored in this tab's IndexedDB, so a reload restores it; a tampered store is refused, and **Clear receipt** starts a new chain.
+- A committed browser pass (`scripts/browser_check.mjs`): 67 local checks, 13 hosted consent/receipt checks, and 10 hosted demo checks. It covers both pages, the manual booking path, the receipt verify/download/reload/clear, zero hotel requests before **Allow**, zero after **Decline**, the approved cross-site answer, a peer 503, a hostile-peer outbound email block and inbound key block, phone layout and keyboard consent, and the keyless demo.
 - `npm test` now includes 13 DLP/audit checks, 3 receipt restore/tamper/clear checks, and 5 keyless-demo checks (35 total).
 
 **Scope**
@@ -203,7 +205,7 @@ Spec: https://github.com/pham-canh/trip-relay/blob/main/docs/ROADMAP-DLP.md
 - [x] Confirm the repository is public and the license is visible.
 - [ ] Upload the repository social preview (`docs/social-preview.png`) and pin the repo if it belongs in the portfolio.
 - [x] Re-run `npm test` after the last code change (35/35 pass).
-- [x] Re-run `npm run check:browser` after the last code change (66/66 pass), `npm run check:browser:live` (12/12 pass), and `npm run check:browser:demo` (10/10 pass).
+- [x] Re-run `npm run check:browser` after the last code change (67/67 pass), `npm run check:browser:live` (13/13 pass), and `npm run check:browser:demo` (10/10 pass).
 - [x] Run `npm run benchmark:dlp` (12/12 attacks blocked, 4/4 controls pass).
 - [x] Push `main` so `PROTOCOL.md`, `scripts/build_public.mjs`, and the demo docs stop 404ing on GitHub.
 - [x] Keep the Devpost confirmation email; edit the project story if any claim changes, and post the DLP update separately.

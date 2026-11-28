@@ -60,7 +60,7 @@ npm install
 npm run check:browser:live
 ```
 
-Expected: 12/12 checks pass. The same checks run locally with `npm run check:browser` (66/66) after `npm run serve:airline` and `npm run serve:hotel`; the local pass also covers receipt reload/clear, hostile-peer DLP, peer failure, mobile layout, and the keyless demo.
+Expected: 13/13 checks pass. The same checks run locally with `npm run check:browser` (67/67) after `npm run serve:airline` and `npm run serve:hotel`; the local pass also covers receipt reload/clear, hostile-peer DLP, peer failure, mobile layout, and the keyless demo.
 
 Manual origin check:
 

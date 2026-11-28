@@ -37,13 +37,13 @@ with the current bullet under **How we built it** in `docs/DEVPOST.md`, which st
 
 > 35 `node:test` checks run the real runtime with a scripted model…
 
-It covers 35 unit tests, 66 local browser checks, 12 hosted consent/receipt checks, 10 hosted demo checks, the 12-attack + 4-control benchmark, per-tab IndexedDB persistence, and `peer_error`.
+It covers 35 unit tests, 67 local browser checks, 13 hosted consent/receipt checks, 10 hosted demo checks, the 12-attack + 4-control benchmark, per-tab IndexedDB persistence, and `peer_error`.
 
 ## 3. Verification status
 
 Replace the **Protocol and consent** bullet with the current one in `docs/DEVPOST.md`.
 
-Replace the **Hosted boundary** bullet with the current one. It now records the 2026-11-27 12/12 consent pass and the 10/10 keyless-demo pass.
+Replace the **Hosted boundary** bullet with the current one. It now records the 2026-11-28 13/13 consent pass and the 10/10 keyless-demo pass.
 
 Keep **Live Otari call: not yet recorded** and **Scope** as they are.
 
@@ -55,7 +55,7 @@ Replace:
 
 with the current bullet:
 
-> 35 unit tests, a 16-case hostile-peer DLP benchmark (12 attacks + 4 controls), 66 browser checks, and GitHub Actions on every push…
+> 35 unit tests, a 16-case hostile-peer DLP benchmark (12 attacks + 4 controls), 67 browser checks, and GitHub Actions on every push…
 
 Then add the next two bullets from `docs/DEVPOST.md`: the Privacy receipt and the keyless scripted demo.
 
@@ -82,14 +82,15 @@ This replaces `otira` with **Mozilla Otari**, merges `neuro` + `san` into **Neur
 
 ## 6. Gallery
 
-The live gallery already has five images: airline hero, booking, consent, assistant answer, and hotel mobile. It is missing the Privacy receipt. Add `docs/screenshots/privacy-receipt.png` (refreshed 2026-11-27) as the fifth image, with the caption from `docs/DEVPOST.md`. The full order is:
+The redesign adds a hotel hero image and refreshes the drawer screenshots. Replace the gallery with these seven images, in this order, using the captions from `docs/DEVPOST.md`:
 
 1. `docs/screenshots/airline-hero.png`
-2. `docs/screenshots/airline-booking.png`
-3. `docs/screenshots/consent.png`
-4. `docs/screenshots/assistant-answer.png`
-5. `docs/screenshots/privacy-receipt.png`
-6. `docs/screenshots/hotel-mobile.png`
+2. `docs/screenshots/hotel_hero.png`
+3. `docs/screenshots/airline-booking.png`
+4. `docs/screenshots/consent.png`
+5. `docs/screenshots/assistant-answer.png`
+6. `docs/screenshots/privacy-receipt.png`
+7. `docs/screenshots/hotel-mobile.png`
 
 ## 7. After the story is current
 

@@ -28,7 +28,7 @@ Chapters:
 1:23 Tests and trace
 1:33 Closing
 
-Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key. The video's "fourteen tests" line is historical: the repository now has 35 unit tests, 66 local browser checks, 12 hosted consent/receipt checks, 10 hosted demo checks, and a 12/12 hostile-peer benchmark.
+Recording note: this cut uses a scripted OpenAI-compatible endpoint so the handoff is reproducible; the assistant badge says "MOCK LLM — no real model" throughout. The same page accepts Mozilla Otari or any compatible router with a key. The manual booking paths work without a key. The video's "fourteen tests" line is historical: the repository now has 35 unit tests, 67 local browser checks, 13 hosted consent/receipt checks, 10 hosted demo checks, and a 12/12 hostile-peer benchmark.
 
 Language: Vietnamese narration by the entrant, with English captions burned into the picture. English transcript: https://github.com/pham-canh/trip-relay/blob/main/docs/VIDEO-TRANSCRIPT.md
 

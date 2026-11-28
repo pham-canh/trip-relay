@@ -33,7 +33,7 @@ The cut is honest and complete, but it is a screen recording of a product, while
 
 1. **New 8-second hook.** Full-screen `0 requests before you say yes`, then the consent card. Narration: “Your assistant can ask a hotel for you. The question is what leaves your browser before you agree. Here, the answer is nothing.”
 2. **Replace the raw JSON shot.** Use a three-step diagram: `fetch public manifest → check peer policy → run the data-only network locally`. Highlight one policy line; never show the whole document.
-3. **Replace the terminal with a proof card.** `12/12 attacks blocked`, `0 canary egress`, `35 unit tests`, `66 browser checks`, `12/12 hosted`. Re-record the “fourteen tests” line; do not put a stale number on screen.
+3. **Replace the terminal with a proof card.** `12/12 attacks blocked`, `0 canary egress`, `35 unit tests`, `67 browser checks`, `13/13 hosted`. Re-record the “fourteen tests” line; do not put a stale number on screen.
 4. **Zoom to the active panel.** Browser at 125–150%, clean profile, no bookmarks or extensions. Crop to the consent card, then the receipt; do not show the full page with empty chat space.
 5. **Make the receipt a hero.** Open it, press **Verify chain**, show the three events, then the reload restore. Give it 8–10 seconds. This is the differentiator.
 6. **Add a step tracker.** `1/5 Book`, `2/5 Ask`, `3/5 Consent`, `4/5 Receipt`, `5/5 Proof` in a corner of every shot.
@@ -44,7 +44,7 @@ The cut is honest and complete, but it is a screen recording of a product, while
 
 - Add a small webcam inset at the open and close, or at least a human face for two seconds. The reference uses a host to build trust.
 - Add a `0 requests` / `11 requests` counter beside the consent card. The browser check already measures both.
-- Put the strongest numbers on screen, not in narration: `0`, `11`, `12/12`, `35`, `66`.
+- Put the strongest numbers on screen, not in narration: `0`, `11`, `12/12`, `35`, `67`, `13/13`.
 - State what agents add in one sentence: “The hotel publishes a data-only network; it does not run an agent server or receive the traveler’s key.”
 - Add subtle royalty-free music under the voice and normalize the narration. The reference has energy; the current cut is quiet.
 - Use the site’s cream/navy/gold palette and serif headings for every title card, so the video and the product look like one artifact.
@@ -66,7 +66,7 @@ The cut is honest and complete, but it is a screen recording of a product, while
 | 0:30–0:42 | Assistant; consent card fills the frame; highlight origin, request, token estimate | “Now ask about a hotel. Before anything leaves the page, the card names the origin, the exact request, and the cost.” |
 | 0:42–0:52 | **Decline**; big `0 requests`; ask again, **Allow**; hotel answer | “Decline, and the hotel is never contacted. Allow, and the browser fetches only its public network.” |
 | 0:52–1:08 | Receipt: open, **Verify chain**, show events, reload, restore | “Every boundary event goes into a receipt. Verify the chain, download the redacted log, reload without losing it.” |
-| 1:08–1:20 | Proof card: `12/12`, `0`, `35`, `66`, `12/12` | “Twelve hostile-peer attacks blocked, zero canary egress, thirty-five unit tests, sixty-six browser checks.” |
+| 1:08–1:20 | Proof card: `12/12`, `0`, `35`, `67`, `13/13` | “Twelve hostile-peer attacks blocked, zero canary egress, thirty-five unit tests, sixty-seven browser checks, thirteen hosted checks.” |
 | 1:20–1:30 | Simple diagram: hotel manifest → policy → local network; no agent server | “The hotel publishes data, not an agent server. The browser enforces consent and keeps the key on the caller’s side.” |
 | 1:30–1:38 | Closing: keyless demo URL, QR, MIT | “Try the keyless demo, or add your key for a live Otari call. Two sites, one visible boundary.” |
 
@@ -104,7 +104,7 @@ These edits improve the current cut, but they cannot fix the stale “fourteen t
 - a `0 hotel requests before Allow` callout at the decline;
 - a three-step **Fetch → Check → Run** card in place of the raw JSON overlay;
 - a receipt hero with **Verify chain**, the three boundary events, and the redacted-log note;
-- a proof card with `12/12`, `0`, `35`, `66`, and `12/12` in place of the terminal;
+- a proof card with `12/12`, `0`, `35`, `67`, and `13/13` in place of the terminal;
 - a closing card with **Try the keyless demo — no key needed** and both URLs.
 
 It still says “fourteen tests” in the narration; the proof card states both the recorded count and the current count. Treat it as a visual upgrade, not the final re-record. The draft is not linked from the submission.

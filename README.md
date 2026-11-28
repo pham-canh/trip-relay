@@ -6,6 +6,8 @@ Two agentic travel sites, one visible boundary. Zero hotel requests before you p
 
 ![Skyline Air landing page](docs/screenshots/airline-hero.png)
 
+![Harbor Hotel landing page](docs/screenshots/hotel_hero.png)
+
 Trip Relay is an entry for the [Open Agentic Web Challenge](https://cognizant-agenticweb.devpost.com/), built on the MVP Profile 0.2 and Mozilla's [Otari](https://otari.ai/) router.
 
 It is a **reference implementation of a consent-gated agent handoff**, demonstrated with a working pair of static travel sites. The airline and hotel are fictional, the inventory is generated, and no payment or real reservation is made. The contribution is the boundary, not the travel inventory: the airline is the caller, the hotel is a separate origin, and the browser pauses before the first peer request. The full pattern, threat model, and limitations are in [PROTOCOL.md](PROTOCOL.md).
@@ -53,16 +55,16 @@ npm run serve:airline
 npm run serve:hotel
 ```
 
-Open <http://127.0.0.1:8080/>. In **AI model settings**, choose **Otari (Mozilla)** and paste an `otk_...` key, or choose another provider and enter its key and model. Global Otari keys use `https://api.otari.ai/api/v1`; EU keys start with `otk_v1_eu_` and use `https://eu.api.otari.ai/api/v1`. The preset detects the EU prefix and fills the right router. The key is stored in this browser and sent only to the router you choose.
+Open <http://127.0.0.1:8080/> and press **Ask Skyline** to open the assistant drawer. In its **Settings** tab, choose **Otari (Mozilla)** and paste an `otk_...` key, or choose another provider and enter its key and model. Global Otari keys use `https://api.otari.ai/api/v1`; EU keys start with `otk_v1_eu_` and use `https://eu.api.otari.ai/api/v1`. The preset detects the EU prefix and fills the right router. The key is stored in this browser and sent only to the router you choose.
 
-The manual pages work without a key, so the demo never depends on a provider being available. For the assistant without a key, press **Try the scripted demo (no key)**. It uses the deterministic `browser://mock` router: one read or peer call, a real consent card, and a real Privacy receipt, with no provider request and no write. A live model call is the only part that needs Otari or another OpenAI-compatible endpoint.
+The manual pages work without a key, so the demo never depends on a provider being available. For the assistant without a key, open **Ask Skyline** and press **Try the scripted demo (no key)**. It uses the deterministic `browser://mock` router: one read or peer call, a real consent card, and a real Privacy receipt, with no provider request and no write. A live model call is the only part that needs Otari or another OpenAI-compatible endpoint.
 
 ### Five-minute review
 
 1. `npm test` — 35 unit checks, no network; then `npm run benchmark:dlp` for the hostile-peer matrix.
 2. Start both servers, open <http://127.0.0.1:8080/>, and book a flight manually.
 3. Read the handoff sequence in [PROTOCOL.md](PROTOCOL.md), then run the cross-site question below.
-4. Inspect the consent card, the trace rail, the Privacy receipt, and the spec map.
+4. Inspect the consent card, the **Receipt** tab, and the spec map.
 5. The browser pass in `docs/DEMO.md` is the reproducible version of the consent check; the receipt is described below.
 
 Try the cross-site path:
@@ -74,7 +76,7 @@ Try the cross-site path:
 
 ## Privacy receipt
 
-Under the assistant, **Privacy receipt** reads the same hash-chained audit log the runtime writes. It lists the consent request, the decision, the peer fetch, a peer failure, any DLP block, and any denied tool. **Verify chain** recomputes every hash in the page; **Download JSON** exports the redacted log; **Clear receipt** starts a fresh chain. The log is stored in this tab's IndexedDB and survives a reload. A stored chain that fails verification is refused and never loaded into the live log. It is never sent to either site and is not a remote WORM store.
+In the assistant drawer, the **Receipt** tab reads the same hash-chained audit log the runtime writes. It lists the consent request, the decision, the peer fetch, a peer failure, any DLP block, and any denied tool. **Verify chain** recomputes every hash in the page; **Download JSON** exports the redacted log; **Clear receipt** starts a fresh chain. The log is stored in this tab's IndexedDB and survives a reload. A stored chain that fails verification is refused and never loaded into the live log. It is never sent to either site and is not a remote WORM store.
 
 ![Privacy receipt after an approved hotel handoff](docs/screenshots/privacy-receipt.png)
 
@@ -137,17 +139,17 @@ The unit suite runs the real runtime with a scripted model, no network:
 - 3 receipt-chain tests: restore a stored chain, refuse a tampered store, and clear to a fresh chain.
 - 5 keyless-demo tests: select `browser://mock` without a key, route a hotel question to the peer, refuse a write, summarize hotel facts, and report a blocked or failed tool without retrying.
 
-Thirty-five tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 66 checks. Against the deployed pair, `npm run check:browser:live` runs 12 consent/receipt checks and `npm run check:browser:demo` runs 10 keyless-demo checks. All use a scripted endpoint and need Chrome plus `npm install`.
+Thirty-five tests in total. The browser pass is committed too; with the local pair running, `npm run check:browser` runs 67 checks. Against the deployed pair, `npm run check:browser:live` runs 13 consent/receipt checks and `npm run check:browser:demo` runs 10 keyless-demo checks. All use a scripted endpoint and need Chrome plus `npm install`.
 
 | Check | Result | What it covers |
 | --- | --- | --- |
 | Unit suite | 35/35 | network validation, delegation, manifest/action agreement, writes, consent, decline/allow, stale versions, Otari region selection, DLP, audit restore/tamper/clear, keyless demo |
 | DLP benchmark | 12/12 attacks, 4/4 controls | per-run canary, encoded/zero-width/base64 egress, peer response, coded-tool args, sly_data, secrets, caller-write denial, closed policy, audit tamper; clean hotel/coded flows, decline, audit redaction |
-| Local browser pass | 66 checks | 18 page/receipt checks, 12 consent checks, 4 peer-failure checks, 12 hostile-peer DLP checks, 10 mobile/a11y checks, and 10 keyless-demo checks: both pages, manual booking, receipt verify/download/reload/clear, zero hotel requests before **Allow**, approved cross-site answer, blocked outbound email, blocked inbound key, peer 503, phone layout, keyboard consent, and no provider call in the demo |
-| Hosted browser pass | 12 checks | the same consent flow against the deployed pair after the DLP deploy, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, receipt chain verifies, zero console errors |
+| Local browser pass | 67 checks | 18 page/receipt checks, 13 consent checks, 4 peer-failure checks, 12 hostile-peer DLP checks, 10 mobile/a11y checks, and 10 keyless-demo checks: both pages, the four-room hotel page, manual booking, receipt verify/download/reload/clear, zero hotel requests before **Allow**, approved cross-site answer, blocked outbound email, blocked inbound key, peer 503, phone layout, keyboard consent, the visible mock label, and no provider call in the demo |
+| Hosted browser pass | 13 checks | the same consent flow against the deployed pair after the redesign, including the trailing-dot hotel origin: 0 before **Allow**, 0 after **Decline**, 11 after **Allow**, receipt chain verifies, zero console errors |
 | Hosted demo pass | 10 checks | `npm run check:browser:demo`: the deployed keyless demo boots without a key, calls no provider, returns the hotel facts, writes and verifies the receipt, and exits back to the key requirement |
 | Hosted origins + CORS | pass | `npm run check:origins`: distinct origins, hotel manifest and network readable, closed peer policy |
-| Live Otari call | not yet recorded | add a key in **AI model settings** and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |
+| Live Otari call | not yet recorded | add a key in the assistant drawer's **Settings** tab and repeat the question; see [`docs/SUBMIT.md`](docs/SUBMIT.md) |
 
 The unit and browser passes use a scripted model that speaks the same SSE/tool-call protocol. They prove the boundary and the consent flow; they are **not** a live Otari call. The public manifests default to Otari, and the repository contains no key. The hosted evidence, including the two `location.origin` values and the `localStorage` isolation probe, is in [`docs/ORIGIN.md`](docs/ORIGIN.md). GitHub Actions also has a manual **origin-check** workflow (**Actions → origin-check → Run workflow**) that runs `npm run check:origins` against the live pair.
 
@@ -198,7 +200,8 @@ The browser runtime in `site/runtime/` and `peer/runtime/` comes from the
 [Cognizant Agentic Web `agentify-website` skill](https://github.com/cognizant-ai-labs/agentic-web)
 and is licensed under Apache 2.0; its license is kept at
 `site/runtime/LICENSE.txt`. The site code, networks, actions, tests, and docs are
-this project's own work.
+this project's own work. **Lolo (Euloge)** designed the Skyline Air and Harbor
+Hotel interface, the assistant drawer, and the design QA pass.
 
 Otari is Mozilla's open-source LLM router: <https://github.com/mozilla-ai/otari>.
 
